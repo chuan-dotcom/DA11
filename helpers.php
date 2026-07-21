@@ -67,6 +67,25 @@ if (!function_exists('route')) {
     }
 }
 
+if (!function_exists('absolute_url')) {
+    /**
+     * URL tuyệt đối theo host đang truy cập (hữu ích cho QR trên điện thoại cùng mạng LAN).
+     */
+    function absolute_url(string $path): string
+    {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+        $basePath = '';
+        if (!empty($_ENV['APP_URL'])) {
+            $parsed = parse_url($_ENV['APP_URL']);
+            $basePath = rtrim($parsed['path'] ?? '', '/');
+        }
+
+        return $scheme . '://' . $host . $basePath . '/' . ltrim($path, '/');
+    }
+}
+
 if (!function_exists('setFlash')) {
     function setFlash($key, $message)
     {

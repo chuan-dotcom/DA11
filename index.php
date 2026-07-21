@@ -25,6 +25,19 @@ function route($name) {
     return $_ENV['APP_URL'] . $name;
 }
 
+if (!function_exists('absolute_url')) {
+    function absolute_url($path) {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $basePath = '';
+        if (!empty($_ENV['APP_URL'])) {
+            $parsed = parse_url($_ENV['APP_URL']);
+            $basePath = rtrim($parsed['path'] ?? '', '/');
+        }
+        return $scheme . '://' . $host . $basePath . '/' . ltrim($path, '/');
+    }
+}
+
 function file_url($path) {
     if ($path) {
         return $_ENV['APP_URL'] . $path;

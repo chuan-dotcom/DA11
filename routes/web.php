@@ -29,4 +29,7 @@ $router->post('admin/tours/update/(\d+)', TourController::class . '@update');
 $router->get('admin/tours/delete/(\d+)', TourController::class . '@delete');
 $router->get('admin/tours/show/(\d+)', TourController::class . '@show');
 
+// Trang công khai khi quét QR — hiện chi tiết tour ngay
+$router->get('tour/(\d+)', TourController::class . '@qrShow');
+
 $router->run();

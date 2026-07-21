@@ -219,7 +219,11 @@
                     @else
                         @foreach($groupedCompleted as $row)
                             <tr>
-                                <td class="fw-semibold">{{ $row['tour_name'] }}</td>
+                                <td class="fw-semibold">
+                                    <a href="{{ route('admin/tours/show/' . $row['tour_id']) }}" class="text-decoration-none text-dark">
+                                        {{ $row['tour_name'] }}
+                                    </a>
+                                </td>
                                 <td>{{ $row['category_name'] }}</td>
                                 <td class="text-center">
                                     <span class="badge bg-info text-dark">{{ $row['count'] }}</span>
@@ -271,7 +275,11 @@
                     @else
                         @foreach($revenueByTour as $t)
                             <tr>
-                                <td class="fw-semibold">{{ $t['tour_name'] }}</td>
+                                <td class="fw-semibold">
+                                    <a href="{{ route('admin/tours/show/' . $t['tour_id']) }}" class="text-decoration-none text-dark">
+                                        {{ $t['tour_name'] }}
+                                    </a>
+                                </td>
                                 <td>{{ $t['category_name'] ?? '—' }}</td>
                                 <td>{{ $t['duration'] ?? '—' }}</td>
                                 <td>{{ number_format($t['unit_price']) }}đ</td>

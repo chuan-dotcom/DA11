@@ -130,8 +130,30 @@ class TourController extends Controller{
     }
 
     public function show($id){
-        $title='Xem chi tiết tour du lịch';
-        $tour=$this->modelTour->findByid($id);
+        $title = 'Chi tiết tour du lịch';
+        $tour = $this->modelTour->findByid($id);
+
+        if (!$tour) {
+            setFlash('error', 'Tour du lịch không tồn tại');
+            return redirect('admin/tours');
+        }
+
         return view('tours.show', compact('title', 'tour'));
+    }
+
+    /**
+     * Trang công khai khi quét QR — hiện ngay chi tiết tour.
+     */
+    public function qrShow($id) {
+        $tour = $this->modelTour->findByid($id);
+
+        if (!$tour) {
+            http_response_code(404);
+            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Không tìm thấy</title></head><body style="font-family:sans-serif;text-align:center;padding:40px;"><h2>Tour không tồn tại</h2></body></html>';
+            return;
+        }
+
+        $title = $tour['name'];
+        return view('tours.qr_show', compact('title', 'tour'));
     }
 }
