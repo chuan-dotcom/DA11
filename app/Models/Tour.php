@@ -59,18 +59,51 @@ class Tour extends Model{
 
     // Các hàm thống kê
     public function getTotalTours() {
-        return count($this->getAll());
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('COUNT(id) as total_tours')->from('tours');
+
+        return (int) ($stmt->fetchAssociative()['total_tours'] ?? 0);
+    }
+
+    public function getTotalActiveTours() {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('COUNT(id) as total_active_tours')
+            ->from('tours')
+            ->where('status = :status')
+            ->setParameter('status', 1);
+
+        return (int) ($stmt->fetchAssociative()['total_active_tours'] ?? 0);
+    }
+
+    public function getTotalHiddenTours() {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('COUNT(id) as total_hidden_tours')
+            ->from('tours')
+            ->where('status = :status')
+            ->setParameter('status', 0);
+
+        return (int) ($stmt->fetchAssociative()['total_hidden_tours'] ?? 0);
     }
 
     public function getMostExpensiveTour() {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('*')->from('tours')->orderBy('price', 'DESC')->setMaxResults(1);
+        $stmt->select('t.*', 'tc.name as category_name')
+            ->from('tours', 't')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->orderBy('t.price', 'DESC')
+            ->setMaxResults(1);
+
         return $stmt->fetchAssociative();
     }
 
     public function getCheapestTour() {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('*')->from('tours')->orderBy('price', 'ASC')->setMaxResults(1);
+        $stmt->select('t.*', 'tc.name as category_name')
+            ->from('tours', 't')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->orderBy('t.price', 'ASC')
+            ->setMaxResults(1);
+
         return $stmt->fetchAssociative();
     }
 
@@ -86,6 +119,17 @@ class Tour extends Model{
              ->from('tour_categories', 'c')
              ->leftJoin('c', 'tours', 't', 'c.id = t.category_id')
              ->groupBy('c.id');
+        return $stmt->fetchAllAssociative();
+    }
+
+    public function getLatestTours($limit = 5) {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('t.*', 'tc.name as category_name')
+            ->from('tours', 't')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->orderBy('t.id', 'DESC')
+            ->setMaxResults((int) $limit);
+
         return $stmt->fetchAllAssociative();
     }
 }

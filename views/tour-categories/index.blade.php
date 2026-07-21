@@ -43,7 +43,12 @@
                                 <tr>
                                     <td>{{ $category['id'] }}</td>
                                     <td>{{ $category['name'] }}</td>
-                                    <td>{{ Str::limit($category['description'], 100, '...') }}</td>
+                                    <td>
+                                        @php
+                                            $desc = $category['description'];
+                                            echo (strlen($desc) > 100) ? substr($desc, 0, 100) . '...' : $desc;
+                                        @endphp
+                                    </td>
                                     <td>
                                         <a href="{{ route('admin/tour-categories/edit/' . $category['id']) }}" class="btn btn-sm btn-warning">
                                             <i class="bi bi-pencil"></i> Sửa

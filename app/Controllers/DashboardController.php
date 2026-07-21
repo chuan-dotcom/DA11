@@ -4,46 +4,97 @@ namespace App\Controllers;
 use App\Controller;
 use App\Models\Tour;
 use App\Models\TourCategory;
+use App\Models\Booking;
 
-class DashboardController extends Controller{
+class DashboardController extends Controller {
     private $modelTour;
     private $modelCategory;
+    private $modelBooking;
 
-    public function __construct()
-    {
-        $this->modelTour = new Tour();
+    public function __construct() {
+        $this->modelTour     = new Tour();
         $this->modelCategory = new TourCategory();
+        $this->modelBooking  = new Booking();
     }
 
     public function index() {
-        $title = 'Báo cáo thống kê';
+        $title = 'Báo cáo - Thống kê';
 
-        // Tổng số tour
-        $totalTours = $this->modelTour->getTotalTours();
+        // Tháng/năm lọc (mặc định = hiện tại)
+        $month = isset($_GET['month']) ? (int) $_GET['month'] : (int) date('m');
+        $year  = isset($_GET['year'])  ? (int) $_GET['year']  : (int) date('Y');
 
-        // Tổng số danh mục
+        // =============================================
+        // CARD 1: Tổng số tour + tổng danh mục
+        // =============================================
+        $totalTours      = $this->modelTour->getTotalTours();
+        $totalActiveTours = $this->modelTour->getTotalActiveTours();
         $totalCategories = $this->modelCategory->getTotalCategories();
 
-        // Tour có giá cao nhất
-        $mostExpensiveTour = $this->modelTour->getMostExpensiveTour();
+        // =============================================
+        // CARD 2: Booking đang chờ xử lý
+        // =============================================
+        $totalPendingBookings = $this->modelBooking->getTotalPendingBookings();
 
-        // Tour có giá thấp nhất
-        $cheapestTour = $this->modelTour->getCheapestTour();
+        // =============================================
+        // CARD 3: Tổng doanh thu (booking hoàn thành)
+        // =============================================
+        $totalRevenue = $this->modelBooking->getTotalRevenue();
 
-        // Tổng giá trị tất cả tour
-        $totalPrice = $this->modelTour->getTotalPrice();
+        // =============================================
+        // CARD 4: Hoàn thành / Tổng booking
+        // =============================================
+        $totalBookings          = $this->modelBooking->getTotalBookings();
+        $totalCompletedBookings = $this->modelBooking->getTotalCompletedBookings();
 
-        // Thống kê số tour theo danh mục
+        // =============================================
+        // Biểu đồ 1: Số booking theo ngày trong tháng
+        // =============================================
+        $daysInMonth     = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $dailyBookingMap = $this->modelBooking->getDailyBookingCounts($month, $year);
+        $dailyRevenueMap = $this->modelBooking->getDailyRevenue($month, $year);
+
+        $chartLabels   = [];
+        $chartBookings = [];
+        $chartRevenue  = [];
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $chartLabels[]   = str_pad($d, 2, '0', STR_PAD_LEFT);
+            $chartBookings[] = $dailyBookingMap[$d] ?? 0;
+            $chartRevenue[]  = $dailyRevenueMap[$d] ?? 0;
+        }
+
+        // =============================================
+        // Biểu đồ 2: Số tour theo danh mục (từ bảng tours + tour_categories)
+        // =============================================
         $toursByCategory = $this->modelTour->getToursByCategory();
+        $catChartLabels  = array_column($toursByCategory, 'category_name');
+        $catChartCounts  = array_map('intval', array_column($toursByCategory, 'tour_count'));
+
+        // =============================================
+        // Bảng tour hoàn thành (bookings status=1 JOIN tours JOIN categories)
+        // =============================================
+        $completedBookings = $this->modelBooking->getCompletedBookingsWithTour();
+
+        // =============================================
+        // Bảng quản lý tour: danh sách tour + doanh thu booking thực tế
+        // =============================================
+        $revenueByTour = $this->modelBooking->getRevenueByTour();
 
         return view('dashboard.index', compact(
             'title',
-            'totalTours',
-            'totalCategories',
-            'mostExpensiveTour',
-            'cheapestTour',
-            'totalPrice',
-            'toursByCategory'
+            'month', 'year',
+            // cards
+            'totalTours', 'totalActiveTours', 'totalCategories',
+            'totalPendingBookings',
+            'totalRevenue',
+            'totalBookings', 'totalCompletedBookings',
+            // biểu đồ booking theo ngày
+            'chartLabels', 'chartBookings', 'chartRevenue',
+            // biểu đồ tour theo danh mục
+            'catChartLabels', 'catChartCounts',
+            // bảng
+            'completedBookings',
+            'revenueByTour'
         ));
     }
 }
