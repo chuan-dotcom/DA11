@@ -6,12 +6,20 @@ require 'vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
+// Show errors during development to avoid blank pages
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 function view($name, $data = []) {
     $blade = new \eftec\bladeone\BladeOne(
         __DIR__ . '/views',
         __DIR__ . '/storage/cache',
         \eftec\bladeone\BladeOne::MODE_DEBUG
     );
+    if (!is_dir(__DIR__ . '/storage/cache')) {
+        @mkdir(__DIR__ . '/storage/cache', 0755, true);
+    }
     
     echo $blade->run($name, $data);
 }

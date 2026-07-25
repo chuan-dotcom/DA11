@@ -3,6 +3,7 @@
 use App\Controllers\TourController;
 use App\Controllers\TourCategoryController;
 use App\Controllers\DashboardController;
+use App\Controllers\BookingController;
 
 use Bramus\Router\Router;
 
@@ -31,5 +32,33 @@ $router->get('admin/tours/show/(\d+)', TourController::class . '@show');
 
 // Trang công khai khi quét QR — hiện chi tiết tour ngay
 $router->get('tour/(\d+)', TourController::class . '@qrShow');
+
+
+/*
+|--------------------------------------------------------------------------
+| BOOKING
+|--------------------------------------------------------------------------
+*/
+
+// Danh sách Booking
+$router->get('admin/bookings', BookingController::class . '@index');
+
+// Form thêm
+$router->get('admin/bookings/create', BookingController::class . '@create');
+
+// Lưu Booking
+$router->post('admin/bookings/store', BookingController::class . '@store');
+
+// Chi tiết
+$router->get('admin/bookings/show/(\d+)', BookingController::class . '@show');
+
+// Form sửa
+$router->get('admin/bookings/edit/(\d+)', BookingController::class . '@edit');
+
+// Cập nhật
+$router->post('admin/bookings/update/(\d+)', BookingController::class . '@update');
+
+// Xóa
+$router->get('admin/bookings/delete/(\d+)', BookingController::class . '@delete');
 
 $router->run();
