@@ -19,14 +19,9 @@
         </a>
     </li>
     <li class="nav-item">
-
-    <a href="/admin/bookings" class="nav-link">
-
-        <i class="bi bi-calendar-check"></i>
-
-        Quản lý Booking
-
-    </a>
-
-</li>
+        <a href="{{ route('admin/bookings') }}" class="nav-link">
+            <i class="bi bi-calendar-check"></i>
+            Quản lý Booking
+        </a>
+    </li>
 </ul>

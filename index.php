@@ -24,13 +24,29 @@ function view($name, $data = []) {
     echo $blade->run($name, $data);
 }
 
+function app_base_path() {
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $dir = rtrim(dirname($scriptName), '\\/');
+    return $dir === '' || $dir === '.' ? '/' : $dir;
+}
+
 function redirect($url) {
-    header('Location: ' . $_ENV['APP_URL'] . $url);
+    $basePath = app_base_path();
+    $url = '/' . ltrim($url, '/');
+    if ($basePath !== '/') {
+        $url = $basePath . $url;
+    }
+    header('Location: ' . $url);
     exit;
 }
 
 function route($name) {
-    return $_ENV['APP_URL'] . $name;
+    $basePath = app_base_path();
+    $name = '/' . ltrim($name, '/');
+    if ($basePath === '/') {
+        return $name;
+    }
+    return $basePath . $name;
 }
 
 if (!function_exists('absolute_url')) {
