@@ -4,6 +4,7 @@ use App\Controllers\TourController;
 use App\Controllers\TourCategoryController;
 use App\Controllers\DashboardController;
 use App\Controllers\BookingController;
+use App\Controllers\UserController;
 
 use Bramus\Router\Router;
 
@@ -12,6 +13,15 @@ $router = new Router();
 // Trang chủ - Báo cáo thống kê
 $router->get('/', DashboardController::class . '@index');
 $router->get('admin/dashboard', DashboardController::class . '@index');
+
+// Admin: Quản lý Tài khoản
+$router->get('admin/users', UserController::class . '@index');
+$router->get('admin/users/create', UserController::class . '@create');
+$router->post('admin/users/store', UserController::class . '@store');
+$router->get('admin/users/edit/(\d+)', UserController::class . '@edit');
+$router->post('admin/users/update/(\d+)', UserController::class . '@update');
+$router->get('admin/users/delete/(\d+)', UserController::class . '@delete');
+$router->get('admin/users/show/(\d+)', UserController::class . '@show');
 
 // Admin: Quản lý Danh mục Tour
 $router->get('admin/tour-categories', TourCategoryController::class . '@index');
