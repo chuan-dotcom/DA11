@@ -4,17 +4,20 @@ namespace App\Controllers;
 use App\Controller;
 use App\Models\Tour;
 use App\Models\TourCategory;
+use App\Models\Booking;
 use Rakit\Validation\Validator;
 
 class TourController extends Controller{
     private $modelTour;
     private $modelCategory;
+    private $modelBooking;
     private $validator;
 
     public function __construct()
     {
         $this->modelTour = new Tour();
         $this->modelCategory = new TourCategory();
+        $this->modelBooking = new Booking();
         $this->validator = new Validator();
     }
 
@@ -155,5 +158,23 @@ class TourController extends Controller{
 
         $title = $tour['name'];
         return view('tours.qr_show', compact('title', 'tour'));
+    }
+
+    /**
+     * Xem danh sách người tham gia của một tour
+     */
+    public function participants($id) {
+        $title = 'Danh sách người tham gia tour';
+        $tour = $this->modelTour->findByid($id);
+
+        if (!$tour) {
+            setFlash('error', 'Tour du lịch không tồn tại');
+            return redirect('admin/tours');
+        }
+
+        $bookings = $this->modelBooking->getByTourId($id);
+        $stats = $this->modelBooking->getTourParticipantsStats($id);
+
+        return view('tours.participants', compact('title', 'tour', 'bookings', 'stats'));
     }
 }

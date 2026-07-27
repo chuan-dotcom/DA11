@@ -116,6 +116,9 @@
                                         @endif
                                     </td>
                                     <td class="text-nowrap">
+                                        <a href="{{ route('admin/tours/participants/' . $tour['id']) }}" class="btn btn-sm btn-success" title="Xem người tham gia">
+                                            <i class="bi bi-people"></i> Người tham gia
+                                        </a>
                                         <a href="{{ route('admin/tours/show/' . $tour['id']) }}" class="btn btn-sm btn-info text-white" title="Xem chi tiết">
                                             <i class="bi bi-eye"></i> Xem
                                         </a>

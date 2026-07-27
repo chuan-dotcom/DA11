@@ -336,4 +336,43 @@ class Booking extends Model
         return $stmt->fetchAllAssociative();
     }
 
+    /**
+     * Lấy danh sách booking (người tham gia) theo tour ID
+     */
+    public function getByTourId($tourId)
+    {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select(
+                'b.*',
+                't.name AS tour_name'
+            )
+            ->from('bookings', 'b')
+            ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id')
+            ->where('b.tour_id = :tourId')
+            ->setParameter('tourId', $tourId)
+            ->orderBy('b.booking_date', 'DESC');
+
+        return $stmt->fetchAllAssociative();
+    }
+
+    /**
+     * Thống kê số liệu người tham gia theo tour ID
+     */
+    public function getTourParticipantsStats($tourId)
+    {
+        $sql = "
+            SELECT
+                COUNT(b.id) AS total_bookings,
+                COALESCE(SUM(b.num_people), 0) AS total_people,
+                COALESCE(SUM(CASE WHEN b.status = 1 THEN b.num_people ELSE 0 END), 0) AS confirmed_people,
+                COALESCE(SUM(CASE WHEN b.status = 0 THEN b.num_people ELSE 0 END), 0) AS pending_people,
+                COALESCE(SUM(CASE WHEN b.status = 1 THEN b.total_price ELSE 0 END), 0) AS confirmed_revenue,
+                COALESCE(AVG(b.num_people), 0) AS avg_people_per_booking
+            FROM bookings b
+            WHERE b.tour_id = ?
+        ";
+
+        return $this->connection->fetchAssociative($sql, [$tourId]);
+    }
+
 }

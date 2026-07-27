@@ -132,7 +132,10 @@
                     </div>
                 </div>
 
-                <div class="mt-4 d-flex gap-2">
+                <div class="mt-4 d-flex gap-2 flex-wrap">
+                    <a href="{{ route('admin/tours/participants/' . $tour['id']) }}" class="btn btn-success">
+                        <i class="bi bi-people"></i> Xem người tham gia
+                    </a>
                     <a href="{{ route('admin/tours/edit/' . $tour['id']) }}" class="btn btn-warning">
                         <i class="bi bi-pencil"></i> Sửa tour
                     </a>

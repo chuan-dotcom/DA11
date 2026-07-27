@@ -39,6 +39,7 @@ $router->get('admin/tours/edit/(\d+)', TourController::class . '@edit');
 $router->post('admin/tours/update/(\d+)', TourController::class . '@update');
 $router->get('admin/tours/delete/(\d+)', TourController::class . '@delete');
 $router->get('admin/tours/show/(\d+)', TourController::class . '@show');
+$router->get('admin/tours/participants/(\d+)', TourController::class . '@participants');
 
 // Trang công khai khi quét QR — hiện chi tiết tour ngay
 $router->get('tour/(\d+)', TourController::class . '@qrShow');
