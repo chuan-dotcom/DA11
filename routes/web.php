@@ -5,6 +5,7 @@ use App\Controllers\TourCategoryController;
 use App\Controllers\DashboardController;
 use App\Controllers\BookingController;
 use App\Controllers\UserController;
+use App\Controllers\StaffController;
 
 use Bramus\Router\Router;
 
@@ -71,5 +72,32 @@ $router->post('admin/bookings/update/(\d+)', BookingController::class . '@update
 
 // Xóa
 $router->get('admin/bookings/delete/(\d+)', BookingController::class . '@delete');
+
+/*
+|--------------------------------------------------------------------------
+| STAFF - QUẢN LÝ NHÂN SỰ
+|--------------------------------------------------------------------------
+*/
+
+// Danh sách nhân sự
+$router->get('admin/staff', StaffController::class . '@index');
+
+// Form thêm mới
+$router->get('admin/staff/create', StaffController::class . '@create');
+
+// Lưu nhân sự
+$router->post('admin/staff/store', StaffController::class . '@store');
+
+// Chi tiết
+$router->get('admin/staff/show/(\d+)', StaffController::class . '@show');
+
+// Form sửa
+$router->get('admin/staff/edit/(\d+)', StaffController::class . '@edit');
+
+// Cập nhật
+$router->post('admin/staff/update/(\d+)', StaffController::class . '@update');
+
+// Xóa
+$router->get('admin/staff/delete/(\d+)', StaffController::class . '@delete');
 
 $router->run();

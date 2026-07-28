@@ -29,6 +29,11 @@
         <h6 class="text-muted px-3 mb-1">Hệ thống</h6>
     </li>
     <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin/staff') }}">
+            <i class="bi bi-people-fill"></i> Quản lý nhân sự
+        </a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" href="{{ route('admin/users') }}">
             <i class="bi bi-people"></i> Quản lý tài khoản
         </a>
