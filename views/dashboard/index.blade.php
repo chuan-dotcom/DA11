@@ -276,44 +276,44 @@
                         @foreach($revenueByTour as $t)
                             <tr>
                                 <td class="fw-semibold">
-                                    <a href="{{ route('admin/tours/show/' . $t['tour_id']) }}" class="text-decoration-none text-dark">
-                                        {{ $t['tour_name'] }}
+                                    <a href="{{ route('admin/tours/show/' . ($t['tour_id'] ?? '')) }}" class="text-decoration-none text-dark">
+                                        {{ $t['tour_name'] ?? '—' }}
                                     </a>
                                 </td>
                                 <td>{{ $t['category_name'] ?? '—' }}</td>
                                 <td>{{ $t['duration'] ?? '—' }}</td>
-                                <td>{{ number_format($t['unit_price']) }}đ</td>
+                                <td>{{ number_format((float)($t['unit_price'] ?? 0)) }}đ</td>
                                 <td class="text-center">
-                                    @if($t['booking_count'] > 0)
+                                    @if(($t['booking_count'] ?? 0) > 0)
                                         <span class="badge bg-primary">{{ $t['booking_count'] }}</span>
                                     @else
                                         <span class="text-muted">0</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($t['revenue'] > 0)
-                                        <span class="text-success fw-bold">{{ number_format($t['revenue']) }}đ</span>
+                                    @if(($t['revenue'] ?? 0) > 0)
+                                        <span class="text-success fw-bold">{{ number_format((float)($t['revenue'] ?? 0)) }}đ</span>
                                     @else
                                         <span class="text-muted">0đ</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($t['status'] == 1)
+                                    @if(($t['status'] ?? 0) == 1)
                                         <span class="badge bg-success">Hiển thị</span>
                                     @else
                                         <span class="badge bg-secondary">Ẩn</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('admin/tours/show/' . $t['tour_id']) }}"
+                                    <a href="{{ route('admin/tours/show/' . ($t['tour_id'] ?? '')) }}"
                                        class="btn btn-sm btn-outline-info py-0 px-2" title="Xem">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin/tours/edit/' . $t['tour_id']) }}"
+                                    <a href="{{ route('admin/tours/edit/' . ($t['tour_id'] ?? '')) }}"
                                        class="btn btn-sm btn-outline-warning py-0 px-2" title="Sửa">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <a href="{{ route('admin/tours/delete/' . $t['tour_id']) }}"
+                                    <a href="{{ route('admin/tours/delete/' . ($t['tour_id'] ?? '')) }}"
                                        class="btn btn-sm btn-outline-danger py-0 px-2"
                                        onclick="return confirm('Xóa tour này sẽ xóa luôn các booking liên quan. Tiếp tục?')"
                                        title="Xóa">

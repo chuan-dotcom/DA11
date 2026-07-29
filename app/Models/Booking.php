@@ -273,17 +273,23 @@ class Booking extends Model
      */
     public function getRevenueByTour()
     {
-        $sql="
+        $sql = "
         SELECT
-            t.id,
-            t.name,
-            COUNT(b.id) total_booking,
-            COALESCE(SUM(b.total_price),0) AS revenue
+            t.id AS tour_id,
+            t.name AS tour_name,
+            t.duration,
+            t.price AS unit_price,
+            t.status,
+            tc.name AS category_name,
+            COUNT(b.id) AS booking_count,
+            COALESCE(SUM(b.total_price), 0) AS revenue
         FROM tours t
+        LEFT JOIN tour_categories tc
+            ON t.category_id = tc.id
         LEFT JOIN bookings b
-            ON t.id=b.tour_id
-            AND b.status=1
-        GROUP BY t.id
+            ON t.id = b.tour_id
+            AND b.status = 1
+        GROUP BY t.id, t.name, t.duration, t.price, t.status, tc.name
         ORDER BY revenue DESC
     ";
 
