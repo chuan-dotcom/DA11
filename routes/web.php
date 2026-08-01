@@ -6,6 +6,8 @@ use App\Controllers\DashboardController;
 use App\Controllers\BookingController;
 use App\Controllers\UserController;
 use App\Controllers\StaffController;
+use App\Controllers\DepartureController;
+use App\Controllers\StaffAssignmentController;
 
 use Bramus\Router\Router;
 
@@ -99,5 +101,21 @@ $router->post('admin/staff/update/(\d+)', StaffController::class . '@update');
 
 // Xóa
 $router->get('admin/staff/delete/(\d+)', StaffController::class . '@delete');
+
+$router->get('admin/departures', DepartureController::class . '@index');
+$router->get('admin/departures/create', DepartureController::class . '@create');
+$router->post('admin/departures/store', DepartureController::class . '@store');
+$router->get('admin/departures/show/(\d+)', DepartureController::class . '@show');
+$router->get('admin/departures/edit/(\d+)', DepartureController::class . '@edit');
+$router->post('admin/departures/update/(\d+)', DepartureController::class . '@update');
+$router->get('admin/departures/delete/(\d+)', DepartureController::class . '@delete');
+
+$router->get('admin/staff-assignments', StaffAssignmentController::class . '@index');
+$router->get('admin/staff-assignments/create', StaffAssignmentController::class . '@create');
+$router->post('admin/staff-assignments/store', StaffAssignmentController::class . '@store');
+$router->get('admin/staff-assignments/show/(\d+)', StaffAssignmentController::class . '@show');
+$router->get('admin/staff-assignments/edit/(\d+)', StaffAssignmentController::class . '@edit');
+$router->post('admin/staff-assignments/update/(\d+)', StaffAssignmentController::class . '@update');
+$router->get('admin/staff-assignments/delete/(\d+)', StaffAssignmentController::class . '@delete');
 
 $router->run();
