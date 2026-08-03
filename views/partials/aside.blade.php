@@ -4,7 +4,7 @@
             <i class="bi bi-speedometer2"></i> Báo cáo thống kê
         </a>
     </li>
-    
+
     <li class="nav-item mt-3">
         <h6 class="text-muted px-3 mb-1">Quản lý Tour</h6>
     </li>
@@ -22,6 +22,20 @@
         <a href="{{ route('admin/bookings') }}" class="nav-link">
             <i class="bi bi-calendar-check"></i>
             Quản lý Booking
+        </a>
+    </li>
+
+    <li class="nav-item mt-3">
+        <h6 class="text-muted px-3 mb-1">Khởi hành & Nhân sự</h6>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin/departures') }}">
+            <i class="bi bi-calendar3"></i> Quản lý khởi hành
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin/staff-assignments') }}">
+            <i class="bi bi-person-workspace"></i> Phân bổ nhân sự
         </a>
     </li>
 
