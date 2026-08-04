@@ -8,6 +8,7 @@ use App\Models\Departure;
 use App\Models\BookingGuest;
 use App\Models\Staff;
 use App\Models\Tour;
+use App\Models\TourLog;
 
 class TourInfoController extends Controller
 {
@@ -16,6 +17,7 @@ class TourInfoController extends Controller
     private $modelGuest;
     private $modelStaff;
     private $modelTour;
+    private $modelTourLog;
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class TourInfoController extends Controller
         $this->modelGuest = new BookingGuest();
         $this->modelStaff = new Staff();
         $this->modelTour = new Tour();
+        $this->modelTourLog = new TourLog();
     }
 
     private function getActiveHdvId()
@@ -142,14 +145,8 @@ class TourInfoController extends Controller
                     ";
                     $driverInfo = $db->fetchAssociative($driverSql, ['departure_id' => $selectedDepartureId]);
 
-                    // Fetch timeline activity logs for this tour departure
-                    $logSql = "
-                        SELECT id, title, content, log_date, location, weather, mood
-                        FROM tour_logs
-                        WHERE departure_id = :departure_id
-                        ORDER BY log_date ASC, id ASC
-                    ";
-                    $tourLogs = $db->fetchAllAssociative($logSql, ['departure_id' => $selectedDepartureId]);
+                    // Fetch timeline activity logs for this tour departure from the DB model
+                    $tourLogs = $this->modelTourLog->getByDepartureId($selectedDepartureId);
                 }
             }
         }

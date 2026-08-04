@@ -5,18 +5,21 @@ namespace App\Controllers\Admin;
 use App\Controller;
 use App\Models\TourDiary;
 use App\Models\Departure;
+use App\Models\TourLog;
 use Rakit\Validation\Validator;
 
 class TourDiaryController extends Controller
 {
     private $modelDiary;
     private $modelDeparture;
+    private $modelTourLog;
     private $validator;
 
     public function __construct()
     {
         $this->modelDiary = new TourDiary();
         $this->modelDeparture = new Departure();
+        $this->modelTourLog = new TourLog();
         $this->validator = new Validator();
     }
 
@@ -311,12 +314,17 @@ class TourDiaryController extends Controller
         }
 
         $otherDiaries = $this->modelDiary->getByDepartureId($diary['departure_id']);
+        $tourLogs = [];
+        if (!empty($diary['departure_id'])) {
+            $tourLogs = $this->modelTourLog->getByDepartureId($diary['departure_id']);
+        }
 
         return view('admin.tour-diaries.show', compact(
             'title',
             'diary',
             'photos',
-            'otherDiaries'
+            'otherDiaries',
+            'tourLogs'
         ));
     }
 }

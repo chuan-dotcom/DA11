@@ -170,9 +170,49 @@
                     @endforeach
                 </div>
             @endif
-        </div>
 
-        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-white fw-bold"><i class="bi bi-clock-history"></i> Timeline hoạt động chuyến đi</div>
+                <div class="card-body">
+                    @if(empty($tourLogs))
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-info-circle fs-2 mb-2 d-block"></i>
+                            Chưa có ghi nhận timeline hoạt động cho chuyến này.
+                        </div>
+                    @else
+                        <div class="timeline-list">
+                            @foreach($tourLogs as $log)
+                                <div class="timeline-item mb-3 p-3 rounded-4 border bg-light">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="fw-bold mb-1">{{ $log['title'] }}</h6>
+                                            <div class="small text-muted">
+                                                {{ !empty($log['log_date']) ? date('d/m/Y H:i', strtotime($log['log_date'])) : 'Không có thời gian' }}
+                                                @if(!empty($log['location']))
+                                                    · {{ $log['location'] }}
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @if(!empty($log['weather']))
+                                            <span class="badge bg-primary text-white">{{ $log['weather'] }}</span>
+                                        @endif
+                                    </div>
+                                    <p class="mb-2 text-dark">{{ $log['content'] }}</p>
+                                    <div class="d-flex flex-wrap gap-2 small text-muted">
+                                        @if(!empty($log['mood']))
+                                            <span class="badge bg-white border">Tâm trạng: {{ $log['mood'] }}</span>
+                                        @endif
+                                        @if(!empty($log['location']))
+                                            <span class="badge bg-white border">Địa điểm: {{ $log['location'] }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
             <div class="info-tile mb-3">
                 <div class="info-tile-label">Mã nhật ký</div>
                 <div class="info-tile-value">#{{ $diary['id'] }}</div>
@@ -233,7 +273,8 @@
                                         <div class="other-diary-item">
                                             <div class="fw-semibold text-dark">{{ $od['title'] }}</div>
                                             <div class="small text-muted">
-                                                {{ !empty($od['diary_date']) ? date('d/m/Y', strtotime($od['diary_date'])) : '' }}
+                                                {{ !empty($od['diary_date']) ? date('d/m/Y', strtotime($od['diary_date'])) : 'Chưa ghi ngày' }}
+                                                @if(!empty($od['weather'])) · Thời tiết: {{ $od['weather'] }} @endif
                                             </div>
                                         </div>
                                     </a>

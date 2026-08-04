@@ -78,8 +78,10 @@ class TourDiary extends Model
     public function getByDepartureId($departureId)
     {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('td.*')
+        $stmt->select('td.*', 'd.group_name as departure_group_name', 't.name as tour_name', 'd.departure_date as tour_departure_date', 'd.return_date as tour_return_date')
             ->from('tour_diaries', 'td')
+            ->leftJoin('td', 'departures', 'd', 'd.id = td.departure_id')
+            ->leftJoin('d', 'tours', 't', 't.id = d.tour_id')
             ->where('td.departure_id = :departure_id')
             ->setParameter('departure_id', (int) $departureId)
             ->orderBy('td.diary_date', 'ASC')
