@@ -47,6 +47,7 @@ class DepartureController extends Controller
     {
         $data = [
             'tour_id'         => $_POST['tour_id'],
+            'group_name'      => trim($_POST['group_name'] ?? ''),
             'departure_date'  => $_POST['departure_date'],
             'return_date'     => $_POST['return_date'] ?? null,
             'max_participants'=> $_POST['max_participants'] ?? 0,
@@ -60,6 +61,7 @@ class DepartureController extends Controller
         $rules = [
             'tour_id'        => 'required|integer',
             'departure_date' => 'required',
+            'group_name'     => 'max:255',
             'max_participants' => 'integer',
             'status'         => 'required',
         ];
@@ -73,6 +75,13 @@ class DepartureController extends Controller
         if (!empty($data['return_date']) && strtotime($data['return_date']) < strtotime($data['departure_date'])) {
             setFlash('error', 'Ngày trở về không thể sớm hơn ngày khởi hành!');
             return redirect('admin/departures/create');
+        }
+
+        if ($data['group_name'] === '') {
+            $tour = $this->modelTour->findByid((int) $data['tour_id']);
+            $data['group_name'] = $tour
+                ? ('Đoàn ' . $tour['name'] . ' ' . date('d-m-Y', strtotime($data['departure_date'])))
+                : null;
         }
 
         $this->modelDeparture->insert($data);
@@ -106,6 +115,7 @@ class DepartureController extends Controller
 
         $data = [
             'tour_id'         => $_POST['tour_id'],
+            'group_name'      => trim($_POST['group_name'] ?? ''),
             'departure_date'  => $_POST['departure_date'],
             'return_date'     => $_POST['return_date'] ?? null,
             'max_participants'=> $_POST['max_participants'] ?? 0,
@@ -119,6 +129,7 @@ class DepartureController extends Controller
         $rules = [
             'tour_id'        => 'required|integer',
             'departure_date' => 'required',
+            'group_name'     => 'max:255',
             'max_participants' => 'integer',
             'status'         => 'required',
         ];
@@ -132,6 +143,13 @@ class DepartureController extends Controller
         if (!empty($data['return_date']) && strtotime($data['return_date']) < strtotime($data['departure_date'])) {
             setFlash('error', 'Ngày trở về không thể sớm hơn ngày khởi hành!');
             return redirect('admin/departures/edit/' . $id);
+        }
+
+        if ($data['group_name'] === '') {
+            $tour = $this->modelTour->findByid((int) $data['tour_id']);
+            $data['group_name'] = $tour
+                ? ('Đoàn ' . $tour['name'] . ' ' . date('d-m-Y', strtotime($data['departure_date'])))
+                : ($departure['group_name'] ?? null);
         }
 
         $assignments = $this->modelAssignment->getByDepartureId($id);

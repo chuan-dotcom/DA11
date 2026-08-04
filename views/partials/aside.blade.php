@@ -91,7 +91,7 @@
         <h6 class="sidebar-section-title px-3 mb-1">Đoàn khách</h6>
     </li>
     <li class="nav-item">
-        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">
+        <a class="nav-link {{ $isActive('admin/guest-groups') ? 'is-active' : '' }}" href="{{ route('admin/guest-groups') }}">
             <i class="bi bi-people"></i> Quản lý đoàn khách & Check-in
         </a>
     </li>

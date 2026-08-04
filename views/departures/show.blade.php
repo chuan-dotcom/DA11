@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', $title)
 
@@ -34,6 +34,9 @@
             <a href="{{ route('admin/staff-assignments/create') }}?departure_id={{ $departure['id'] }}" class="btn btn-success">
                 <i class="bi bi-person-plus"></i> Phân bổ nhân sự
             </a>
+            <a href="{{ route('admin/guest-groups/show/' . $departure['id']) }}" class="btn btn-primary">
+                <i class="bi bi-people"></i> Quản lý đoàn
+            </a>
         </div>
     </div>
 
@@ -46,6 +49,10 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
+                            <div class="info-row">
+                                <span class="info-label">Tên đoàn:</span>
+                                <div class="fw-semibold">{{ $departure['group_name'] ?: ('Đoàn ' . ($departure['tour_name'] ?? 'Chưa cập nhật')) }}</div>
+                            </div>
                             <div class="info-row">
                                 <span class="info-label">Tour:</span>
                                 <div class="fw-bold fs-5">{{ $departure['tour_name'] ?? 'N/A' }}</div>

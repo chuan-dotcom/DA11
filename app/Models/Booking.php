@@ -6,6 +6,48 @@ use App\Model;
 
 class Booking extends Model
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->ensureGuestGroupColumns();
+    }
+
+    private function ensureGuestGroupColumns()
+    {
+        $columns = [
+            'departure_id' => "ALTER TABLE bookings ADD COLUMN departure_id INT NULL AFTER tour_id",
+            'check_in_status' => "ALTER TABLE bookings ADD COLUMN check_in_status TINYINT(1) NOT NULL DEFAULT 0 AFTER status",
+            'checked_in_at' => "ALTER TABLE bookings ADD COLUMN checked_in_at DATETIME NULL AFTER check_in_status",
+        ];
+
+        foreach ($columns as $columnName => $sql) {
+            try {
+                $column = $this->connection->fetchAssociative(
+                    'SHOW COLUMNS FROM bookings LIKE ?',
+                    [$columnName]
+                );
+
+                if (!$column) {
+                    $this->connection->executeStatement($sql);
+                }
+            } catch (\Throwable $e) {
+            }
+        }
+
+        try {
+            $index = $this->connection->fetchAssociative(
+                "SHOW INDEX FROM bookings WHERE Key_name = 'idx_bookings_departure_id'"
+            );
+
+            if (!$index) {
+                $this->connection->executeStatement(
+                    'ALTER TABLE bookings ADD INDEX idx_bookings_departure_id (departure_id)'
+                );
+            }
+        } catch (\Throwable $e) {
+        }
+    }
+
     /**
      * Lấy danh sách tất cả Booking
      */
@@ -379,6 +421,149 @@ class Booking extends Model
         ";
 
         return $this->connection->fetchAssociative($sql, [$tourId]);
+    }
+
+    /**
+     * Danh sách booking đã được gắn vào một chuyến khởi hành
+     */
+    public function getByDepartureId($departureId)
+    {
+        $stmt = $this->connection->createQueryBuilder();
+
+        $stmt->select(
+                'b.*',
+                't.name AS tour_name',
+                'd.departure_date',
+                'd.return_date',
+                'd.meeting_point',
+                'd.meeting_time',
+                'd.status AS departure_status'
+            )
+            ->from('bookings', 'b')
+            ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id')
+            ->leftJoin('b', 'departures', 'd', 'b.departure_id = d.id')
+            ->where('b.departure_id = :departureId')
+            ->setParameter('departureId', $departureId)
+            ->orderBy('b.check_in_status', 'DESC')
+            ->addOrderBy('b.checked_in_at', 'DESC')
+            ->addOrderBy('b.id', 'DESC');
+
+        return $stmt->fetchAllAssociative();
+    }
+
+    /**
+     * Danh sách booking có thể gắn vào đoàn của chuyến khởi hành
+     */
+    public function getAvailableForDeparture($tourId)
+    {
+        $stmt = $this->connection->createQueryBuilder();
+
+        $stmt->select(
+                'b.*',
+                't.name AS tour_name'
+            )
+            ->from('bookings', 'b')
+            ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id')
+            ->where('b.tour_id = :tourId')
+            ->andWhere('b.status = :status')
+            ->andWhere('b.departure_id IS NULL')
+            ->setParameter('tourId', $tourId)
+            ->setParameter('status', 1)
+            ->orderBy('b.booking_date', 'DESC')
+            ->addOrderBy('b.id', 'DESC');
+
+        return $stmt->fetchAllAssociative();
+    }
+
+    /**
+     * Thống kê đoàn khách theo chuyến khởi hành
+     */
+    public function getAssignedStatsByDepartureId($departureId)
+    {
+        $sql = "
+            SELECT
+                COUNT(b.id) AS total_bookings,
+                COALESCE(SUM(b.num_people), 0) AS total_people,
+                COALESCE(SUM(CASE WHEN b.check_in_status = 1 THEN b.num_people ELSE 0 END), 0) AS checked_in_people,
+                COALESCE(SUM(CASE WHEN b.check_in_status = 0 THEN b.num_people ELSE 0 END), 0) AS pending_check_in_people
+            FROM bookings b
+            WHERE b.departure_id = ?
+        ";
+
+        return $this->connection->fetchAssociative($sql, [$departureId]);
+    }
+
+    /**
+     * Tổng số khách đã gắn vào một đoàn
+     */
+    public function getAssignedPeopleCount($departureId)
+    {
+        $sql = "
+            SELECT COALESCE(SUM(num_people), 0) AS total_people
+            FROM bookings
+            WHERE departure_id = ?
+        ";
+
+        $row = $this->connection->fetchAssociative($sql, [$departureId]);
+
+        return (int) ($row['total_people'] ?? 0);
+    }
+
+    /**
+     * Gắn booking vào chuyến khởi hành
+     */
+    public function assignToDeparture($bookingId, $departureId)
+    {
+        return $this->connection->update('bookings', [
+            'departure_id' => $departureId,
+            'check_in_status' => 0,
+            'checked_in_at' => null,
+        ], [
+            'id' => $bookingId,
+        ]);
+    }
+
+    /**
+     * Bỏ booking khỏi chuyến khởi hành
+     */
+    public function removeFromDeparture($bookingId, $departureId)
+    {
+        return $this->connection->update('bookings', [
+            'departure_id' => null,
+            'check_in_status' => 0,
+            'checked_in_at' => null,
+        ], [
+            'id' => $bookingId,
+            'departure_id' => $departureId,
+        ]);
+    }
+
+    /**
+     * Đánh dấu check-in
+     */
+    public function markCheckedIn($bookingId, $departureId)
+    {
+        return $this->connection->update('bookings', [
+            'check_in_status' => 1,
+            'checked_in_at' => date('Y-m-d H:i:s'),
+        ], [
+            'id' => $bookingId,
+            'departure_id' => $departureId,
+        ]);
+    }
+
+    /**
+     * Hủy trạng thái check-in
+     */
+    public function cancelCheckedIn($bookingId, $departureId)
+    {
+        return $this->connection->update('bookings', [
+            'check_in_status' => 0,
+            'checked_in_at' => null,
+        ], [
+            'id' => $bookingId,
+            'departure_id' => $departureId,
+        ]);
     }
 
 }

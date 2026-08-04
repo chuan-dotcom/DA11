@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', $title)
 
@@ -182,6 +182,9 @@
                                         </a>
                                         <a href="{{ route('admin/departures/edit/' . $d['id']) }}" class="btn btn-sm btn-warning">
                                             <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{{ route('admin/guest-groups/show/' . $d['id']) }}" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-people"></i>
                                         </a>
                                         <a href="{{ route('admin/staff-assignments/create') }}?departure_id={{ $d['id'] }}" class="btn btn-sm btn-success">
                                             <i class="bi bi-person-plus"></i>

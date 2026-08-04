@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', $title)
 
@@ -16,6 +16,11 @@
             <form action="{{ route('admin/departures/store') }}" method="POST">
                 <div class="row">
                     <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="group_name" class="form-label">Tên đoàn</label>
+                            <input type="text" class="form-control" id="group_name" name="group_name" placeholder="Ví dụ: Nguyễn Anh Tài - Du lịch Cáp Nhĩ Tân">
+                            <div class="form-text">Để trống nếu bạn muốn hệ thống tự sinh tên đoàn theo tour và ngày khởi hành.</div>
+                        </div>
                         <div class="mb-3">
                             <label for="tour_id" class="form-label">Tour <span class="text-danger">*</span></label>
                             <select class="form-select" id="tour_id" name="tour_id" required>

@@ -9,6 +9,7 @@ use App\Controllers\StaffController;
 use App\Controllers\DepartureController;
 use App\Controllers\StaffAssignmentController;
 use App\Controllers\ServiceController;
+use App\Controllers\GuestGroupController;
 
 use Bramus\Router\Router;
 
@@ -126,5 +127,13 @@ $router->get('admin/services/show/(\d+)', ServiceController::class . '@show');
 $router->get('admin/services/edit/(\d+)', ServiceController::class . '@edit');
 $router->post('admin/services/update/(\d+)', ServiceController::class . '@update');
 $router->get('admin/services/delete/(\d+)', ServiceController::class . '@delete');
+
+$router->get('admin/guest-groups', GuestGroupController::class . '@index');
+$router->get('admin/guest-groups/show/(\d+)', GuestGroupController::class . '@show');
+$router->get('admin/guest-groups/print/(\d+)', GuestGroupController::class . '@printList');
+$router->get('admin/guest-groups/assign/(\d+)/(\d+)', GuestGroupController::class . '@assign');
+$router->get('admin/guest-groups/unassign/(\d+)/(\d+)', GuestGroupController::class . '@unassign');
+$router->get('admin/guest-groups/check-in/(\d+)/(\d+)', GuestGroupController::class . '@checkIn');
+$router->get('admin/guest-groups/check-in-cancel/(\d+)/(\d+)', GuestGroupController::class . '@cancelCheckIn');
 
 $router->run();
