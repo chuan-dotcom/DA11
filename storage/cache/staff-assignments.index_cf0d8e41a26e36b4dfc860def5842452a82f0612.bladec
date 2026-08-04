@@ -1,0 +1,143 @@
+﻿<?php $_shouldextend[1]=1; ?>
+
+<?php $this->startSection('title', $title); ?>
+
+<?php $this->startSection('content'); ?>
+<style>
+ .status-assigned { background-color: #0d6efd; }
+ .status-confirmed { background-color: #198754; }
+ .status-completed { background-color: #0f5132; }
+ .status-rejected { background-color: #dc3545; }
+ .role-lead_guide { background-color: #084298; }
+ .role-assistant_guide { background-color: #055160; }
+ .role-driver { background-color: #997404; color: #000; }
+ .role-photographer { background-color: #146c43; }
+ .role-other { background-color: #6c757d; }
+</style>
+
+<div class="container mt-4">
+ <h2 class="mb-4"><?php echo \htmlentities($title??'', ENT_QUOTES, 'UTF-8', false); ?></h2>
+
+ <?php if(isset($_SESSION['flash']['success'])): ?>
+ <div class="alert alert-success"><?php echo \htmlentities($_SESSION['flash']['success']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php unset($_SESSION['flash']['success']);  ?>
+ <?php endif; ?>
+ <?php if(isset($_SESSION['flash']['error'])): ?>
+ <div class="alert alert-danger"><?php echo \htmlentities($_SESSION['flash']['error']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php unset($_SESSION['flash']['error']);  ?>
+ <?php endif; ?>
+
+ <div class="row mb-4 g-3">
+ <div class="col-md-4">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body">
+ <div class="d-flex justify-content-between align-items-center">
+ <div>
+ <div class="text-muted small">Tổng phân bổ</div>
+ <div class="fs-4 fw-bold"><?php echo \htmlentities($totalAssignments??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <i class="bi bi-person-check fs-2 text-primary"></i>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <div class="mb-3 d-flex gap-2 flex-wrap">
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/create')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-primary">
+ <i class="bi bi-person-plus"></i> Phân bổ mới
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/departures')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-outline-secondary">
+ <i class="bi bi-calendar3"></i> Quản lý khởi hành
+ </a>
+ </div>
+
+ <div class="card">
+ <div class="card-body">
+ <div class="table-responsive">
+ <table class="table table-bordered table-hover align-middle">
+ <thead class="table-dark">
+ <tr>
+ <th>ID</th>
+ <th>Chuyến khởi hành</th>
+ <th>Ngày đi</th>
+ <th>Nhân viên</th>
+ <th>Vai trò</th>
+ <th>Trạng thái</th>
+ <th>Ngày phân bổ</th>
+ <th>Thao tác</th>
+ </tr>
+ </thead>
+ <tbody>
+ <?php if(empty($assignments)): ?>
+ <tr>
+ <td colspan="8" class="text-center">Chưa có phân bổ nào</td>
+ </tr>
+ <?php else: ?>
+ <?php 
+ $roleText = [
+ 'lead_guide' => 'HDV chính',
+ 'assistant_guide' => 'HDV phụ',
+ 'driver' => 'Lái xe',
+ 'photographer' => 'Nhiếp ảnh',
+ 'other' => 'Khác'
+ ];
+ $statusText = [
+ 'assigned' => 'Đã phân bổ',
+ 'confirmed' => 'Đã xác nhận',
+ 'completed' => 'Hoàn thành',
+ 'rejected' => 'Từ chối'
+ ];
+ ?>
+ <?php $__currentLoopData = $assignments; $this->addLoop($__currentLoopData);$this->getFirstLoop();
+ foreach($__currentLoopData as $a): $loop = $this->incrementLoopIndices();  ?>
+ <tr>
+ <td><?php echo \htmlentities($a['id']??'', ENT_QUOTES, 'UTF-8', false); ?></td>
+ <td>
+ <a href="<?php echo \htmlentities(route('admin/departures/show/' . $a['departure_id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="fw-semibold text-decoration-none text-dark">
+ <?php echo \htmlentities($a['tour_name'] ?? 'N/A'??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </a>
+ </td>
+ <td><?php echo \htmlentities($a['departure_date'] ? date('d/m/Y', strtotime($a['departure_date'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?></td>
+ <td>
+ <span class="fw-semibold"><?php echo \htmlentities($a['staff_name'] ?? 'N/A'??'', ENT_QUOTES, 'UTF-8', false); ?></span>
+ </td>
+ <td>
+ <span class="badge role-<?php echo \htmlentities($a['role']??'', ENT_QUOTES, 'UTF-8', false); ?>">
+ <?php echo \htmlentities($roleText[$a['role']] ?? $a['role']??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </span>
+ </td>
+ <td>
+ <span class="badge status-<?php echo \htmlentities($a['status']??'', ENT_QUOTES, 'UTF-8', false); ?>">
+ <?php echo \htmlentities($statusText[$a['status']] ?? $a['status']??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </span>
+ </td>
+ <td><?php echo \htmlentities($a['assigned_at'] ? date('d/m/Y H:i', strtotime($a['assigned_at'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?></td>
+ <td class="text-nowrap">
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/show/' . $a['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-info text-white">
+ <i class="bi bi-eye"></i>
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/edit/' . $a['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-warning">
+ <i class="bi bi-pencil"></i>
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/delete/' . $a['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ class="btn btn-sm btn-danger"
+ onclick="return confirm('Bạn có chắc muốn xóa phân bổ này?')">
+ <i class="bi bi-trash"></i>
+ </a>
+ </td>
+ </tr>
+ <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
+ <?php endif; ?>
+ </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
+</div>
+<?php $this->stopSection(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->runChild('layouts.admin'); } ?>

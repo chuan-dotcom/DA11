@@ -1,0 +1,125 @@
+﻿@extends('layouts.admin')
+
+@section('title', $title)
+
+@section('content')
+<div class="container mt-4">
+    <h2 class="mb-4">{{ $title }}</h2>
+
+    @if(isset($_SESSION['flash']['error']))
+        <div class="alert alert-danger">{{ $_SESSION['flash']['error'] }}</div>
+        @php unset($_SESSION['flash']['error']); @endphp
+    @endif
+
+    <div class="card">
+        <div class="card-body">
+            <form action="{{ route('admin/staff-assignments/store') }}" method="POST" id="assignmentForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="departure_id" class="form-label">Chuyến khởi hành <span class="text-danger">*</span></label>
+                            <select class="form-select" id="departure_id" name="departure_id" required>
+                                <option value="">-- Chọn chuyến khởi hành --</option>
+                                @foreach($departures as $d)
+                                    <option value="{{ $d['id'] }}" {{ $departureId == $d['id'] ? 'selected' : '' }}>
+                                        {{ $d['tour_name'] }} - {{ date('d/m/Y', strtotime($d['departure_date'])) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <small class="text-muted">Chỉ hiển thị các chuyến sắp tới</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="staff_id" class="form-label">Nhân viên <span class="text-danger">*</span></label>
+                            <select class="form-select" id="staff_id" name="staff_id" required>
+                                <option value="">-- Chọn nhân viên --</option>
+                                @if(!empty($availableStaff))
+                                    <optgroup label="Nhân viên khả dụng">
+                                        @foreach($availableStaff as $s)
+                                            <option value="{{ $s['HDV_id'] }}" class="text-success fw-semibold">
+                                                [] {{ $s['Hoten'] }} - {{ $s['Ngonngu'] ?? 'Tiếng Việt' }}
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endif
+                                <optgroup label="Tất cả nhân viên">
+                                    @foreach($staffList as $s)
+                                        <option value="{{ $s['HDV_id'] }}">
+                                            {{ $s['Hoten'] }} - {{ $s['Ngonngu'] ?? 'Tiếng Việt' }}
+                                        </option>
+                                    @endforeach
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Vai trò <span class="text-danger">*</span></label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="lead_guide">HDV chính</option>
+                                <option value="assistant_guide">HDV phụ</option>
+                                <option value="driver">Lái xe</option>
+                                <option value="photographer">Nhiếp ảnh</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Trạng thái</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="assigned">Đã phân bổ</option>
+                                <option value="confirmed">Đã xác nhận</option>
+                                <option value="completed">Hoàn thành</option>
+                                <option value="rejected">Từ chối</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="responsibilities" class="form-label">Trách nhiệm chính</label>
+                            <textarea class="form-control" id="responsibilities" name="responsibilities" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Ghi chú</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info d-none" id="conflictAlert">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span>Nhân viên này có thể đã có lịch trong khoảng thời gian này!</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Lưu phân bổ
+                </button>
+                <a href="{{ route('admin/staff-assignments') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const departureSelect = document.getElementById('departure_id');
+    const staffSelect = document.getElementById('staff_id');
+
+    departureSelect.addEventListener('change', function() {
+        if (this.value) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('departure_id', this.value);
+            window.location.href = currentUrl.toString();
+        }
+    });
+
+    staffSelect.addEventListener('change', function() {
+        const opt = this.options[this.selectedIndex];
+        const conflictAlert = document.getElementById('conflictAlert');
+        if (!opt.classList.contains('text-success') && this.value) {
+            conflictAlert.classList.remove('d-none');
+        } else {
+            conflictAlert.classList.add('d-none');
+        }
+    });
+});
+</script>
+@endsection

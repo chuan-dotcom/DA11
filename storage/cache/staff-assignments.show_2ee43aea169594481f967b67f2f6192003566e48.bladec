@@ -1,0 +1,149 @@
+﻿<?php $_shouldextend[1]=1; ?>
+
+<?php $this->startSection('title', $title); ?>
+
+<?php $this->startSection('content'); ?>
+<style>
+ .info-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; }
+ .info-row:last-child { border-bottom: none; }
+ .info-label { color: #6c757d; font-weight: 500; }
+</style>
+
+<div class="container mt-4">
+ <h2 class="mb-4"><?php echo \htmlentities($title??'', ENT_QUOTES, 'UTF-8', false); ?></h2>
+
+ <?php if(isset($_SESSION['flash']['success'])): ?>
+ <div class="alert alert-success"><?php echo \htmlentities($_SESSION['flash']['success']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php unset($_SESSION['flash']['success']);  ?>
+ <?php endif; ?>
+ <?php if(isset($_SESSION['flash']['error'])): ?>
+ <div class="alert alert-danger"><?php echo \htmlentities($_SESSION['flash']['error']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php unset($_SESSION['flash']['error']);  ?>
+ <?php endif; ?>
+
+ <div class="row mb-3">
+ <div class="col-12 d-flex gap-2 flex-wrap">
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-secondary">
+ <i class="bi bi-arrow-left"></i> Danh sách phân bổ
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/edit/' . $assignment['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-warning">
+ <i class="bi bi-pencil"></i> Sửa
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/departures/show/' . $assignment['departure_id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-info text-white">
+ <i class="bi bi-calendar3"></i> Xem chuyến khởi hành
+ </a>
+ </div>
+ </div>
+
+ <div class="row">
+ <div class="col-md-8">
+ <div class="card mb-4">
+ <div class="card-header bg-primary text-white">
+ <h5 class="mb-0"><i class="bi bi-person-check me-2"></i>Thông tin phân bổ</h5>
+ </div>
+ <div class="card-body">
+ <div class="row">
+ <div class="col-md-6">
+ <div class="info-row">
+ <span class="info-label">Mã phân bổ:</span>
+ <div class="fw-bold">#<?php echo \htmlentities(str_pad($assignment['id'], 5, '0', STR_PAD_LEFT)??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Chuyến khởi hành:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($assignment['tour_name'] ?? 'N/A'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Ngày đi:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($assignment['departure_date'] ? date('d/m/Y', strtotime($assignment['departure_date'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Ngày về:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($assignment['return_date'] ? date('d/m/Y', strtotime($assignment['return_date'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ </div>
+ <div class="col-md-6">
+ <div class="info-row">
+ <span class="info-label">Nhân viên:</span>
+ <div class="fw-bold fs-5"><?php echo \htmlentities($assignment['staff_name'] ?? 'N/A'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Liên hệ:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($assignment['staff_phone'] ?? '-'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Ngôn ngữ:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($assignment['staff_languages'] ?? 'Tiếng Việt'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Vai trò:</span>
+ <div>
+ <?php 
+ $roleMap = [
+ 'lead_guide' => ['HDV chính', 'bg-primary'],
+ 'assistant_guide' => ['HDV phụ', 'bg-info'],
+ 'driver' => ['Lái xe', 'bg-warning text-dark'],
+ 'photographer' => ['Nhiếp ảnh', 'bg-success'],
+ 'other' => ['Khác', 'bg-secondary']
+ ];
+ $statusMap = [
+ 'assigned' => ['Đã phân bổ', 'bg-primary'],
+ 'confirmed' => ['Đã xác nhận', 'bg-success'],
+ 'completed' => ['Hoàn thành', 'bg-dark'],
+ 'rejected' => ['Từ chối', 'bg-danger']
+ ];
+ $r = $roleMap[$assignment['role']] ?? [$assignment['role'], 'bg-secondary'];
+ ?>
+ <span class="badge <?php echo \htmlentities($r[1]??'', ENT_QUOTES, 'UTF-8', false); ?>"><?php echo \htmlentities($r[0]??'', ENT_QUOTES, 'UTF-8', false); ?></span>
+ </div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Trạng thái:</span>
+ <div>
+ <?php $s = $statusMap[$assignment['status']] ?? [$assignment['status'], 'bg-secondary'];  ?>
+ <span class="badge <?php echo \htmlentities($s[1]??'', ENT_QUOTES, 'UTF-8', false); ?>"><?php echo \htmlentities($s[0]??'', ENT_QUOTES, 'UTF-8', false); ?></span>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <?php if($assignment['responsibilities']): ?>
+ <div class="info-row mt-3">
+ <span class="info-label">Trách nhiệm chính:</span>
+ <div><?php echo \htmlentities(nl2br(htmlspecialchars($assignment['responsibilities']))??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <?php endif; ?>
+
+ <?php if($assignment['notes']): ?>
+ <div class="info-row">
+ <span class="info-label">Ghi chú:</span>
+ <div><?php echo \htmlentities(nl2br(htmlspecialchars($assignment['notes']))??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <?php endif; ?>
+ </div>
+ </div>
+ </div>
+
+ <div class="col-md-4">
+ <div class="card">
+ <div class="card-header bg-info text-white">
+ <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Lịch sử</h5>
+ </div>
+ <div class="card-body">
+ <div class="info-row">
+ <span class="info-label">Ngày phân bổ:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($assignment['assigned_at'] ? date('d/m/Y H:i', strtotime($assignment['assigned_at'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <?php if($assignment['updated_at']): ?>
+ <div class="info-row">
+ <span class="info-label">Cập nhật lần cuối:</span>
+ <div class="fw-semibold"><?php echo \htmlentities(date('d/m/Y H:i', strtotime($assignment['updated_at']))??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <?php endif; ?>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>
+<?php $this->stopSection(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->runChild('layouts.admin'); } ?>
