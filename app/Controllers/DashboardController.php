@@ -9,7 +9,7 @@ use App\Models\Booking;
 class DashboardController extends Controller { 
     private $modelTour;
     private $modelCategory;
-    private $modelBooking;
+    private $modelBooking; 
 
     public function __construct() {
         $this->modelTour     = new Tour();
