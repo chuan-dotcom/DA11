@@ -1,156 +1,156 @@
 <?php
 
-use App\Controllers\TourController;
-use App\Controllers\TourCategoryController;
-use App\Controllers\DashboardController;
-use App\Controllers\BookingController;
-use App\Controllers\UserController;
-use App\Controllers\StaffController;
-use App\Controllers\DepartureController;
-use App\Controllers\StaffAssignmentController;
-use App\Controllers\ServiceController;
-use App\Controllers\GuestGroupController;
-use App\Controllers\TourDiaryController;
+use App\Controllers\Admin\TourController as AdminTourController;
+use App\Controllers\Admin\TourCategoryController as AdminTourCategoryController;
+use App\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Controllers\Admin\BookingController as AdminBookingController;
+use App\Controllers\Admin\UserController as AdminUserController;
+use App\Controllers\Admin\StaffController as AdminStaffController;
+use App\Controllers\Admin\DepartureController as AdminDepartureController;
+use App\Controllers\Admin\StaffAssignmentController as AdminStaffAssignmentController;
+use App\Controllers\Admin\ServiceController as AdminServiceController;
+use App\Controllers\Admin\GuestGroupController as AdminGuestGroupController;
+use App\Controllers\Admin\TourDiaryController as AdminTourDiaryController;
+
+use App\Controllers\Hdv\TourInfoController as HdvTourInfoController;
+use App\Controllers\Hdv\AssignedTourController as HdvAssignedTourController;
+use App\Controllers\Hdv\ScheduleController as HdvScheduleController;
+use App\Controllers\Hdv\DiaryController as HdvDiaryController;
     
 use Bramus\Router\Router;
 
 $router = new Router();
+$router->setBasePath(app_base_path());
 
-// Trang chủ - Báo cáo thống kê
-$router->get('/', DashboardController::class . '@index');
-$router->get('admin/dashboard', DashboardController::class . '@index');
+/*
+|--------------------------------------------------------------------------
+| QUẢN TRỊ ADMIN
+|--------------------------------------------------------------------------
+*/
+$router->get('/', AdminDashboardController::class . '@index');
+$router->get('admin', AdminDashboardController::class . '@index');
+$router->get('admin/dashboard', AdminDashboardController::class . '@index');
 
 // Admin: Quản lý Tài khoản
-$router->get('admin/users', UserController::class . '@index');
-$router->get('admin/users/create', UserController::class . '@create');
-$router->post('admin/users/store', UserController::class . '@store');
-$router->get('admin/users/edit/(\d+)', UserController::class . '@edit');
-$router->post('admin/users/update/(\d+)', UserController::class . '@update');
-$router->get('admin/users/delete/(\d+)', UserController::class . '@delete');
-$router->get('admin/users/show/(\d+)', UserController::class . '@show');
+$router->get('admin/users', AdminUserController::class . '@index');
+$router->get('admin/users/create', AdminUserController::class . '@create');
+$router->post('admin/users/store', AdminUserController::class . '@store');
+$router->get('admin/users/edit/(\d+)', AdminUserController::class . '@edit');
+$router->post('admin/users/update/(\d+)', AdminUserController::class . '@update');
+$router->get('admin/users/delete/(\d+)', AdminUserController::class . '@delete');
+$router->get('admin/users/show/(\d+)', AdminUserController::class . '@show');
 
 // Admin: Quản lý Danh mục Tour
-$router->get('admin/tour-categories', TourCategoryController::class . '@index');
-$router->get('admin/tour-categories/create', TourCategoryController::class . '@create');
-$router->post('admin/tour-categories/store', TourCategoryController::class . '@store');
-$router->get('admin/tour-categories/edit/(\d+)', TourCategoryController::class . '@edit');
-$router->post('admin/tour-categories/update/(\d+)', TourCategoryController::class . '@update');
-$router->get('admin/tour-categories/delete/(\d+)', TourCategoryController::class . '@delete');
+$router->get('admin/tour-categories', AdminTourCategoryController::class . '@index');
+$router->get('admin/tour-categories/create', AdminTourCategoryController::class . '@create');
+$router->post('admin/tour-categories/store', AdminTourCategoryController::class . '@store');
+$router->get('admin/tour-categories/edit/(\d+)', AdminTourCategoryController::class . '@edit');
+$router->post('admin/tour-categories/update/(\d+)', AdminTourCategoryController::class . '@update');
+$router->get('admin/tour-categories/delete/(\d+)', AdminTourCategoryController::class . '@delete');
 
 // Admin: Quản lý Tour
-$router->get('admin/tours', TourController::class . '@index');
-$router->get('admin/tours/create', TourController::class . '@create');
-$router->post('admin/tours/store', TourController::class . '@store');
-$router->get('admin/tours/edit/(\d+)', TourController::class . '@edit');
-$router->post('admin/tours/update/(\d+)', TourController::class . '@update');
-$router->get('admin/tours/delete/(\d+)', TourController::class . '@delete');
-$router->get('admin/tours/show/(\d+)', TourController::class . '@show');
-$router->get('admin/tours/participants/(\d+)', TourController::class . '@participants');
+$router->get('admin/tours', AdminTourController::class . '@index');
+$router->get('admin/tours/create', AdminTourController::class . '@create');
+$router->post('admin/tours/store', AdminTourController::class . '@store');
+$router->get('admin/tours/edit/(\d+)', AdminTourController::class . '@edit');
+$router->post('admin/tours/update/(\d+)', AdminTourController::class . '@update');
+$router->get('admin/tours/delete/(\d+)', AdminTourController::class . '@delete');
+$router->get('admin/tours/show/(\d+)', AdminTourController::class . '@show');
+$router->get('admin/tours/participants/(\d+)', AdminTourController::class . '@participants');
 
-// Trang công khai khi quét QR — hiện chi tiết tour ngay
-$router->get('tour/(\d+)', TourController::class . '@qrShow');
+// Trang công khai QR
+$router->get('tour/(\d+)', AdminTourController::class . '@qrShow');
 
+// Admin: Booking
+$router->get('admin/bookings', AdminBookingController::class . '@index');
+$router->get('admin/bookings/create', AdminBookingController::class . '@create');
+$router->post('admin/bookings/store', AdminBookingController::class . '@store');
+$router->get('admin/bookings/show/(\d+)', AdminBookingController::class . '@show');
+$router->get('admin/bookings/edit/(\d+)', AdminBookingController::class . '@edit');
+$router->post('admin/bookings/update/(\d+)', AdminBookingController::class . '@update');
+$router->get('admin/bookings/delete/(\d+)', AdminBookingController::class . '@delete');
+
+// Admin: Staff / HDV
+$router->get('admin/staff', AdminStaffController::class . '@index');
+$router->get('admin/staff/create', AdminStaffController::class . '@create');
+$router->post('admin/staff/store', AdminStaffController::class . '@store');
+$router->get('admin/staff/show/(\d+)', AdminStaffController::class . '@show');
+$router->get('admin/staff/edit/(\d+)', AdminStaffController::class . '@edit');
+$router->post('admin/staff/update/(\d+)', AdminStaffController::class . '@update');
+$router->get('admin/staff/delete/(\d+)', AdminStaffController::class . '@delete');
+
+// Admin: Departures
+$router->get('admin/departures', AdminDepartureController::class . '@index');
+$router->get('admin/departures/create', AdminDepartureController::class . '@create');
+$router->post('admin/departures/store', AdminDepartureController::class . '@store');
+$router->get('admin/departures/show/(\d+)', AdminDepartureController::class . '@show');
+$router->get('admin/departures/edit/(\d+)', AdminDepartureController::class . '@edit');
+$router->post('admin/departures/update/(\d+)', AdminDepartureController::class . '@update');
+$router->get('admin/departures/delete/(\d+)', AdminDepartureController::class . '@delete');
+
+// Admin: Staff Assignments
+$router->get('admin/staff-assignments', AdminStaffAssignmentController::class . '@index');
+$router->get('admin/staff-assignments/create', AdminStaffAssignmentController::class . '@create');
+$router->post('admin/staff-assignments/store', AdminStaffAssignmentController::class . '@store');
+$router->get('admin/staff-assignments/show/(\d+)', AdminStaffAssignmentController::class . '@show');
+$router->get('admin/staff-assignments/edit/(\d+)', AdminStaffAssignmentController::class . '@edit');
+$router->post('admin/staff-assignments/update/(\d+)', AdminStaffAssignmentController::class . '@update');
+$router->get('admin/staff-assignments/delete/(\d+)', AdminStaffAssignmentController::class . '@delete');
+
+// Admin: Services
+$router->get('admin/services', AdminServiceController::class . '@index');
+$router->get('admin/services/create', AdminServiceController::class . '@create');
+$router->post('admin/services/store', AdminServiceController::class . '@store');
+$router->get('admin/services/show/(\d+)', AdminServiceController::class . '@show');
+$router->get('admin/services/edit/(\d+)', AdminServiceController::class . '@edit');
+$router->post('admin/services/update/(\d+)', AdminServiceController::class . '@update');
+$router->get('admin/services/delete/(\d+)', AdminServiceController::class . '@delete');
+
+// Admin: Guest Groups
+$router->get('admin/guest-groups', AdminGuestGroupController::class . '@index');
+$router->get('admin/guest-groups/show/(\d+)', AdminGuestGroupController::class . '@show');
+$router->get('admin/guest-groups/print/(\d+)', AdminGuestGroupController::class . '@printList');
+$router->get('admin/guest-groups/assign/(\d+)/(\d+)', AdminGuestGroupController::class . '@assign');
+$router->get('admin/guest-groups/unassign/(\d+)/(\d+)', AdminGuestGroupController::class . '@unassign');
+$router->get('admin/guest-groups/check-in/(\d+)/(\d+)', AdminGuestGroupController::class . '@checkIn');
+$router->get('admin/guest-groups/check-in-cancel/(\d+)/(\d+)', AdminGuestGroupController::class . '@cancelCheckIn');
+$router->get('admin/guest-groups/seed-customers/(\d+)', AdminGuestGroupController::class . '@seedCustomers');
+$router->get('admin/guest-groups/booking-guests/create/(\d+)/(\d+)', AdminGuestGroupController::class . '@createGuest');
+$router->post('admin/guest-groups/booking-guests/store/(\d+)/(\d+)', AdminGuestGroupController::class . '@storeGuest');
+$router->get('admin/guest-groups/booking-guests/edit/(\d+)/(\d+)', AdminGuestGroupController::class . '@editGuest');
+$router->post('admin/guest-groups/booking-guests/update/(\d+)/(\d+)', AdminGuestGroupController::class . '@updateGuest');
+$router->get('admin/guest-groups/booking-guests/delete/(\d+)/(\d+)', AdminGuestGroupController::class . '@deleteGuest');
+$router->get('admin/guest-groups/booking-guests/check-in/(\d+)/(\d+)', AdminGuestGroupController::class . '@checkInGuest');
+$router->get('admin/guest-groups/booking-guests/check-in-cancel/(\d+)/(\d+)', AdminGuestGroupController::class . '@cancelCheckInGuest');
+
+// Admin: Tour Diaries
+$router->get('admin/tour-diaries', AdminTourDiaryController::class . '@index');
+$router->get('admin/tour-diaries/create', AdminTourDiaryController::class . '@create');
+$router->post('admin/tour-diaries/store', AdminTourDiaryController::class . '@store');
+$router->get('admin/tour-diaries/show/(\d+)', AdminTourDiaryController::class . '@show');
+$router->get('admin/tour-diaries/edit/(\d+)', AdminTourDiaryController::class . '@edit');
+$router->post('admin/tour-diaries/update/(\d+)', AdminTourDiaryController::class . '@update');
+$router->get('admin/tour-diaries/delete/(\d+)', AdminTourDiaryController::class . '@delete');
 
 /*
 |--------------------------------------------------------------------------
-| BOOKING
+| KÊNH HƯỚNG DẪN VIÊN (HDV)
 |--------------------------------------------------------------------------
 */
+$router->get('hdv', HdvTourInfoController::class . '@index');
+$router->get('hdv/thong-tin-tour', HdvTourInfoController::class . '@index');
 
-// Danh sách Booking
-$router->get('admin/bookings', BookingController::class . '@index');
+$router->get('hdv/tour-phan-cong', HdvAssignedTourController::class . '@index');
+$router->post('hdv/guest/check-in', HdvAssignedTourController::class . '@toggleCheckIn');
 
-// Form thêm
-$router->get('admin/bookings/create', BookingController::class . '@create');
+$router->get('hdv/lich-trinh', HdvScheduleController::class . '@index');
 
-// Lưu Booking
-$router->post('admin/bookings/store', BookingController::class . '@store');
-
-// Chi tiết
-$router->get('admin/bookings/show/(\d+)', BookingController::class . '@show');
-
-// Form sửa
-$router->get('admin/bookings/edit/(\d+)', BookingController::class . '@edit');
-
-// Cập nhật
-$router->post('admin/bookings/update/(\d+)', BookingController::class . '@update');
-
-// Xóa
-$router->get('admin/bookings/delete/(\d+)', BookingController::class . '@delete');
-
-/*
-|--------------------------------------------------------------------------
-| STAFF - QUẢN LÝ NHÂN SỰ
-|--------------------------------------------------------------------------
-*/
-
-// Danh sách nhân sự
-$router->get('admin/staff', StaffController::class . '@index');
-
-// Form thêm mới
-$router->get('admin/staff/create', StaffController::class . '@create');
-
-// Lưu nhân sự
-$router->post('admin/staff/store', StaffController::class . '@store');
-
-// Chi tiết
-$router->get('admin/staff/show/(\d+)', StaffController::class . '@show');
-
-// Form sửa
-$router->get('admin/staff/edit/(\d+)', StaffController::class . '@edit');
-
-// Cập nhật
-$router->post('admin/staff/update/(\d+)', StaffController::class . '@update');
-
-// Xóa
-$router->get('admin/staff/delete/(\d+)', StaffController::class . '@delete');
-
-$router->get('admin/departures', DepartureController::class . '@index');
-$router->get('admin/departures/create', DepartureController::class . '@create');
-$router->post('admin/departures/store', DepartureController::class . '@store');
-$router->get('admin/departures/show/(\d+)', DepartureController::class . '@show');
-$router->get('admin/departures/edit/(\d+)', DepartureController::class . '@edit');
-$router->post('admin/departures/update/(\d+)', DepartureController::class . '@update');
-$router->get('admin/departures/delete/(\d+)', DepartureController::class . '@delete');
-
-$router->get('admin/staff-assignments', StaffAssignmentController::class . '@index');
-$router->get('admin/staff-assignments/create', StaffAssignmentController::class . '@create');
-$router->post('admin/staff-assignments/store', StaffAssignmentController::class . '@store');
-$router->get('admin/staff-assignments/show/(\d+)', StaffAssignmentController::class . '@show');
-$router->get('admin/staff-assignments/edit/(\d+)', StaffAssignmentController::class . '@edit');
-$router->post('admin/staff-assignments/update/(\d+)', StaffAssignmentController::class . '@update');
-$router->get('admin/staff-assignments/delete/(\d+)', StaffAssignmentController::class . '@delete');
-
-$router->get('admin/services', ServiceController::class . '@index');
-$router->get('admin/services/create', ServiceController::class . '@create');
-$router->post('admin/services/store', ServiceController::class . '@store');
-$router->get('admin/services/show/(\d+)', ServiceController::class . '@show');
-$router->get('admin/services/edit/(\d+)', ServiceController::class . '@edit');
-$router->post('admin/services/update/(\d+)', ServiceController::class . '@update');
-$router->get('admin/services/delete/(\d+)', ServiceController::class . '@delete');
-
-$router->get('admin/guest-groups', GuestGroupController::class . '@index');
-$router->get('admin/guest-groups/show/(\d+)', GuestGroupController::class . '@show');
-$router->get('admin/guest-groups/print/(\d+)', GuestGroupController::class . '@printList');
-$router->get('admin/guest-groups/assign/(\d+)/(\d+)', GuestGroupController::class . '@assign');
-$router->get('admin/guest-groups/unassign/(\d+)/(\d+)', GuestGroupController::class . '@unassign');
-$router->get('admin/guest-groups/check-in/(\d+)/(\d+)', GuestGroupController::class . '@checkIn');
-$router->get('admin/guest-groups/check-in-cancel/(\d+)/(\d+)', GuestGroupController::class . '@cancelCheckIn');
-$router->get('admin/guest-groups/seed-customers/(\d+)', GuestGroupController::class . '@seedCustomers');
-$router->get('admin/guest-groups/booking-guests/create/(\d+)/(\d+)', GuestGroupController::class . '@createGuest');
-$router->post('admin/guest-groups/booking-guests/store/(\d+)/(\d+)', GuestGroupController::class . '@storeGuest');
-$router->get('admin/guest-groups/booking-guests/edit/(\d+)/(\d+)', GuestGroupController::class . '@editGuest');
-$router->post('admin/guest-groups/booking-guests/update/(\d+)/(\d+)', GuestGroupController::class . '@updateGuest');
-$router->get('admin/guest-groups/booking-guests/delete/(\d+)/(\d+)', GuestGroupController::class . '@deleteGuest');
-$router->get('admin/guest-groups/booking-guests/check-in/(\d+)/(\d+)', GuestGroupController::class . '@checkInGuest');
-$router->get('admin/guest-groups/booking-guests/check-in-cancel/(\d+)/(\d+)', GuestGroupController::class . '@cancelCheckInGuest');
-
-$router->get('admin/tour-diaries', TourDiaryController::class . '@index');
-$router->get('admin/tour-diaries/create', TourDiaryController::class . '@create');
-$router->post('admin/tour-diaries/store', TourDiaryController::class . '@store');
-$router->get('admin/tour-diaries/show/(\d+)', TourDiaryController::class . '@show');
-$router->get('admin/tour-diaries/edit/(\d+)', TourDiaryController::class . '@edit');
-$router->post('admin/tour-diaries/update/(\d+)', TourDiaryController::class . '@update');
-$router->get('admin/tour-diaries/delete/(\d+)', TourDiaryController::class . '@delete');
+$router->get('hdv/nhat-ky-tour', HdvDiaryController::class . '@index');
+$router->get('hdv/nhat-ky-tour/create', HdvDiaryController::class . '@create');
+$router->post('hdv/nhat-ky-tour/store', HdvDiaryController::class . '@store');
+$router->get('hdv/nhat-ky-tour/show/(\d+)', HdvDiaryController::class . '@show');
+$router->get('hdv/nhat-ky-tour/edit/(\d+)', HdvDiaryController::class . '@edit');
+$router->post('hdv/nhat-ky-tour/update/(\d+)', HdvDiaryController::class . '@update');
+$router->get('hdv/nhat-ky-tour/delete/(\d+)', HdvDiaryController::class . '@delete');
 
 $router->run();

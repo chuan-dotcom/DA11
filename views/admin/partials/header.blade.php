@@ -1,0 +1,12 @@
+<nav class="navbar admin-header px-3 px-md-4 py-3">
+    <a class="admin-brand" href="{{ route('admin') }}">
+        <span class="admin-brand-logo">
+            <i class="bi bi-airplane-engines-fill"></i>
+        </span>
+        <span>
+            <span class="admin-brand-title">Đức Long Travel</span>
+            <span class="admin-brand-subtitle">Hệ thống quản lý tour</span>
+        </span>
+    </a>
+</nav>
+                          

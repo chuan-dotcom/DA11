@@ -27,9 +27,13 @@ class Model
         }
     }
 
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
     public function __destruct()
     {
         $this->connection = null;
     }
 }
-        

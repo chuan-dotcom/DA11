@@ -82,7 +82,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12 col-md-3 col-lg-2 admin-sidebar min-vh-100 p-3">
-            @include('partials.aside')
+            @include('admin.partials.aside')
         </div>
 
         <div class="col-12 col-md-9 col-lg-10 p-3">
@@ -91,7 +91,7 @@
     </div>
 </div>
 
-@include('partials.footer')
+@include('admin.partials.footer')
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -150,7 +150,7 @@ class StaffAssignment extends Model
 
         if (!empty($assignedIds)) {
             $staffStmt->andWhere('h.HDV_id NOT IN (:assigned_ids)');
-            $staffStmt->setParameter('assigned_ids', $assignedIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+            $staffStmt->setParameter('assigned_ids', $assignedIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
         }
 
         $staffList = $staffStmt->fetchAllAssociative();

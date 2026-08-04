@@ -187,6 +187,21 @@ class Booking extends Model
     }
 
     /**
+     * Tổng khách hàng (theo email)
+     */
+    public function getTotalCustomers()
+    {
+        $stmt = $this->connection->createQueryBuilder();
+
+        $stmt->select('COUNT(DISTINCT b.customer_email) AS total')
+            ->from('bookings', 'b');
+
+        $row = $stmt->fetchAssociative();
+
+        return (int) ($row['total'] ?? 0);
+    }
+
+    /**
      * Booking chờ xác nhận
      */
     public function getTotalPendingBookings()
@@ -355,6 +370,14 @@ class Booking extends Model
             ->setMaxResults($limit);
 
         return $stmt->fetchAllAssociative();
+    }
+
+    /**
+     * Alias for getLatestBookings() used by existing dashboard code.
+     */
+    public function getRecentBookings($limit = 5)
+    {
+        return $this->getLatestBookings($limit);
     }
 
     /**
