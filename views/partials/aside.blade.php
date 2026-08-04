@@ -86,6 +86,11 @@
             <i class="bi bi-briefcase-fill"></i> Quản lý dịch vụ
         </a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link {{ $isActive('admin/tour-diaries') ? 'is-active' : '' }}" href="{{ route('admin/tour-diaries') }}">
+            <i class="bi bi-journal-text"></i> Nhật ký tour
+        </a>
+    </li>
 
     <li class="nav-item mt-3">
         <h6 class="sidebar-section-title px-3 mb-1">Đoàn khách</h6>

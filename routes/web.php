@@ -10,6 +10,7 @@ use App\Controllers\DepartureController;
 use App\Controllers\StaffAssignmentController;
 use App\Controllers\ServiceController;
 use App\Controllers\GuestGroupController;
+use App\Controllers\TourDiaryController;
     
 use Bramus\Router\Router;
 
@@ -135,5 +136,13 @@ $router->get('admin/guest-groups/assign/(\d+)/(\d+)', GuestGroupController::clas
 $router->get('admin/guest-groups/unassign/(\d+)/(\d+)', GuestGroupController::class . '@unassign');
 $router->get('admin/guest-groups/check-in/(\d+)/(\d+)', GuestGroupController::class . '@checkIn');
 $router->get('admin/guest-groups/check-in-cancel/(\d+)/(\d+)', GuestGroupController::class . '@cancelCheckIn');
+
+$router->get('admin/tour-diaries', TourDiaryController::class . '@index');
+$router->get('admin/tour-diaries/create', TourDiaryController::class . '@create');
+$router->post('admin/tour-diaries/store', TourDiaryController::class . '@store');
+$router->get('admin/tour-diaries/show/(\d+)', TourDiaryController::class . '@show');
+$router->get('admin/tour-diaries/edit/(\d+)', TourDiaryController::class . '@edit');
+$router->post('admin/tour-diaries/update/(\d+)', TourDiaryController::class . '@update');
+$router->get('admin/tour-diaries/delete/(\d+)', TourDiaryController::class . '@delete');
 
 $router->run();

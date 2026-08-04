@@ -73,6 +73,32 @@ function setFlash($key, $value) {
     $_SESSION[$key] = $value;
 }
 
+function old($key, $default = null) {
+    if (isset($_SESSION['old_input'][$key])) {
+        $v = $_SESSION['old_input'][$key];
+        return is_string($v) ? htmlspecialchars($v, ENT_QUOTES, 'UTF-8') : $v;
+    }
+    if (isset($_POST[$key])) {
+        $v = $_POST[$key];
+        return is_string($v) ? htmlspecialchars($v, ENT_QUOTES, 'UTF-8') : $v;
+    }
+    return $default;
+}
+
+function e($value, $doubleEncode = true) {
+    if (is_null($value)) return '';
+    if (is_string($value)) {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+    }
+    if (is_numeric($value) || is_bool($value)) {
+        return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+    }
+    if (is_array($value) || is_object($value)) {
+        return '';
+    }
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+}
+
 function is_upload($name) {
     return isset($_FILES[$name]) && $_FILES[$name]['error'] == 0;
 }
