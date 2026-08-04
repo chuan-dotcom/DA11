@@ -84,27 +84,36 @@
                     <th>STT</th>
                     <th>Mã booking</th>
                     <th>Tên khách</th>
-                    <th>Số lượng</th>
-                    <th>Email</th>
+                    <th>CCCD/Passport</th>
                     <th>SĐT</th>
+                    <th>Email</th>
+                    <th>Thanh toán</th>
                     <th>Check-in</th>
                 </tr>
             </thead>
             <tbody>
-                @if(empty($bookings))
+                @php
+                    $paymentMap = [
+                        'unpaid' => 'Chưa thanh toán',
+                        'deposit' => 'Đã đặt cọc',
+                        'paid' => 'Đã thanh toán',
+                    ];
+                @endphp
+                @if(empty($guests))
                     <tr>
-                        <td colspan="7" class="text-center">Chưa có khách trong đoàn</td>
+                        <td colspan="8" class="text-center">Chưa có khách trong đoàn</td>
                     </tr>
                 @else
-                    @foreach($bookings as $index => $booking)
+                    @foreach($guests as $index => $guest)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td>#{{ $booking['id'] }}</td>
-                            <td>{{ $booking['customer_name'] }}</td>
-                            <td>{{ $booking['num_people'] }}</td>
-                            <td>{{ $booking['customer_email'] }}</td>
-                            <td>{{ $booking['customer_phone'] }}</td>
-                            <td>{{ (int) ($booking['check_in_status'] ?? 0) === 1 ? 'Đã check-in' : 'Chưa check-in' }}</td>
+                            <td>#{{ $guest['booking_id'] }}</td>
+                            <td>{{ $guest['full_name'] }}</td>
+                            <td>{{ $guest['identity_no'] ?: '-' }}</td>
+                            <td>{{ $guest['phone'] ?: '-' }}</td>
+                            <td>{{ $guest['email'] ?: '-' }}</td>
+                            <td>{{ $paymentMap[$guest['payment_status'] ?? 'unpaid'] ?? '-' }}</td>
+                            <td>{{ (int) ($guest['check_in_status'] ?? 0) === 1 ? 'Đã check-in' : 'Chưa check-in' }}</td>
                         </tr>
                     @endforeach
                 @endif

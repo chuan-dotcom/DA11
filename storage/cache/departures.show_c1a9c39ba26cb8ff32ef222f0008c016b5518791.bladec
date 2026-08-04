@@ -1,0 +1,221 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->startSection('title', $title); ?>                 
+
+<?php $this->startSection('content'); ?>
+<style>
+ .status-badge { font-size: 0.85rem; padding: 6px 12px; }
+ .info-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; }
+ .info-row:last-child { border-bottom: none; }
+ .info-label { color: #6c757d; font-weight: 500; }
+ .role-chip { font-size: 0.75rem; }
+</style>
+
+<div class="container mt-4">
+ <h2 class="mb-4"><?php echo \htmlentities($title??'', ENT_QUOTES, 'UTF-8', false); ?></h2>
+
+ <?php if(isset($_SESSION['flash']['success'])): ?>
+ <div class="alert alert-success"><?php echo \htmlentities($_SESSION['flash']['success']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php unset($_SESSION['flash']['success']);  ?>
+ <?php endif; ?>
+ <?php if(isset($_SESSION['flash']['error'])): ?>
+ <div class="alert alert-danger"><?php echo \htmlentities($_SESSION['flash']['error']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php unset($_SESSION['flash']['error']);  ?>
+ <?php endif; ?>
+
+ <div class="row mb-3">
+ <div class="col-12 d-flex gap-2 flex-wrap">
+ <a href="<?php echo \htmlentities(route('admin/departures')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-secondary">
+ <i class="bi bi-arrow-left"></i> Danh sách khởi hành
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/departures/edit/' . $departure['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-warning">
+ <i class="bi bi-pencil"></i> Sửa
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/create')??'', ENT_QUOTES, 'UTF-8', false); ?>?departure_id=<?php echo \htmlentities($departure['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-success">
+ <i class="bi bi-person-plus"></i> Phân bổ nhân sự
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/guest-groups/show/' . $departure['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-primary">
+ <i class="bi bi-people"></i> Quản lý đoàn
+ </a>
+ </div>
+ </div>
+
+ <div class="row">
+ <div class="col-md-8">
+ <div class="card mb-4">
+ <div class="card-header bg-primary text-white">
+ <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Thông tin chuyến khởi hành</h5>
+ </div>
+ <div class="card-body">
+ <div class="row">
+ <div class="col-md-6">
+ <div class="info-row">
+ <span class="info-label">Tên đoàn:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($departure['group_name'] ?: ('Đoàn ' . ($departure['tour_name'] ?? 'Chưa cập nhật'))??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Tour:</span>
+ <div class="fw-bold fs-5"><?php echo \htmlentities($departure['tour_name'] ?? 'N/A'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Ngày khởi hành:</span>
+ <div class="fw-semibold"><?php echo \htmlentities(date('d/m/Y', strtotime($departure['departure_date']))??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Ngày trở về:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($departure['return_date'] ? date('d/m/Y', strtotime($departure['return_date'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Thời gian:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($departure['tour_duration'] ?? '-'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ </div>
+ <div class="col-md-6">
+ <div class="info-row">
+ <span class="info-label">Điểm tập trung:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($departure['meeting_point'] ?? '-'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Giờ tập trung:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($departure['meeting_time'] ? date('H:i', strtotime($departure['meeting_time'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Phương tiện:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($departure['vehicle'] ?? '-'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Số khách tối đa:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($departure['max_participants']??'', ENT_QUOTES, 'UTF-8', false); ?> người</div>
+ </div>
+ </div>
+ </div>
+ <div class="info-row mt-3">
+ <span class="info-label">Trạng thái:</span>
+ <div>
+ <?php 
+ $statusMap = [
+ 'scheduled' => ['Lên lịch', 'bg-primary'],
+ 'in_progress' => ['Đang diễn ra', 'bg-warning text-dark'],
+ 'completed' => ['Hoàn thành', 'bg-success'],
+ 'cancelled' => ['Đã hủy', 'bg-secondary']
+ ];
+ $s = $statusMap[$departure['status']] ?? [$departure['status'], 'bg-secondary'];
+ ?>
+ <span class="badge status-badge <?php echo \htmlentities($s[1]??'', ENT_QUOTES, 'UTF-8', false); ?>"><?php echo \htmlentities($s[0]??'', ENT_QUOTES, 'UTF-8', false); ?></span>
+ </div>
+ </div>
+ <?php if($departure['notes']): ?>
+ <div class="info-row">
+ <span class="info-label">Ghi chú:</span>
+ <div><?php echo \htmlentities(nl2br(htmlspecialchars($departure['notes']))??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <?php endif; ?>
+ </div>
+ </div>
+
+ <div class="card">
+ <div class="card-header bg-success text-white">
+ <h5 class="mb-0"><i class="bi bi-people me-2"></i>Nhân sự tham gia</h5>
+ </div>
+ <div class="card-body">
+ <?php if(empty($assignments)): ?>
+ <div class="text-center text-muted py-4">
+ <i class="bi bi-person-x fs-1 d-block mb-2"></i>
+ Chưa phân bổ nhân sự cho chuyến này
+ <br>
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/create')??'', ENT_QUOTES, 'UTF-8', false); ?>?departure_id=<?php echo \htmlentities($departure['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-success mt-3">
+ <i class="bi bi-person-plus"></i> Phân bổ ngay
+ </a>
+ </div>
+ <?php else: ?>
+ <div class="table-responsive">
+ <table class="table table-bordered align-middle">
+ <thead class="table-light">
+ <tr>
+ <th>Họ tên</th>
+ <th>Vai trò</th>
+ <th>Liên hệ</th>
+ <th>Ngôn ngữ</th>
+ <th>Trách nhiệm</th>
+ <th>Thao tác</th>
+ </tr>
+ </thead>
+ <tbody>
+ <?php 
+ $roleMap = [
+ 'lead_guide' => ['HDV chính', 'bg-primary'],
+ 'assistant_guide' => ['HDV phụ', 'bg-info'],
+ 'driver' => ['Lái xe', 'bg-warning text-dark'],
+ 'photographer' => ['Nhiếp ảnh', 'bg-success'],
+ 'other' => ['Khác', 'bg-secondary']
+ ];
+ ?>
+ <?php $__currentLoopData = $assignments; $this->addLoop($__currentLoopData);$this->getFirstLoop();
+ foreach($__currentLoopData as $a): $loop = $this->incrementLoopIndices();  ?>
+ <tr>
+ <td class="fw-semibold">
+ <i class="bi bi-person-circle me-1"></i>
+ <?php echo \htmlentities($a['staff_name']??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </td>
+ <td>
+ <?php $r = $roleMap[$a['role']] ?? [$a['role'], 'bg-secondary'];  ?>
+ <span class="badge role-chip <?php echo \htmlentities($r[1]??'', ENT_QUOTES, 'UTF-8', false); ?>"><?php echo \htmlentities($r[0]??'', ENT_QUOTES, 'UTF-8', false); ?></span>
+ </td>
+ <td><?php echo \htmlentities($a['staff_phone'] ?? '-'??'', ENT_QUOTES, 'UTF-8', false); ?></td>
+ <td><?php echo \htmlentities($a['staff_languages'] ?? '-'??'', ENT_QUOTES, 'UTF-8', false); ?></td>
+ <td><?php echo \htmlentities($a['responsibilities'] ?? '-'??'', ENT_QUOTES, 'UTF-8', false); ?></td>
+ <td class="text-nowrap">
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/show/' . $a['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-info text-white">
+ <i class="bi bi-eye"></i>
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/edit/' . $a['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-warning">
+ <i class="bi bi-pencil"></i>
+ </a>
+ </td>
+ </tr>
+ <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
+ </tbody>
+ </table>
+ </div>
+ <?php endif; ?>
+ </div>
+ </div>
+ </div>
+
+ <div class="col-md-4">
+ <div class="card">
+ <div class="card-header bg-info text-white">
+ <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Thông tin khác</h5>
+ </div>
+ <div class="card-body">
+ <div class="info-row">
+ <span class="info-label">Mã chuyến:</span>
+ <div class="fw-bold">#<?php echo \htmlentities(str_pad($departure['id'], 4, '0', STR_PAD_LEFT)??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Giá tour:</span>
+ <div class="fw-semibold text-danger"><?php echo \htmlentities(number_format($departure['tour_price'] ?? 0)??'', ENT_QUOTES, 'UTF-8', false); ?> VNĐ</div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Số nhân sự:</span>
+ <div class="fw-semibold"><?php echo \htmlentities(count($assignments)??'', ENT_QUOTES, 'UTF-8', false); ?> người</div>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Ngày tạo:</span>
+ <div class="fw-semibold"><?php echo \htmlentities($departure['created_at'] ? date('d/m/Y H:i', strtotime($departure['created_at'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <?php if($departure['updated_at']): ?>
+ <div class="info-row">
+ <span class="info-label">Cập nhật lần cuối:</span>
+ <div class="fw-semibold"><?php echo \htmlentities(date('d/m/Y H:i', strtotime($departure['updated_at']))??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <?php endif; ?>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>
+<?php $this->stopSection(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->runChild('layouts.admin'); } ?>

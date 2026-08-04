@@ -38,7 +38,7 @@
                             <th>SĐT</th>
                             <th>Số người</th>
                             <th>Tổng tiền</th>
-                            <th>Ngày đi</th>
+                            <th>Ngày đặt</th>
                             <th>Trạng thái</th>
                             <th width="220">Thao tác</th>
                         </tr>
