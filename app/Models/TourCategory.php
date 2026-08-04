@@ -9,7 +9,7 @@ class TourCategory extends Model{
         $stmt->select('*')
             ->from('tour_categories');
         
-        return $stmt->fetchAllAssociative();
+        return $stmt->fetchAllAssociative(); 
     }
 
     public function findByid($id) {

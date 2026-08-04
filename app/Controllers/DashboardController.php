@@ -6,7 +6,7 @@ use App\Models\Tour;
 use App\Models\TourCategory; 
 use App\Models\Booking;
 
-class DashboardController extends Controller {
+class DashboardController extends Controller { 
     private $modelTour;
     private $modelCategory;
     private $modelBooking;

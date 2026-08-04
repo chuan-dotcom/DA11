@@ -8,7 +8,7 @@ class Tour extends Model{
         $stmt=$this->connection->createQueryBuilder();
         $stmt->select('t.*', 'tc.name as category_name')
             ->from('tours', 't')
-            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id') 
             ->orderBy('t.id', 'DESC');
         
         return $stmt->fetchAllAssociative();

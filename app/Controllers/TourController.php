@@ -7,7 +7,7 @@ use App\Models\TourCategory;
 use App\Models\Booking;
 use Rakit\Validation\Validator;
 
-class TourController extends Controller{ 
+class TourController extends Controller{  
     private $modelTour;
     private $modelCategory;
     private $modelBooking;
