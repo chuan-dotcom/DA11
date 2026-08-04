@@ -1,0 +1,264 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->startSection('title', $title); ?>
+
+<?php $this->startSection('content'); ?>
+<style>
+ .log-card {
+ transition: all 0.2s ease;
+ border-left: 4px solid #0d6efd;
+ }
+ .log-card:hover {
+ transform: translateY(-2px);
+ box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+ }
+ .status-published { border-left-color: #198754; }
+ .status-draft { border-left-color: #6c757d; }
+ .mood-emoji { font-size: 1.5rem; }
+ .log-preview {
+ display: -webkit-box;
+ -webkit-line-clamp: 2;
+ -webkit-box-orient: vertical;
+ overflow: hidden;
+ }
+ .stat-card {
+ border-radius: 10px;
+ border: none;
+ box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+ }
+</style>
+
+<div class="container mt-4">
+ <h2 class="mb-4"><?php echo \htmlentities($title??'', ENT_QUOTES, 'UTF-8', false); ?></h2>
+
+ <?php if(isset($_SESSION['flash']['success'])): ?>
+ <div class="alert alert-success"><?php echo \htmlentities($_SESSION['flash']['success']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php unset($_SESSION['flash']['success']);  ?>
+ <?php endif; ?>
+ <?php if(isset($_SESSION['flash']['error'])): ?>
+ <div class="alert alert-danger"><?php echo \htmlentities($_SESSION['flash']['error']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php unset($_SESSION['flash']['error']);  ?>
+ <?php endif; ?>
+
+ <div class="row mb-4 g-3">
+ <div class="col-md-4">
+ <div class="card stat-card">
+ <div class="card-body">
+ <div class="d-flex justify-content-between align-items-center">
+ <div>
+ <div class="text-muted small">Tổng số nhật ký</div>
+ <div class="fs-4 fw-bold"><?php echo \htmlentities($totalLogs??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <i class="bi bi-journal-text fs-2 text-primary"></i>
+ </div>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-4">
+ <div class="card stat-card">
+ <div class="card-body">
+ <div class="d-flex justify-content-between align-items-center">
+ <div>
+ <div class="text-muted small">Hiển thị</div>
+ <div class="fs-4 fw-bold text-success"><?php echo \htmlentities(count($logs)??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <i class="bi bi-eye fs-2 text-success"></i>
+ </div>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-4">
+ <div class="card stat-card">
+ <div class="card-body">
+ <div class="d-flex justify-content-between align-items-center">
+ <div>
+ <div class="text-muted small">Chuyến khởi hành</div>
+ <div class="fs-4 fw-bold text-info"><?php echo \htmlentities(count($departures)??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <i class="bi bi-bus-front fs-2 text-info"></i>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <div class="mb-4 d-flex gap-2 flex-wrap align-items-end">
+ <a href="<?php echo \htmlentities(route('admin/tour-logs/create')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-primary">
+ <i class="bi bi-plus-circle"></i> Ghi nhật ký mới
+ </a>
+ <form method="get" class="d-flex gap-2 flex-wrap align-items-end ms-auto">
+ <div>
+ <label for="departure_id" class="form-label small mb-1">Chuyến khởi hành</label>
+ <select name="departure_id" id="departure_id" class="form-select form-select-sm">
+ <option value="">Tất cả chuyến</option>
+ <?php $__currentLoopData = $departures; $this->addLoop($__currentLoopData);$this->getFirstLoop();
+ foreach($__currentLoopData as $d): $loop = $this->incrementLoopIndices();  ?>
+ <option value="<?php echo \htmlentities($d['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" <?php echo \htmlentities((!empty($departureId) && (int)$departureId === (int)$d['id']) ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>
+ #<?php echo \htmlentities($d['id']??'', ENT_QUOTES, 'UTF-8', false); ?> - <?php echo \htmlentities($d['tour_name'] ?? 'Tour'??'', ENT_QUOTES, 'UTF-8', false); ?> (<?php echo \htmlentities(date('d/m/Y', strtotime($d['departure_date']))??'', ENT_QUOTES, 'UTF-8', false); ?>)
+ </option>
+ <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
+ </select>
+ </div>
+ <div>
+ <label for="status" class="form-label small mb-1">Trạng thái</label>
+ <select name="status" id="status" class="form-select form-select-sm">
+ <option value="">Tất cả</option>
+ <option value="published" <?php echo \htmlentities($status === 'published' ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>Đã công khai</option>
+ <option value="draft" <?php echo \htmlentities($status === 'draft' ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>Nháp</option>
+ </select>
+ </div>
+ <button type="submit" class="btn btn-outline-primary btn-sm">
+ <i class="bi bi-funnel"></i> Lọc
+ </button>
+ <?php if(!empty($departureId) || $status !== null): ?>
+ <a href="<?php echo \htmlentities(route('admin/tour-logs')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-outline-secondary btn-sm">
+ <i class="bi bi-x-circle"></i> Xóa lọc
+ </a>
+ <?php endif; ?>
+ </form>
+ </div>
+
+ <?php if(!empty($departures) && !empty($departureId)): ?>
+ <?php 
+ $selectedDeparture = null;
+ foreach ($departures as $d) {
+ if ((int)$d['id'] === (int)$departureId) { $selectedDeparture = $d; break; }
+ }
+ ?>
+ <?php if($selectedDeparture): ?>
+ <div class="alert alert-info py-2 mb-3 d-flex justify-content-between align-items-center">
+ <span>
+ Đang xem nhật ký của chuyến:
+ <strong><?php echo \htmlentities($selectedDeparture['tour_name'] ?? 'Tour'??'', ENT_QUOTES, 'UTF-8', false); ?></strong>
+ (<?php echo \htmlentities(date('d/m/Y', strtotime($selectedDeparture['departure_date']))??'', ENT_QUOTES, 'UTF-8', false); ?>)
+ <?php if(!empty($selectedDeparture['group_name'])): ?> - <?php echo \htmlentities($selectedDeparture['group_name']??'', ENT_QUOTES, 'UTF-8', false); ?> <?php endif; ?>
+ </span>
+ <a href="<?php echo \htmlentities(route('admin/tour-logs/create')??'', ENT_QUOTES, 'UTF-8', false); ?>?departure_id=<?php echo \htmlentities($selectedDeparture['id']??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ class="btn btn-sm btn-success">
+ <i class="bi bi-plus"></i> Thêm nhật ký chuyến này
+ </a>
+ </div>
+ <?php endif; ?>
+ <?php endif; ?>
+
+ <?php if(empty($logs)): ?>
+ <div class="card">
+ <div class="card-body text-center py-5">
+ <i class="bi bi-journal-x fs-1 text-muted d-block mb-3"></i>
+ <h5 class="text-muted">Chưa có nhật ký nào</h5>
+ <p class="text-muted mb-3">Hãy bắt đầu ghi lại những khoảnh khắc đáng nhớ của tour</p>
+ <a href="<?php echo \htmlentities(route('admin/tour-logs/create')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-primary">
+ <i class="bi bi-plus-circle"></i> Ghi nhật ký đầu tiên
+ </a>
+ </div>
+ </div>
+ <?php else: ?>
+ <div class="row g-4">
+ <?php $__currentLoopData = $logs; $this->addLoop($__currentLoopData);$this->getFirstLoop();
+ foreach($__currentLoopData as $log): $loop = $this->incrementLoopIndices();  ?>
+ <div class="col-md-6 col-lg-4">
+ <div class="card log-card status-<?php echo \htmlentities($log['status']??'', ENT_QUOTES, 'UTF-8', false); ?> h-100">
+ <div class="card-body d-flex flex-column">
+ <div class="d-flex justify-content-between align-items-start mb-2">
+ <div>
+ <small class="text-muted">
+ <i class="bi bi-calendar-event me-1"></i>
+ <?php echo \htmlentities(date('d/m/Y H:i', strtotime($log['log_date']))??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </small>
+ <?php if(!empty($log['location'])): ?>
+ <div class="small text-muted mt-1">
+ <i class="bi bi-geo-alt me-1"></i><?php echo \htmlentities($log['location']??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </div>
+ <?php endif; ?>
+ </div>
+ <div class="text-end">
+ <?php if(!empty($log['mood'])): ?>
+ <span class="mood-emoji" title="Tâm trạng: <?php echo \htmlentities($log['mood']??'', ENT_QUOTES, 'UTF-8', false); ?>">
+ <?php 
+ $moodEmoji = [
+ 'happy' => '😊', 'excited' => '🎉', 'calm' => '😌',
+ 'tired' => '😴', 'sad' => '😢', 'neutral' => '😐'
+ ];
+ ?>
+ <?php echo \htmlentities($moodEmoji[$log['mood']] ?? '📝'??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </span>
+ <?php endif; ?>
+ </div>
+ </div>
+
+ <h5 class="card-title mb-2">
+ <a href="<?php echo \htmlentities(route('admin/tour-logs/show/' . $log['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ class="text-dark text-decoration-none">
+ <?php echo \htmlentities($log['title']??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </a>
+ </h5>
+
+ <div class="small text-info mb-2">
+ <i class="bi bi-bus-front me-1"></i>
+ <?php echo \htmlentities($log['tour_name'] ?? 'Tour'??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ <?php if(!empty($log['group_name'])): ?>
+ <span class="text-muted">(<?php echo \htmlentities($log['group_name']??'', ENT_QUOTES, 'UTF-8', false); ?>)</span>
+ <?php endif; ?>
+ </div>
+
+ <p class="card-text log-preview text-muted small mb-3">
+ <?php echo \htmlentities(strip_tags($log['content'])??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </p>
+
+ <div class="mt-auto d-flex justify-content-between align-items-center">
+ <div class="d-flex gap-1">
+ <?php if(!empty($log['weather'])): ?>
+ <span class="badge bg-light text-dark">
+ <i class="bi bi-cloud-sun me-1"></i><?php echo \htmlentities($log['weather']??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </span>
+ <?php endif; ?>
+ <?php if($log['status'] === 'draft'): ?>
+ <span class="badge bg-secondary"><i class="bi bi-lock"></i> Nháp</span>
+ <?php else: ?>
+ <span class="badge bg-success"><i class="bi bi-globe"></i> Công khai</span>
+ <?php endif; ?>
+ <?php 
+ $imgCount = 0;
+ $imgs = json_decode($log['images'] ?? '[]', true);
+ if (is_array($imgs)) { $imgCount = count($imgs); }
+ ?>
+ <?php if($imgCount > 0): ?>
+ <span class="badge bg-info">
+ <i class="bi bi-image me-1"></i><?php echo \htmlentities($imgCount??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </span>
+ <?php endif; ?>
+ </div>
+ <div class="d-flex gap-1">
+ <a href="<?php echo \htmlentities(route('admin/tour-logs/show/' . $log['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+ <i class="bi bi-eye"></i>
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/tour-logs/edit/' . $log['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ class="btn btn-sm btn-outline-warning" title="Sửa">
+ <i class="bi bi-pencil"></i>
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/tour-logs/delete/' . $log['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ class="btn btn-sm btn-outline-danger" title="Xóa"
+ onclick="return confirm('Bạn có chắc muốn xóa nhật ký này?')">
+ <i class="bi bi-trash"></i>
+ </a>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
+ </div>
+ <?php endif; ?>
+</div>
+<?php $this->stopSection(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->runChild('layouts.admin'); } ?>

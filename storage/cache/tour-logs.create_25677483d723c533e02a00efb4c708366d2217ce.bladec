@@ -1,0 +1,194 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->startSection('title', $title); ?>
+
+<?php $this->startSection('content'); ?>
+<style>
+ .image-preview-wrapper {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 10px;
+ margin-top: 10px;
+ }
+ .image-preview-item {
+ position: relative;
+ width: 120px;
+ height: 120px;
+ border: 2px dashed #ddd;
+ border-radius: 8px;
+ overflow: hidden;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ background: #f8f9fa;
+ }
+ .image-preview-item img {
+ max-width: 100%;
+ max-height: 100%;
+ object-fit: cover;
+ }
+ .mood-option {
+ cursor: pointer;
+ transition: all 0.2s;
+ }
+ .mood-option:hover { transform: scale(1.2); }
+ .mood-option.selected {
+ transform: scale(1.3);
+ filter: drop-shadow(0 0 4px rgba(13,110,253,0.5));
+ }
+</style>
+
+<div class="container mt-4">
+ <h2 class="mb-4"><?php echo \htmlentities($title??'', ENT_QUOTES, 'UTF-8', false); ?></h2>
+
+ <?php if(isset($_SESSION['flash']['error'])): ?>
+ <div class="alert alert-danger"><?php echo \htmlentities($_SESSION['flash']['error']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php unset($_SESSION['flash']['error']);  ?>
+ <?php endif; ?>
+
+ <div class="card">
+ <div class="card-body">
+ <form action="<?php echo \htmlentities(route('admin/tour-logs/store')??'', ENT_QUOTES, 'UTF-8', false); ?>" method="POST" enctype="multipart/form-data">
+ <div class="row">
+ <div class="col-md-8">
+ <div class="mb-3">
+ <label for="title" class="form-label">Tiêu đề nhật ký <span class="text-danger">*</span></label>
+ <input type="text" class="form-control form-control-lg" id="title" name="title"
+ placeholder="Ví dụ: Ngày đầu tiên khám phá Hà Nội cổ" required>
+ </div>
+
+ <div class="mb-3">
+ <label for="content" class="form-label">Nội dung <span class="text-danger">*</span></label>
+ <textarea class="form-control" id="content" name="content" rows="10"
+ placeholder="Hãy kể lại những khoảnh khắc, sự kiện, cảm xúc trong ngày..."
+ required style="resize: vertical;"></textarea>
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Hình ảnh</label>
+ <input type="file" class="form-control" id="images" name="images[]"
+ accept="image/*" multiple>
+ <div class="form-text">Bạn có thể chọn nhiều ảnh cùng lúc.</div>
+ <div class="image-preview-wrapper" id="imagePreview"></div>
+ </div>
+ </div>
+
+ <div class="col-md-4">
+ <div class="mb-3">
+ <label for="departure_id" class="form-label">Chuyến khởi hành <span class="text-danger">*</span></label>
+ <select class="form-select" id="departure_id" name="departure_id" required>
+ <option value="">-- Chọn chuyến khởi hành --</option>
+ <?php $__currentLoopData = $departures; $this->addLoop($__currentLoopData);$this->getFirstLoop();
+ foreach($__currentLoopData as $d): $loop = $this->incrementLoopIndices();  ?>
+ <option value="<?php echo \htmlentities($d['id']??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ <?php echo \htmlentities((!empty($departureId) && (int)$departureId === (int)$d['id']) ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>
+ #<?php echo \htmlentities($d['id']??'', ENT_QUOTES, 'UTF-8', false); ?> - <?php echo \htmlentities($d['tour_name'] ?? 'Tour'??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ (<?php echo \htmlentities(date('d/m/Y', strtotime($d['departure_date']))??'', ENT_QUOTES, 'UTF-8', false); ?>)
+ </option>
+ <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
+ </select>
+ </div>
+
+ <div class="mb-3">
+ <label for="log_date" class="form-label">Ngày giờ sự kiện <span class="text-danger">*</span></label>
+ <input type="datetime-local" class="form-control" id="log_date" name="log_date"
+ value="<?php echo \htmlentities(date('Y-m-d\TH:i')??'', ENT_QUOTES, 'UTF-8', false); ?>" required>
+ </div>
+
+ <div class="mb-3">
+ <label for="location" class="form-label">Địa điểm</label>
+ <div class="input-group">
+ <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+ <input type="text" class="form-control" id="location" name="location"
+ placeholder="Ví dụ: Hoàn Kiếm, Hà Nội">
+ </div>
+ </div>
+
+ <div class="mb-3">
+ <label for="weather" class="form-label">Thời tiết</label>
+ <select class="form-select" id="weather" name="weather">
+ <option value="">-- Chọn --</option>
+ <option value="Nắng">☀️ Nắng</option>
+ <option value="Mây">☁️ Mây</option>
+ <option value="Mưa">🌧️ Mưa</option>
+ <option value="Sương mù">🌫️ Sương mù</option>
+ <option value="Gió">💨 Gió mạnh</option>
+ <option value="Nóng bức">🔥 Nóng bức</option>
+ <option value="Lạnh">❄️ Lạnh</option>
+ </select>
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Tâm trạng</label>
+ <input type="hidden" id="mood" name="mood" value="">
+ <div class="d-flex justify-content-around p-3 bg-light rounded">
+ <span class="mood-option fs-1" data-mood="excited" title="Phấn khởi">🎉</span>
+ <span class="mood-option fs-1" data-mood="happy" title="Vui vẻ">😊</span>
+ <span class="mood-option fs-1" data-mood="calm" title="Bình yên">😌</span>
+ <span class="mood-option fs-1" data-mood="neutral" title="Bình thường">😐</span>
+ <span class="mood-option fs-1" data-mood="tired" title="Mệt">😴</span>
+ <span class="mood-option fs-1" data-mood="sad" title="Buồn">😢</span>
+ </div>
+ </div>
+
+ <div class="mb-3">
+ <label for="status" class="form-label">Trạng thái</label>
+ <select class="form-select" id="status" name="status">
+ <option value="published">✅ Công khai</option>
+ <option value="draft">📝 Lưu nháp</option>
+ </select>
+ </div>
+ </div>
+ </div>
+
+ <hr>
+ <div class="d-flex gap-2">
+ <button type="submit" class="btn btn-primary">
+ <i class="bi bi-save2"></i> Lưu nhật ký
+ </button>
+ <a href="<?php echo \htmlentities(route('admin/tour-logs')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-secondary">
+ <i class="bi bi-arrow-left"></i> Hủy bỏ
+ </a>
+ </div>
+ </form>
+ </div>
+ </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+ const moodOptions = document.querySelectorAll('.mood-option');
+ const moodInput = document.getElementById('mood');
+
+ moodOptions.forEach(opt => {
+ opt.addEventListener('click', function() {
+ moodOptions.forEach(o => o.classList.remove('selected'));
+ this.classList.add('selected');
+ moodInput.value = this.dataset.mood;
+ });
+ });
+
+ const imagesInput = document.getElementById('images');
+ const preview = document.getElementById('imagePreview');
+
+ imagesInput.addEventListener('change', function() {
+ preview.innerHTML = '';
+ const files = this.files;
+ for (let i = 0; i < files.length; i++) {
+ const file = files[i];
+ const reader = new FileReader();
+ reader.onload = function(e) {
+ const div = document.createElement('div');
+ div.className = 'image-preview-item';
+ div.innerHTML = '<img src="' + e.target.result + '">';
+ preview.appendChild(div);
+ };
+ reader.readAsDataURL(file);
+ }
+ });
+});
+</script>
+<?php $this->stopSection(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->runChild('layouts.admin'); } ?>
