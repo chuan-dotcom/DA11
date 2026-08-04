@@ -136,6 +136,14 @@ $router->get('admin/guest-groups/assign/(\d+)/(\d+)', GuestGroupController::clas
 $router->get('admin/guest-groups/unassign/(\d+)/(\d+)', GuestGroupController::class . '@unassign');
 $router->get('admin/guest-groups/check-in/(\d+)/(\d+)', GuestGroupController::class . '@checkIn');
 $router->get('admin/guest-groups/check-in-cancel/(\d+)/(\d+)', GuestGroupController::class . '@cancelCheckIn');
+$router->get('admin/guest-groups/seed-customers/(\d+)', GuestGroupController::class . '@seedCustomers');
+$router->get('admin/guest-groups/booking-guests/create/(\d+)/(\d+)', GuestGroupController::class . '@createGuest');
+$router->post('admin/guest-groups/booking-guests/store/(\d+)/(\d+)', GuestGroupController::class . '@storeGuest');
+$router->get('admin/guest-groups/booking-guests/edit/(\d+)/(\d+)', GuestGroupController::class . '@editGuest');
+$router->post('admin/guest-groups/booking-guests/update/(\d+)/(\d+)', GuestGroupController::class . '@updateGuest');
+$router->get('admin/guest-groups/booking-guests/delete/(\d+)/(\d+)', GuestGroupController::class . '@deleteGuest');
+$router->get('admin/guest-groups/booking-guests/check-in/(\d+)/(\d+)', GuestGroupController::class . '@checkInGuest');
+$router->get('admin/guest-groups/booking-guests/check-in-cancel/(\d+)/(\d+)', GuestGroupController::class . '@cancelCheckInGuest');
 
 $router->get('admin/tour-diaries', TourDiaryController::class . '@index');
 $router->get('admin/tour-diaries/create', TourDiaryController::class . '@create');

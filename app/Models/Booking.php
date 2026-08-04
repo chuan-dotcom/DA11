@@ -480,17 +480,42 @@ class Booking extends Model
      */
     public function getAssignedStatsByDepartureId($departureId)
     {
-        $sql = "
-            SELECT
-                COUNT(b.id) AS total_bookings,
-                COALESCE(SUM(b.num_people), 0) AS total_people,
-                COALESCE(SUM(CASE WHEN b.check_in_status = 1 THEN b.num_people ELSE 0 END), 0) AS checked_in_people,
-                COALESCE(SUM(CASE WHEN b.check_in_status = 0 THEN b.num_people ELSE 0 END), 0) AS pending_check_in_people
-            FROM bookings b
-            WHERE b.departure_id = ?
-        ";
+        try {
+            $sql = "
+                SELECT
+                    COUNT(DISTINCT b.id) AS total_bookings,
+                    CASE
+                        WHEN COUNT(g.id) > 0 THEN COUNT(g.id)
+                        ELSE COALESCE(SUM(b.num_people), 0)
+                    END AS total_people,
+                    CASE
+                        WHEN COUNT(g.id) > 0 THEN COALESCE(SUM(CASE WHEN g.check_in_status = 1 THEN 1 ELSE 0 END), 0)
+                        ELSE COALESCE(SUM(CASE WHEN b.check_in_status = 1 THEN b.num_people ELSE 0 END), 0)
+                    END AS checked_in_people,
+                    CASE
+                        WHEN COUNT(g.id) > 0 THEN COALESCE(SUM(CASE WHEN g.check_in_status = 0 THEN 1 ELSE 0 END), 0)
+                        ELSE COALESCE(SUM(CASE WHEN b.check_in_status = 0 THEN b.num_people ELSE 0 END), 0)
+                    END AS pending_check_in_people
+                FROM bookings b
+                LEFT JOIN booking_guests g
+                    ON g.booking_id = b.id
+                WHERE b.departure_id = ?
+            ";
 
-        return $this->connection->fetchAssociative($sql, [$departureId]);
+            return $this->connection->fetchAssociative($sql, [(int) $departureId]);
+        } catch (\Throwable $e) {
+            $sql = "
+                SELECT
+                    COUNT(b.id) AS total_bookings,
+                    COALESCE(SUM(b.num_people), 0) AS total_people,
+                    COALESCE(SUM(CASE WHEN b.check_in_status = 1 THEN b.num_people ELSE 0 END), 0) AS checked_in_people,
+                    COALESCE(SUM(CASE WHEN b.check_in_status = 0 THEN b.num_people ELSE 0 END), 0) AS pending_check_in_people
+                FROM bookings b
+                WHERE b.departure_id = ?
+            ";
+
+            return $this->connection->fetchAssociative($sql, [(int) $departureId]);
+        }
     }
 
     /**

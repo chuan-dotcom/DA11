@@ -25,7 +25,7 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $title = 'Danh sách Booking';
+        $title = 'Danh sách khách hàng';
 
         $bookings = $this->modelBooking->getAll();
 

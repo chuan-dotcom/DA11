@@ -48,6 +48,11 @@
             <a href="{{ route('admin/guest-groups/print/' . $guestGroup['id']) }}" class="btn btn-outline-dark" target="_blank">
                 <i class="bi bi-printer"></i> In danh sách
             </a>
+            <a href="{{ route('admin/guest-groups/seed-customers/' . $guestGroup['id']) }}"
+               class="btn btn-primary"
+               onclick="return confirm('Tạo 17 khách hàng mẫu và gắn vào đoàn này?')">
+                <i class="bi bi-people"></i> Danh sách khách hàng (17)
+            </a>
             <a href="{{ route('admin/departures/edit/' . $guestGroup['id']) }}" class="btn btn-warning">
                 <i class="bi bi-pencil"></i> Sửa đoàn
             </a>
@@ -111,94 +116,142 @@
 
     <div class="card group-card mb-4">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Danh sách khách đoàn</h5>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="mb-0">Quản lý khách hàng</h5>
+                @if(!empty($assignedBookings) && !empty($selectedBookingId))
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{{ route('admin/guest-groups/booking-guests/create/' . $guestGroup['id'] . '/' . $selectedBookingId) }}"
+                           class="btn btn-sm btn-success">
+                            <i class="bi bi-person-plus"></i> Thêm khách
+                        </a>
+                        <a href="{{ route('admin/guest-groups/unassign/' . $guestGroup['id'] . '/' . $selectedBookingId) }}"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Gỡ booking này khỏi đoàn?')">
+                            Gỡ booking
+                        </a>
+                    </div>
+                @endif
+            </div>
         </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Tên khách</th>
-                            <th>Tour</th>
-                            <th>Ngày đi</th>
-                            <th>Số người</th>
-                            <th>Email</th>
-                            <th>SĐT</th>
-                            <th>Thanh toán</th>
-                            <th>Trạng thái</th>
-                            <th>Ghi chú</th>
-                            <th>Check-in</th>
-                            <th>Chức năng</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(empty($assignedBookings))
-                            <tr>
-                                <td colspan="12" class="text-center text-muted">Đoàn này chưa có khách.</td>
-                            </tr>
-                        @else
-                            @foreach($assignedBookings as $booking)
-                                <tr>
-                                    <td>#{{ $booking['id'] }}</td>
-                                    <td>{{ $booking['customer_name'] }}</td>
-                                    <td>{{ $booking['tour_name'] ?? '-' }}</td>
-                                    <td>{{ !empty($booking['booking_date']) ? date('Y-m-d', strtotime($booking['booking_date'])) : '-' }}</td>
-                                    <td>{{ $booking['num_people'] }}</td>
-                                    <td>{{ $booking['customer_email'] }}</td>
-                                    <td>{{ $booking['customer_phone'] }}</td>
-                                    <td>{{ number_format($booking['total_price']) }}đ</td>
-                                    <td>
-                                        @if((int) $booking['status'] === 1)
-                                            <span class="badge bg-success">Đã xác nhận</span>
-                                        @elseif((int) $booking['status'] === 0)
-                                            <span class="badge bg-warning text-dark">Chờ xác nhận</span>
-                                        @else
-                                            <span class="badge bg-danger">Đã hủy</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $booking['note'] ?: '-' }}</td>
-                                    <td>
-                                        @if((int) ($booking['check_in_status'] ?? 0) === 1)
-                                            <span class="badge bg-success">Đã check-in</span>
-                                            <div class="small text-muted mt-1">
-                                                {{ !empty($booking['checked_in_at']) ? date('d/m/Y H:i', strtotime($booking['checked_in_at'])) : '' }}
-                                            </div>
-                                        @else
-                                            <span class="badge bg-secondary">Chưa check-in</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-nowrap">
-                                        @if((int) ($booking['check_in_status'] ?? 0) === 1)
-                                            <a href="{{ route('admin/guest-groups/check-in-cancel/' . $guestGroup['id'] . '/' . $booking['id']) }}"
-                                               class="btn btn-sm btn-outline-warning"
-                                               onclick="return confirm('Bạn có chắc muốn hủy check-in khách này?')">
-                                                Hủy check-in
-                                            </a>
-                                        @else
-                                            <a href="{{ route('admin/guest-groups/check-in/' . $guestGroup['id'] . '/' . $booking['id']) }}"
-                                               class="btn btn-sm btn-success">
-                                                Check-in
-                                            </a>
-                                        @endif
-                                        <a href="{{ route('admin/guest-groups/unassign/' . $guestGroup['id'] . '/' . $booking['id']) }}"
-                                           class="btn btn-sm btn-danger"
-                                           onclick="return confirm('Bạn có chắc muốn xóa khách này khỏi đoàn?')">
-                                            Xóa
-                                        </a>
-                                    </td>
-                                </tr>
+            @if(empty($assignedBookings))
+                <div class="text-muted">Đoàn này chưa có booking nào để quản lý khách.</div>
+            @else
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <form method="GET" action="{{ route('admin/guest-groups/show/' . $guestGroup['id']) }}" class="d-flex gap-2 align-items-center flex-wrap">
+                        <div class="fw-semibold">Khách theo booking</div>
+                        <select name="booking_id" class="form-select form-select-sm" style="min-width: 260px;" onchange="this.form.submit()">
+                            @foreach($assignedBookings as $b)
+                                <option value="{{ $b['id'] }}" {{ (int) $selectedBookingId === (int) $b['id'] ? 'selected' : '' }}>
+                                    #{{ $b['id'] }} - {{ $b['customer_name'] }}
+                                </option>
                             @endforeach
+                        </select>
+                    </form>
+
+                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                        <span class="badge bg-primary">
+                            {{ (int) ($bookingGuestStats['checked_in_guests'] ?? 0) }}/{{ (int) ($bookingGuestStats['total_guests'] ?? 0) }} khách đã check-in
+                        </span>
+                        @if(!empty($selectedBooking))
+                            <span class="text-muted small">
+                                Khởi hành: {{ !empty($selectedBooking['departure_date']) ? date('d/m/Y', strtotime($selectedBooking['departure_date'])) : '-' }}
+                            </span>
                         @endif
-                    </tbody>
-                </table>
-            </div>
+                    </div>
+                </div>
+
+                @php
+                    $paymentMap = [
+                        'unpaid' => ['Chưa thanh toán', 'bg-warning text-dark'],
+                        'deposit' => ['Đã đặt cọc', 'bg-info text-dark'],
+                        'paid' => ['Đã thanh toán', 'bg-success'],
+                    ];
+                @endphp
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="70">ID</th>
+                                <th>Họ tên</th>
+                                <th>Thông tin</th>
+                                <th>Địa chỉ</th>
+                                <th width="140">Thanh toán</th>
+                                <th width="140">Check-in</th>
+                                <th width="140">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(empty($bookingGuests))
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Chưa có khách trong booking này.</td>
+                                </tr>
+                            @else
+                                @foreach($bookingGuests as $guest)
+                                    @php
+                                        $payment = $paymentMap[$guest['payment_status'] ?? 'unpaid'] ?? ['-', 'bg-secondary'];
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $guest['id'] }}</td>
+                                        <td class="fw-semibold">{{ $guest['full_name'] }}</td>
+                                        <td>
+                                            <div class="small text-muted">
+                                                {{ !empty($guest['dob']) ? date('Y-m-d', strtotime($guest['dob'])) : '' }}
+                                            </div>
+                                            <div>{{ $guest['phone'] ?: '-' }}</div>
+                                            <div class="small text-muted">{{ $guest['email'] ?: '-' }}</div>
+                                            <div class="small text-muted">{{ $guest['identity_no'] ?: '-' }}</div>
+                                        </td>
+                                        <td>{{ $guest['address'] ?: '-' }}</td>
+                                        <td>
+                                            <span class="badge {{ $payment[1] }}">{{ $payment[0] }}</span>
+                                        </td>
+                                        <td>
+                                            @if((int) ($guest['check_in_status'] ?? 0) === 1)
+                                                <span class="badge bg-success">Đã check-in</span>
+                                                <div class="small text-muted mt-1">
+                                                    {{ !empty($guest['checked_in_at']) ? date('d/m/Y H:i', strtotime($guest['checked_in_at'])) : '' }}
+                                                </div>
+                                            @else
+                                                <span class="badge bg-secondary">Chưa check-in</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-nowrap">
+                                            @if((int) ($guest['check_in_status'] ?? 0) === 1)
+                                                <a href="{{ route('admin/guest-groups/booking-guests/check-in-cancel/' . $guestGroup['id'] . '/' . $guest['id']) }}"
+                                                   class="btn btn-sm btn-outline-warning"
+                                                   onclick="return confirm('Hủy check-in khách này?')">
+                                                    Hủy
+                                                </a>
+                                            @else
+                                                <a href="{{ route('admin/guest-groups/booking-guests/check-in/' . $guestGroup['id'] . '/' . $guest['id']) }}"
+                                                   class="btn btn-sm btn-success">
+                                                    Check-in
+                                                </a>
+                                            @endif
+                                            <a href="{{ route('admin/guest-groups/booking-guests/edit/' . $guestGroup['id'] . '/' . $guest['id']) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{{ route('admin/guest-groups/booking-guests/delete/' . $guestGroup['id'] . '/' . $guest['id']) }}"
+                                               class="btn btn-sm btn-outline-danger"
+                                               onclick="return confirm('Xóa khách này?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </div>
     </div>
 
     <div class="card group-card">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Booking có thể thêm vào đoàn</h5>
+            <h5 class="mb-0">Danh sách khách hàng có thể thêm vào đoàn</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
