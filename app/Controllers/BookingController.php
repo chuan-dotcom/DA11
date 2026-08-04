@@ -21,7 +21,7 @@ class BookingController extends Controller
     }
 
     /**
-     * Danh sách Booking
+     * Danh sách Booking   
      */
     public function index()
     {
