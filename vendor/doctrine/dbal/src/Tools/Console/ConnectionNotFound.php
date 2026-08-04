@@ -8,4 +8,4 @@ use OutOfBoundsException;
 
 final class ConnectionNotFound extends OutOfBoundsException
 {
-}
+}                

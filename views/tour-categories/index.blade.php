@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4">{{ $title }}</h2>
+    <h2 class="mb-4">{{ $title }}</h2>                  
 
     @if(isset($_SESSION['success']))
         <div class="alert alert-success">{{ $_SESSION['success'] }}</div>

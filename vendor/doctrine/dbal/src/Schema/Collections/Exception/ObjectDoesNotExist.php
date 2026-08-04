@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Collections\Exception;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use LogicException;
 
-use function sprintf;
+use function sprintf;                      
 
 /** @internal */
 final class ObjectDoesNotExist extends LogicException implements Exception

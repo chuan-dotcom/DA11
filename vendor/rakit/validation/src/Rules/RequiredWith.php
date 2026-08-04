@@ -6,7 +6,7 @@ use Rakit\Validation\Rule;
 
 class RequiredWith extends Required
 {
-    /** @var bool */
+    /** @var bool */                   
     protected $implicit = true;
 
     /** @var string */

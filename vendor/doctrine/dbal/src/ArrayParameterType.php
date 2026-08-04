@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\DBAL;
 
 enum ArrayParameterType
-{
+{              
     /**
      * Represents an array of ints to be expanded by Doctrine SQL parsing.
      */

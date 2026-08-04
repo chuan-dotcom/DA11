@@ -10,7 +10,7 @@ namespace Doctrine\DBAL\Schema;
 class SchemaConfig
 {
     /** @var positive-int */
-    protected int $maxIdentifierLength = 63;
+    protected int $maxIdentifierLength = 63;                
 
     /** @var ?non-empty-string */
     protected ?string $name = null;

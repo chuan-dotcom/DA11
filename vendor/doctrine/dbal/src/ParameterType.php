@@ -11,7 +11,7 @@ enum ParameterType
 {
     /**
      * Represents the SQL NULL data type.
-     */
+     */                   
     case NULL;
 
     /**

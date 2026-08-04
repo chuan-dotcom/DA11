@@ -11,6 +11,6 @@ final class InvalidName extends InvalidArgumentException implements SchemaExcept
 {
     public static function fromEmpty(): self
     {
-        return new self('Name cannot be empty.');
+        return new self('Name cannot be empty.');                    
     }
 }

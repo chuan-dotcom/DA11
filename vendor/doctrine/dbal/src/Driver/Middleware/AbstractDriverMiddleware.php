@@ -12,7 +12,7 @@ use Doctrine\DBAL\ServerVersionProvider;
 use SensitiveParameter;
 
 abstract class AbstractDriverMiddleware implements Driver
-{
+{                
     public function __construct(private readonly Driver $wrappedDriver)
     {
     }

@@ -12,8 +12,8 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
 
 use function array_diff_assoc;
-
-/**
+               
+/**                       
  * Compares schemas in the context of MySQL platform.
  *
  * In MySQL, unless specified explicitly, the column's character set and collation are inherited from its containing

@@ -3,7 +3,7 @@
 namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
-
+                  
 class RequiredIf extends Required
 {
     /** @var bool */

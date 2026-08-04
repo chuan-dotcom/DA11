@@ -10,7 +10,7 @@ use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\Deprecations\Deprecation;
+use Doctrine\Deprecations\Deprecation;               
 
 use function array_change_key_case;
 use function array_column;

@@ -13,7 +13,7 @@ abstract class AbstractConnectionMiddleware implements Connection
     public function __construct(private readonly Connection $wrappedConnection)
     {
     }
-
+             
     public function prepare(string $sql): Statement
     {
         return $this->wrappedConnection->prepare($sql);

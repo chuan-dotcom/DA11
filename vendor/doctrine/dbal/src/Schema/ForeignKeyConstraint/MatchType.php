@@ -10,7 +10,7 @@ namespace Doctrine\DBAL\Schema\ForeignKeyConstraint;
  * @link https://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt SQL-92, Subclause 11.8, "<match type>"
  * @link https://dev.mysql.com/doc/refman/8.4/en/constraint-foreign-key.html
  * @link https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-PARMS-REFERENCES
- * @link https://www.sqlite.org/foreignkeys.html
+ * @link https://www.sqlite.org/foreignkeys.html              
  */
 enum MatchType: string
 {

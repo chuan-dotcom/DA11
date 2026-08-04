@@ -7,7 +7,7 @@ namespace Dotenv\Loader;
 use Dotenv\Repository\RepositoryInterface;
 
 interface LoaderInterface
-{
+{               
     /**
      * Load the given entries into the repository.
      *

@@ -6,7 +6,7 @@ use Rakit\Validation\Helper;
 use Rakit\Validation\Rule;
 
 class NotIn extends Rule
-{
+{                   
 
     /** @var string */
     protected $message = "The :attribute is not allowing :disallowed_values";

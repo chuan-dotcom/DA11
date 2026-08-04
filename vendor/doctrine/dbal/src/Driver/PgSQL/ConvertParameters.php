@@ -10,7 +10,7 @@ use function count;
 use function implode;
 
 final class ConvertParameters implements Visitor
-{
+{             
     /** @var list<string> */
     private array $buffer = [];
 

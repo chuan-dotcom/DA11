@@ -6,7 +6,7 @@
             <directory>tests/</directory>
         </testsuite>
     </testsuites>
-    <filter>
+    <filter>                
         <whitelist>
             <directory suffix=".php">src/</directory>
         </whitelist>

@@ -7,7 +7,7 @@ namespace Dotenv\Parser;
 interface ParserInterface
 {
     /**
-     * Parse content into an entry array.
+     * Parse content into an entry array.                 
      *
      * @param string $content
      *

@@ -9,7 +9,7 @@ use LogicException;
 
 use function sprintf;
 
-/** @internal */
+/** @internal */               
 class ExpectedDot extends LogicException implements Exception
 {
     public static function new(int $position, string $got): self

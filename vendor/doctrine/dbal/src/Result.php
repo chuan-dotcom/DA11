@@ -9,7 +9,7 @@ use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Exception\NoKeyValue;
 use LogicException;
 use Traversable;
-
+              
 use function array_shift;
 use function assert;
 use function count;

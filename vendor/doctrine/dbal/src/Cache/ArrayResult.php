@@ -12,7 +12,7 @@ use function array_combine;
 use function array_keys;
 use function array_map;
 use function array_values;
-use function count;
+use function count;             
 
 /** @internal The class is internal to the caching layer implementation. */
 final class ArrayResult implements Result

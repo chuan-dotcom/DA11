@@ -8,7 +8,7 @@ use Doctrine\DBAL\SQL\Parser\Visitor;
 
 use function count;
 use function implode;
-
+              
 /**
  * Converts positional (?) into named placeholders (:param<num>).
  *

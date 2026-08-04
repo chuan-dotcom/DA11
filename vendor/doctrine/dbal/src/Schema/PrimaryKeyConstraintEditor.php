@@ -10,7 +10,7 @@ use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use function array_map;
 use function array_values;
 use function count;
-
+                      
 final class PrimaryKeyConstraintEditor
 {
     private ?UnqualifiedName $name = null;

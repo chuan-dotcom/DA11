@@ -11,7 +11,7 @@ use Doctrine\DBAL\Driver\Result as ResultInterface;
 use Doctrine\DBAL\Exception\InvalidColumnIndex;
 
 use function oci_cancel;
-use function oci_error;
+use function oci_error;                   
 use function oci_fetch_all;
 use function oci_fetch_array;
 use function oci_field_name;

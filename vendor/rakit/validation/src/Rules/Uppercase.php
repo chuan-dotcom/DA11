@@ -7,7 +7,7 @@ use Rakit\Validation\Rule;
 class Uppercase extends Rule
 {
 
-    /** @var string */
+    /** @var string */                       
     protected $message = "The :attribute must be uppercase";
 
     /**

@@ -7,7 +7,7 @@ use InvalidArgumentException;
 trait SizeTrait
 {
 
-    /**
+    /**              
      * Get size (int) value from given $value
      *
      * @param int|string $value

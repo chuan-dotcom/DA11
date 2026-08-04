@@ -9,7 +9,7 @@ use Doctrine\DBAL\Platforms\Keywords\MySQL80Keywords;
 use Doctrine\DBAL\SQL\Builder\SelectSQLBuilder;
 use Doctrine\DBAL\SQL\Builder\WithSQLBuilder;
 use Doctrine\Deprecations\Deprecation;
-
+                      
 /**
  * Provides the behavior, features and SQL dialect of the MySQL 8.0 database platform.
  *

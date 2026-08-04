@@ -12,7 +12,7 @@ use Doctrine\DBAL\SQL\Parser;
 
 use function addcslashes;
 use function assert;
-use function is_resource;
+use function is_resource;             
 use function oci_commit;
 use function oci_parse;
 use function oci_rollback;

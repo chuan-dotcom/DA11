@@ -10,7 +10,7 @@ use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\DBAL\Platforms\Exception\PlatformException;
-use PDO;
+use PDO;                 
 use SensitiveParameter;
 
 use const CASE_LOWER;

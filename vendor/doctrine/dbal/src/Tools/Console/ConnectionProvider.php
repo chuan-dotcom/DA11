@@ -13,3 +13,4 @@ interface ConnectionProvider
     /** @throws ConnectionNotFound in case a connection with the given name does not exist. */
     public function getConnection(string $name): Connection;
 }
+                  

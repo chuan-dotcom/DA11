@@ -5,7 +5,7 @@ namespace Rakit\Validation\Rules;
 use Rakit\Validation\Rule;
 
 class Ip extends Rule
-{
+{               
 
     /** @var string */
     protected $message = "The :attribute is not valid IP Address";

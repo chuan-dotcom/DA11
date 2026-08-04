@@ -6,7 +6,7 @@ namespace Dotenv\Parser;
 
 final class Lexer
 {
-    /**
+    /**                
      * The regex for each type of token.
      */
     private const PATTERNS = [

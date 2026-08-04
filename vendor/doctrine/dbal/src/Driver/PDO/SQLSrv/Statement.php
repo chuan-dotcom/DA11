@@ -14,7 +14,7 @@ final class Statement extends AbstractStatementMiddleware
     /** @internal The statement can be only instantiated by its driver connection. */
     public function __construct(private readonly PDOStatement $statement)
     {
-        parent::__construct($statement);
+        parent::__construct($statement);                
     }
 
     public function bindValue(int|string $param, mixed $value, ParameterType $type): void

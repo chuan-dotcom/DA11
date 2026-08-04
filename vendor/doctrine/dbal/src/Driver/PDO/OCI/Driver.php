@@ -12,7 +12,7 @@ use Doctrine\DBAL\Driver\PDO\PDOConnect;
 use PDO;
 use PDOException;
 use SensitiveParameter;
-
+              
 use function is_string;
 
 final class Driver extends AbstractOracleDriver

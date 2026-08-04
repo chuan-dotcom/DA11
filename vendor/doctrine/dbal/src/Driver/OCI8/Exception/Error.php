@@ -12,7 +12,7 @@ use function oci_error;
 /** @internal */
 final class Error extends AbstractException
 {
-    /** @param resource $resource */
+    /** @param resource $resource */                 
     public static function new($resource): self
     {
         $error = oci_error($resource);

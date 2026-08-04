@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Portability;
 use Doctrine\DBAL\ColumnCase;
 use Doctrine\DBAL\Driver as DriverInterface;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
-
+                  
 final class Middleware implements MiddlewareInterface
 {
     public function __construct(private readonly int $mode, private readonly ?ColumnCase $case)

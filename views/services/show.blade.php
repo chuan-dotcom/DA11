@@ -8,7 +8,7 @@
         <h2 class="mb-0">{{ $title }} #{{ $service['id'] }}</h2>
         <div class="d-flex gap-2">
             <a href="{{ route('admin/services') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Quay lại
+                <i class="bi bi-arrow-left"></i> Quay lại                    
             </a>
             <a href="{{ route('admin/services/edit/' . $service['id']) }}" class="btn btn-warning">
                 <i class="bi bi-pencil-square"></i> Sửa

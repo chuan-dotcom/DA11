@@ -11,7 +11,7 @@ use ReflectionProperty;
 
 /** @internal */
 final class StatementError extends AbstractException
-{
+{                  
     public static function new(mysqli_stmt $statement): self
     {
         return new self($statement->error, $statement->sqlstate, $statement->errno);

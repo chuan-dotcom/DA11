@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\API\ExceptionConverter as ExceptionConverterInterface;
 use Doctrine\DBAL\Driver\API\MySQL\ExceptionConverter;
-use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;                
 use Doctrine\DBAL\Platforms\Exception\InvalidPlatformVersion;
 use Doctrine\DBAL\Platforms\MariaDB1010Platform;
 use Doctrine\DBAL\Platforms\MariaDB1052Platform;

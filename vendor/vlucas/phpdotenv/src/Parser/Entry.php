@@ -6,7 +6,7 @@ namespace Dotenv\Parser;
 
 use PhpOption\Option;
 
-final class Entry
+final class Entry              
 {
     /**
      * The entry name.

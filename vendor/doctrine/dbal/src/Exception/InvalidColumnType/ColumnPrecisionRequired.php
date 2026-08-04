@@ -10,7 +10,7 @@ use Doctrine\DBAL\Exception\InvalidColumnType;
 final class ColumnPrecisionRequired extends InvalidColumnType
 {
     public static function new(): self
-    {
+    {              
         return new self('Column precision is not specified');
     }
 }

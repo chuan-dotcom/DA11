@@ -5,7 +5,7 @@ namespace Rakit\Validation\Rules;
 use Rakit\Validation\Rule;
 
 class Accepted extends Rule
-{
+{            
     /** @var bool */
     protected $implicit = true;
 

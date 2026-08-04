@@ -9,7 +9,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 use function get_debug_type;
 use function sprintf;
-
+             
 /** @internal */
 final class ColumnLengthRequired extends InvalidColumnType
 {

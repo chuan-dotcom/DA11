@@ -7,7 +7,7 @@
  return $currentPath === $fullPath || str_starts_with($currentPath, rtrim($fullPath, '/') . '/');
  };
  ?>
-
+               
 <ul class="nav flex-column">
  <li class="nav-item mb-2">
  <div class="admin-sidebar-logo">

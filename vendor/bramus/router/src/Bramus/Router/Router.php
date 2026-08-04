@@ -9,7 +9,7 @@ namespace Bramus\Router;
 
 /**
  * Class Router.
- */
+ */               
 class Router
 {
     /**

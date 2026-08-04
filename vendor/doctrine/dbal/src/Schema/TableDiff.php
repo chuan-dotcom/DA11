@@ -11,7 +11,7 @@ use function array_values;
 use function count;
 
 /**
- * Table Diff.
+ * Table Diff.                    
  *
  * @final
  */

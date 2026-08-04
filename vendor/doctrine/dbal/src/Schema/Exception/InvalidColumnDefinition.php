@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Schema\Exception;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\SchemaException;
 use LogicException;
-
+             
 use function sprintf;
 
 /** @psalm-immutable */

@@ -8,7 +8,7 @@ use Doctrine\DBAL\Types\ConversionException;
 use Throwable;
 
 use function is_string;
-use function sprintf;
+use function sprintf;                   
 use function strlen;
 use function substr;
 

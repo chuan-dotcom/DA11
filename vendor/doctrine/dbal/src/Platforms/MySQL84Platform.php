@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Platforms;
 
 use Doctrine\DBAL\Platforms\Keywords\KeywordList;
 use Doctrine\DBAL\Platforms\Keywords\MySQL84Keywords;
-use Doctrine\Deprecations\Deprecation;
+use Doctrine\Deprecations\Deprecation;                    
 
 /**
  * Provides the behavior, features and SQL dialect of the MySQL 8.4 database platform.

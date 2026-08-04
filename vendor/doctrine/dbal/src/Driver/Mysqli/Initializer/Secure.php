@@ -11,7 +11,7 @@ use SensitiveParameter;
 final class Secure implements Initializer
 {
     public function __construct(
-        #[SensitiveParameter]
+        #[SensitiveParameter]               
         private readonly string $key,
         private readonly string $cert,
         private readonly string $ca,

@@ -7,7 +7,7 @@ use Rakit\Validation\Rule;
 class Present extends Rule
 {
     /** @var bool */
-    protected $implicit = true;
+    protected $implicit = true;                   
 
     /** @var string */
     protected $message = "The :attribute must be present";

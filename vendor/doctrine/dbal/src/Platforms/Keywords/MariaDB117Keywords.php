@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Platforms\Keywords;
 
 use function array_merge;
 
-/** @deprecated */
+/** @deprecated */              
 class MariaDB117Keywords extends MariaDBKeywords
 {
     /**

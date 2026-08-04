@@ -10,7 +10,7 @@ use Psr\Cache\CacheItemPoolInterface;
 
 use function hash;
 use function serialize;
-use function sha1;
+use function sha1;             
 
 /**
  * Query Cache Profile handles the data relevant for query caching.

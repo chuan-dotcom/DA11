@@ -5,7 +5,7 @@ namespace Rakit\Validation\Rules;
 use Rakit\Validation\Rule;
 
 class Json extends Rule
-{
+{                   
 
     /** @var string */
     protected $message = "The :attribute must be a valid JSON string";

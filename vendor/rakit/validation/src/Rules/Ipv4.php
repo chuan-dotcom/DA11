@@ -3,7 +3,7 @@
 namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
-
+                
 class Ipv4 extends Rule
 {
 

@@ -9,7 +9,7 @@ interface RepositoryInterface
     /**
      * Determine if the given environment variable is defined.
      *
-     * @param string $name
+     * @param string $name                     
      *
      * @return bool
      */

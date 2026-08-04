@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Query;
 use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 
 /** @internal */
-final readonly class ForUpdate
+final readonly class ForUpdate                   
 {
     public function __construct(
         private ConflictResolutionMode $conflictResolutionMode,

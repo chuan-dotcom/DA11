@@ -12,7 +12,7 @@ use mysqli_sql_exception;
 final class Charset implements Initializer
 {
     public function __construct(private readonly string $charset)
-    {
+    {                  
     }
 
     public function initialize(mysqli $connection): void

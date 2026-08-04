@@ -4,7 +4,7 @@ namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
 
-class Boolean extends Rule
+class Boolean extends Rule               
 {
     /** @var string */
     protected $message = "The :attribute must be a boolean";

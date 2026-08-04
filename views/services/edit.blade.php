@@ -9,7 +9,7 @@
         <a href="{{ route('admin/services') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Quay lại
         </a>
-    </div>
+    </div>                    
 
     @if(isset($_SESSION['flash']['success']))
         <div class="alert alert-success">{{ $_SESSION['flash']['success'] }}</div>

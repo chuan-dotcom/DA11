@@ -10,7 +10,7 @@ This component provides features added to PHP 8.0 core:
 - `FILTER_VALIDATE_BOOL` constant
 - [`get_debug_type`](https://php.net/get_debug_type)
 - [`PhpToken`](https://php.net/phptoken) class
-- [`preg_last_error_msg`](https://php.net/preg_last_error_msg)
+- [`preg_last_error_msg`](https://php.net/preg_last_error_msg)                   
 - [`str_contains`](https://php.net/str_contains)
 - [`str_starts_with`](https://php.net/str_starts_with)
 - [`str_ends_with`](https://php.net/str_ends_with)

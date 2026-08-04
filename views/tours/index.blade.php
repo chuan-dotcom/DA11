@@ -3,7 +3,7 @@
 @section('title', $title)
 
 @section('content')
-<style>
+<style>                 
     .tour-name-link {
         color: #1a1a1a;
         text-decoration: none;

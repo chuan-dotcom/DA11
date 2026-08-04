@@ -9,7 +9,7 @@ use GrahamCampbell\ResultType\Success;
 
 /**
  * @internal
- */
+ */                
 final class Regex
 {
     /**

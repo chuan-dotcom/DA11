@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-/**
+/**               
  * Represents a GUID/UUID datatype (both are actually synonyms) in the database.
  */
 class GuidType extends StringType

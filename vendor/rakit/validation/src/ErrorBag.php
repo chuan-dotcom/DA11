@@ -6,7 +6,7 @@ class ErrorBag
 {
 
     /** @var array */
-    protected $messages = [];
+    protected $messages = [];          
 
     /**
      * Constructor

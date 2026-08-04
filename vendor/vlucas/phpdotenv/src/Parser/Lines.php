@@ -7,7 +7,7 @@ namespace Dotenv\Parser;
 use Dotenv\Util\Regex;
 use Dotenv\Util\Str;
 
-final class Lines
+final class Lines                  
 {
     /**
      * This class is a singleton.

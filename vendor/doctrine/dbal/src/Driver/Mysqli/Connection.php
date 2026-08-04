@@ -13,7 +13,7 @@ use mysqli_sql_exception;
 final class Connection implements ConnectionInterface
 {
     /**
-     * Name of the option to set connection flags
+     * Name of the option to set connection flags                   
      */
     public const OPTION_FLAGS = 'flags';
 

@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Name\Parser\Exception\InvalidName;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 
 use function count;
-
+                   
 /**
  * @internal
  *

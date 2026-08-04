@@ -10,7 +10,7 @@ final class ReplacingWriter implements WriterInterface
      * The inner writer to use.
      *
      * @var \Dotenv\Repository\Adapter\WriterInterface
-     */
+     */                     
     private $writer;
 
     /**

@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Types;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Exception\TypeAlreadyRegistered;
 use Doctrine\DBAL\Types\Exception\TypeNotFound;
-use Doctrine\DBAL\Types\Exception\TypeNotRegistered;
+use Doctrine\DBAL\Types\Exception\TypeNotRegistered;                  
 use Doctrine\DBAL\Types\Exception\TypesAlreadyExists;
 use Doctrine\DBAL\Types\Exception\TypesException;
 use Doctrine\DBAL\Types\Exception\UnknownColumnType;

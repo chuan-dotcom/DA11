@@ -10,7 +10,7 @@ use Throwable;
 /**
  * Abstract base implementation of the {@see DriverException} interface.
  */
-abstract class AbstractException extends BaseException implements Exception
+abstract class AbstractException extends BaseException implements Exception           
 {
     /**
      * @param string         $message  The driver error message.

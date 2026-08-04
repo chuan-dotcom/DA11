@@ -83,4 +83,4 @@ SELECT
     @departure_id, @staff_id_2, 'assistant_guide', 'Hỗ trợ dẫn đoàn', 'assigned'
 WHERE @departure_id IS NOT NULL AND @staff_id_2 IS NOT NULL;
 
-SET FOREIGN_KEY_CHECKS = 1;
+SET FOREIGN_KEY_CHECKS = 1;   

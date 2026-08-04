@@ -13,3 +13,4 @@ final class NoCacheKey extends CacheException
         return new self('No cache key was set.');
     }
 }
+                

@@ -9,7 +9,7 @@ use Doctrine\DBAL\ServerVersionProvider;
 /**
  * Connection interface.
  * Driver connections must implement this interface.
- */
+ */             
 interface Connection extends ServerVersionProvider
 {
     /**

@@ -10,7 +10,7 @@
  */
 
 namespace Symfony\Polyfill\Mbstring;
-
+                  
 /**
  * Partial mbstring implementation in PHP, iconv based, UTF-8 centric.
  *

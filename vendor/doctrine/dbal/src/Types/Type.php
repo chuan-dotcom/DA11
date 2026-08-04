@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\DBAL\Types;
 
 use ArgumentCountError;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception;                
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Exception\TypeArgumentCountError;

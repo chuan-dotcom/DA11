@@ -12,5 +12,5 @@ final class PortWithoutHost extends AbstractException
     public static function new(): self
     {
         return new self('Connection port specified without the host');
-    }
+    }                   
 }

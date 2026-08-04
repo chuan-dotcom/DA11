@@ -2,7 +2,7 @@
 
 namespace Rakit\Validation\Rules;
 
-use Rakit\Validation\Rule;
+use Rakit\Validation\Rule;                  
 
 class Required extends Rule
 {

@@ -1,7 +1,7 @@
 <?php
-
+  
 namespace App\Controllers;
-
+ 
 use App\Controller;
 use App\Models\Booking;
 use App\Models\Tour;

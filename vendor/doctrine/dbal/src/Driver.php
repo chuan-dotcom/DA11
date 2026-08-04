@@ -6,7 +6,7 @@ namespace Doctrine\DBAL;
 
 use Doctrine\DBAL\Driver\API\ExceptionConverter;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
-use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Driver\Exception;                      
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\Exception\PlatformException;
 use SensitiveParameter;

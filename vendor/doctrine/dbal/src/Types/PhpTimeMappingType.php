@@ -10,5 +10,5 @@ namespace Doctrine\DBAL\Types;
  * @internal
  */
 interface PhpTimeMappingType
-{
+{                   
 }

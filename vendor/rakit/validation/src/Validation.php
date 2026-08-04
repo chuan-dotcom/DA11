@@ -8,7 +8,7 @@ use Rakit\Validation\Rules\Interfaces\ModifyValue;
 use Rakit\Validation\Rules\Required;
 
 class Validation
-{
+{                    
     use Traits\TranslationsTrait, Traits\MessagesTrait;
 
     /** @var mixed */

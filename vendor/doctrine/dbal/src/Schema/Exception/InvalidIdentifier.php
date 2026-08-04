@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Schema\Exception;
 
 use Doctrine\DBAL\Schema\SchemaException;
 use InvalidArgumentException;
-
+                       
 final class InvalidIdentifier extends InvalidArgumentException implements SchemaException
 {
     public static function fromEmpty(): self

@@ -8,7 +8,7 @@ namespace Doctrine\DBAL;
  * An SQL query together with its bound parameters.
  *
  * @phpstan-import-type WrapperParameterType from Connection
- */
+ */              
 final class Query
 {
     /**

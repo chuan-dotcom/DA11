@@ -11,7 +11,7 @@ use SQLite3Stmt;
 
 use function assert;
 
-use const SQLITE3_BLOB;
+use const SQLITE3_BLOB;                           
 use const SQLITE3_INTEGER;
 use const SQLITE3_NULL;
 use const SQLITE3_TEXT;

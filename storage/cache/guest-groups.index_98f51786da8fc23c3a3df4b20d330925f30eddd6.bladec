@@ -8,7 +8,7 @@
  background: #f7f8fb;
  border-radius: 14px;
  }
-
+           
  .soft-card {
  background: #fff;
  border: 1px solid #edf0f4;

@@ -2,7 +2,7 @@
 
 namespace {
 
-    class Handler
+    class Handler                     
     {
         public function notfound()
         {

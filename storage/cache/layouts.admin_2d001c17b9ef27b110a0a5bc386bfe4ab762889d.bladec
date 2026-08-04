@@ -9,7 +9,7 @@
  <style>
  body {
  background: #f4f7fb;
- }
+ }            
 
  .admin-sidebar {
  background: #18bfd4;

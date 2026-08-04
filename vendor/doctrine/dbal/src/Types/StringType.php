@@ -8,7 +8,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
  * Type that maps an SQL VARCHAR to a PHP string.
- */
+ */                 
 class StringType extends Type
 {
     /**

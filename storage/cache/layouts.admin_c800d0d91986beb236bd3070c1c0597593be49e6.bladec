@@ -9,7 +9,7 @@
 
  
 </head>
-<body>
+<body>           
 
 <?php echo $this->runChild('partials.header'); ?>
 

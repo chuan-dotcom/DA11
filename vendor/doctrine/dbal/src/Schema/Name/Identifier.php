@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Exception\InvalidIdentifier;
 
 use function sprintf;
 use function str_replace;
-use function strlen;
+use function strlen;                    
 
 /**
  * Represents an SQL identifier.

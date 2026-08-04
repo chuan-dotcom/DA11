@@ -8,5 +8,5 @@ use Doctrine\DBAL\Schema\SchemaException;
 
 /** @internal */
 interface Exception extends SchemaException
-{
+{                       
 }

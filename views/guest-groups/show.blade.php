@@ -7,7 +7,7 @@
     .group-card {
         border: 1px solid #edf0f4;
         border-radius: 14px;
-        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);                
     }
 
     .group-stat {

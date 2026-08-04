@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Schema;
 
 use Doctrine\DBAL\Schema\Name\GenericName;
 use Doctrine\DBAL\Schema\Name\Parser\GenericNameParser;
-use Doctrine\DBAL\Schema\Name\Parsers;
+use Doctrine\DBAL\Schema\Name\Parsers;              
 
 /**
  * An abstraction class for an asset identifier.

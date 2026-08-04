@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Portability;
 
 use Closure;
 
-use function array_change_key_case;
+use function array_change_key_case;                  
 use function array_map;
 use function array_reduce;
 use function is_string;

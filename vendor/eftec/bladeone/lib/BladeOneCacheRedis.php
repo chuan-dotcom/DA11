@@ -8,7 +8,7 @@ use function class_exists;
 use function file_put_contents;
 use function filemtime;
 use function ob_get_contents;
-use function strlen;
+use function strlen;                   
 use function substr;
 use function time;
 

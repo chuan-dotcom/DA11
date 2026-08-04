@@ -11,7 +11,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 
-final class Statement implements StatementInterface
+final class Statement implements StatementInterface            
 {
     /** @internal The statement can be only instantiated by its driver connection. */
     public function __construct(private readonly PDOStatement $stmt)

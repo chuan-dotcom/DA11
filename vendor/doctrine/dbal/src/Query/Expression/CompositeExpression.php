@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Query\Expression;
 
 use Countable;
 
-use function array_merge;
+use function array_merge;                    
 use function array_values;
 use function count;
 use function implode;

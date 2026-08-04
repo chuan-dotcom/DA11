@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 use LogicException;
 
 use function sprintf;
-
+                
 final class NamespaceAlreadyExists extends LogicException implements SchemaException
 {
     public static function new(string $namespaceName): self

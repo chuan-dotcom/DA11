@@ -3,7 +3,7 @@
 <?php $this->startSection('title', $title); ?>
 
 <?php $this->startSection('content'); ?>
-<style>
+<style>      
  .stat-card {
  border-radius: 10px;
  border: 1px solid #e8e8e8;

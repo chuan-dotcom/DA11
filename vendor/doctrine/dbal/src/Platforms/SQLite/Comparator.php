@@ -11,7 +11,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
 
 use function strcasecmp;
-
+                                    
 /**
  * Compares schemas in the context of SQLite platform.
  *

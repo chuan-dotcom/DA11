@@ -6,7 +6,7 @@
 <style>
     .profile-avatar-lg {
         width: 160px;
-        height: 160px;
+        height: 160px;                    
         object-fit: cover;
         border-radius: 50%;
         border: 4px solid #fff;

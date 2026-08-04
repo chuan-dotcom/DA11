@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Collections\Exception\ObjectDoesNotExist;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\NamedObject;
 
-use function array_combine;
+use function array_combine;                 
 use function array_keys;
 use function array_search;
 use function array_values;

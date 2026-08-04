@@ -10,7 +10,7 @@ use LogicException;
 final class InvalidPrimaryKeyConstraintDefinition extends LogicException implements SchemaException
 {
     public static function columnNamesNotSet(): self
-    {
+    {                
         return new self('Primary key constraint column names are not set.');
     }
 }

@@ -3,7 +3,7 @@
 namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Helper;
-use Rakit\Validation\MimeTypeGuesser;
+use Rakit\Validation\MimeTypeGuesser;                    
 use Rakit\Validation\Rule;
 
 class Mimes extends Rule

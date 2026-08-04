@@ -8,7 +8,7 @@ use Doctrine\DBAL\Types\Type;
 use Exception;
 
 use function get_debug_type;
-use function spl_object_hash;
+use function spl_object_hash;                  
 use function sprintf;
 
 final class TypeAlreadyRegistered extends Exception implements TypesException

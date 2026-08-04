@@ -5,7 +5,7 @@ namespace Rakit\Validation\Rules;
 use Rakit\Validation\Rule;
 
 class Digits extends Rule
-{
+{                 
 
     /** @var string */
     protected $message = "The :attribute must be numeric and must have an exact length of :length";

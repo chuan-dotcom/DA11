@@ -14,7 +14,7 @@ final class CannotCopyStreamToStream extends AbstractException
     {
         $message = 'Could not copy source stream to temporary file';
 
-        if ($error !== null) {
+        if ($error !== null) {                
             $message .= ': ' . $error['message'];
         }
 

@@ -8,7 +8,7 @@ use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Schema\Exception\InvalidColumnDefinition;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Types\Exception\TypesException;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Type;                  
 
 final class ColumnEditor
 {

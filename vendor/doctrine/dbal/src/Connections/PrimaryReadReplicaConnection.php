@@ -13,7 +13,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Statement;
 use InvalidArgumentException;
-use SensitiveParameter;
+use SensitiveParameter;                  
 
 use function array_rand;
 use function assert;

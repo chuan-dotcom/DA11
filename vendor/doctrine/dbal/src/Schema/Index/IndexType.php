@@ -9,5 +9,5 @@ enum IndexType
     case REGULAR;
     case UNIQUE;
     case FULLTEXT;
-    case SPATIAL;
+    case SPATIAL;                    
 }

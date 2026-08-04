@@ -11,7 +11,7 @@ use Doctrine\DBAL\Schema\Name\Parser\Exception\InvalidName;
 use function count;
 
 /**
- * @internal
+ * @internal                  
  *
  * @implements Parser<OptionallyQualifiedName>
  */

@@ -12,7 +12,7 @@ final class Exception extends AbstractException
 {
     public static function new(PDOException $exception): self
     {
-        if ($exception->errorInfo !== null) {
+        if ($exception->errorInfo !== null) {              
             [$sqlState, $code] = $exception->errorInfo;
 
             $code ??= 0;

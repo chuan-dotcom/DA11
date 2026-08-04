@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Types\Exception;
 use Exception;
 
 use function sprintf;
-
+                    
 final class TypeNotFound extends Exception implements TypesException
 {
     public static function new(string $name): self

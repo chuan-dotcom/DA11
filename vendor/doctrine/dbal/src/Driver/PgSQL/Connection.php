@@ -12,7 +12,7 @@ use PgSql\Connection as PgSqlConnection;
 use function assert;
 use function pg_close;
 use function pg_escape_literal;
-use function pg_get_result;
+use function pg_get_result;            
 use function pg_last_error;
 use function pg_result_error;
 use function pg_send_prepare;

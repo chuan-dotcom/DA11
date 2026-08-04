@@ -9,7 +9,7 @@ use Doctrine\DBAL\ParameterType;
 /**
  * Driver-level statement
  */
-interface Statement
+interface Statement                 
 {
     /**
      * Binds a value to a corresponding named (not supported by mysqli driver, see comment below) or positional

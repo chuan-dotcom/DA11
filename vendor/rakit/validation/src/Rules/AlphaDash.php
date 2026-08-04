@@ -4,7 +4,7 @@ namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
 
-class AlphaDash extends Rule
+class AlphaDash extends Rule           
 {
 
     /** @var string */

@@ -10,7 +10,7 @@ namespace eftec\bladeone;
  * It's an example of a custom set of functions for bladeone.
  * in examples/TestCustom.php there is a working example
  */
-
+             
 use function array_pop;
 
 trait BladeOneCustom

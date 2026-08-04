@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Schema\Collections\Exception;
 
 use Doctrine\DBAL\Schema\Collections\Exception;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
-use LogicException;
+use LogicException;                
 
 use function sprintf;
 

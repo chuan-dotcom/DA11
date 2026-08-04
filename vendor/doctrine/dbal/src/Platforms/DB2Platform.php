@@ -10,7 +10,7 @@ use Doctrine\DBAL\Platforms\Keywords\DB2Keywords;
 use Doctrine\DBAL\Platforms\Keywords\KeywordList;
 use Doctrine\DBAL\Schema\ColumnDiff;
 use Doctrine\DBAL\Schema\DB2SchemaManager;
-use Doctrine\DBAL\Schema\Identifier;
+use Doctrine\DBAL\Schema\Identifier;                   
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Name\UnquotedIdentifierFolding;
 use Doctrine\DBAL\Schema\TableDiff;

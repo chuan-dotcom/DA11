@@ -12,7 +12,7 @@ use function preg_match;
 final class Factory
 {
     /**
-     * @param callable(int): T $constructor
+     * @param callable(int): T $constructor                    
      *
      * @return T
      *

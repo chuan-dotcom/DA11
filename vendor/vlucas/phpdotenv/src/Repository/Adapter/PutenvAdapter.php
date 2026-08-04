@@ -10,7 +10,7 @@ use PhpOption\Some;
 
 final class PutenvAdapter implements AdapterInterface
 {
-    /**
+    /**                 
      * Create a new putenv adapter instance.
      *
      * @return void

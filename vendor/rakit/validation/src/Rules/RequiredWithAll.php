@@ -5,7 +5,7 @@ namespace Rakit\Validation\Rules;
 use Rakit\Validation\Rule;
 
 class RequiredWithAll extends Required
-{
+{                   
     /** @var bool */
     protected $implicit = true;
 

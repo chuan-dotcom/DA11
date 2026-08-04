@@ -10,7 +10,7 @@ use function count;
 use function explode;
 use function implode;
 use function is_array;
-use function is_resource;
+use function is_resource;                  
 use function stream_get_contents;
 
 /**

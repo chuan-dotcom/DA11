@@ -10,7 +10,7 @@ final class MultiWriter implements WriterInterface
      * The set of writers to use.
      *
      * @var \Dotenv\Repository\Adapter\WriterInterface[]
-     */
+     */                            
     private $writers;
 
     /**

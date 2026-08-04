@@ -9,7 +9,7 @@ trait LoggerAwareTrait
 {
     /**
      * The logger instance.
-     */
+     */              
     protected ?LoggerInterface $logger = null;
 
     /**

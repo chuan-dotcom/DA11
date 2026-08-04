@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Exception\NotImplemented;
 use Doctrine\DBAL\Schema\Name\GenericName;
 use Doctrine\DBAL\Schema\Name\Identifier;
 use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
-use Doctrine\DBAL\Schema\Name\Parser;
+use Doctrine\DBAL\Schema\Name\Parser;                
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\Deprecations\Deprecation;
 use Throwable;

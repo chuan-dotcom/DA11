@@ -9,7 +9,7 @@ use Dotenv\Repository\Adapter\WriterInterface;
 use InvalidArgumentException;
 
 final class AdapterRepository implements RepositoryInterface
-{
+{                       
     /**
      * The reader to use.
      *

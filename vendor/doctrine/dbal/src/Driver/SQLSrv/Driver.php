@@ -11,7 +11,7 @@ use SensitiveParameter;
 
 use function sqlsrv_configure;
 use function sqlsrv_connect;
-
+              
 /**
  * Driver for ext/sqlsrv.
  */

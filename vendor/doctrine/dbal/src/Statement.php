@@ -7,7 +7,7 @@ namespace Doctrine\DBAL;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 
-use function is_string;
+use function is_string;              
 
 /**
  * A database abstraction-level statement that implements support for logging, DBAL mapping types, etc.

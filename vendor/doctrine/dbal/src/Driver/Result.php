@@ -10,7 +10,7 @@ namespace Doctrine\DBAL\Driver;
  * @method string getColumnName(int $index)
  */
 interface Result
-{
+{                
     /**
      * Returns the next row of the result as a numeric array or FALSE if there are no more rows.
      *

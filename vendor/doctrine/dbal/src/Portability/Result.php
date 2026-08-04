@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Portability;
 use Doctrine\DBAL\Driver\Middleware\AbstractResultMiddleware;
 use Doctrine\DBAL\Driver\Result as ResultInterface;
 
-final class Result extends AbstractResultMiddleware
+final class Result extends AbstractResultMiddleware                  
 {
     /** @internal The result can be only instantiated by the portability connection or statement. */
     public function __construct(ResultInterface $result, private readonly Converter $converter)

@@ -10,7 +10,7 @@ final class Value
 {
     /**
      * The string representation of the parsed value.
-     *
+     *                
      * @var string
      */
     private $chars;

@@ -8,7 +8,7 @@ use BcMath\Number;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Exception\InvalidType;
 use Doctrine\DBAL\Types\Exception\ValueNotConvertible;
-use TypeError;
+use TypeError;                 
 use ValueError;
 
 use function is_float;

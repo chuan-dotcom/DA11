@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Types;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-/**
+/**                 
  * Type that maps a database SMALLINT to a PHP integer.
  */
 class SmallIntType extends Type implements PhpIntegerMappingType

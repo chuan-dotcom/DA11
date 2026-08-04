@@ -10,7 +10,7 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL') && !defined('__PHPUNIT_PHAR__')
     !http_response_code() &&
     (basename($_SERVER['PHP_SELF']) === 'bladeonecli.php' || basename($_SERVER['PHP_SELF']) === 'bladeonecli')
 ) {
-    // we also excluded it if it is called by phpunit.
+    // we also excluded it if it is called by phpunit.             
     include_once __DIR__ . '/BladeOne.php';
 
     $compilepath = BladeOne::getParameterCli('compilepath', null);

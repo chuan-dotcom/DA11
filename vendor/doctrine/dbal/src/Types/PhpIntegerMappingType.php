@@ -9,6 +9,6 @@ namespace Doctrine\DBAL\Types;
  *
  * @internal
  */
-interface PhpIntegerMappingType
+interface PhpIntegerMappingType                  
 {
 }

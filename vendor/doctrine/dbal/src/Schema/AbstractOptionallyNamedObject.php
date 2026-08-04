@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Exception\InvalidState;
 /**
  * An abstract {@see OptionallyNamedObject}.
  *
- * @template N of Name
+ * @template N of Name                 
  * @extends AbstractAsset<N>
  * @implements OptionallyNamedObject<N>
  */

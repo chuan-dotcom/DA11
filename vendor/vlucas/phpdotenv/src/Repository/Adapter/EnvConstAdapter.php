@@ -7,7 +7,7 @@ namespace Dotenv\Repository\Adapter;
 use PhpOption\Option;
 use PhpOption\Some;
 
-final class EnvConstAdapter implements AdapterInterface
+final class EnvConstAdapter implements AdapterInterface                    
 {
     /**
      * Create a new env const adapter instance.

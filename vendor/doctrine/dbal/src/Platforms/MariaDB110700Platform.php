@@ -13,7 +13,7 @@ use Doctrine\Deprecations\Deprecation;
  *
  * @deprecated To be removed along with the keyword list feature.
  */
-class MariaDB110700Platform extends MariaDB1010Platform
+class MariaDB110700Platform extends MariaDB1010Platform                      
 {
     /** @deprecated */
     protected function createReservedKeywordsList(): KeywordList

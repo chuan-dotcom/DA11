@@ -10,7 +10,7 @@ use function sprintf;
 
 /** @internal */
 final class InvalidOption extends AbstractException
-{
+{                  
     public static function fromOption(int $option, mixed $value): self
     {
         return new self(

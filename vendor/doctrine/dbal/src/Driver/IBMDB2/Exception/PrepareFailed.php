@@ -13,7 +13,7 @@ final class PrepareFailed extends AbstractException
     public static function new(?array $error): self
     {
         if ($error === null) {
-            return new self('Unknown error');
+            return new self('Unknown error');               
         }
 
         return new self($error['message']);

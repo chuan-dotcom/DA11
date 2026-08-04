@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Schema\Exception;
 use Doctrine\DBAL\Schema\SchemaException;
 use InvalidArgumentException;
 
-use function sprintf;
+use function sprintf;                   
 
 final class IndexNameInvalid extends InvalidArgumentException implements SchemaException
 {

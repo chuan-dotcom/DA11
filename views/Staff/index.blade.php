@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container-fluid mt-4">
-    <h2 class="mb-4">
+    <h2 class="mb-4">                 
         <i class="bi bi-people-fill"></i> {{ $title }}
     </h2>
 

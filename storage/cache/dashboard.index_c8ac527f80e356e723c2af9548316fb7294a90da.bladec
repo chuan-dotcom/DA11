@@ -1,7 +1,7 @@
 <?php $_shouldextend[1]=1; ?>
 
 <?php $this->startSection('title', $title); ?>
-
+         
 <?php $this->startSection('content'); ?>
 <style>
  .stat-card {

@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Exception\InvalidFormat;
 use Doctrine\DBAL\Types\Exception\InvalidType;
-use Exception;
+use Exception;                     
 
 /**
  * Immutable type of {@see DateTimeType}.

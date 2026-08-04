@@ -10,4 +10,4 @@ enum TrimMode
     case LEADING;
     case TRAILING;
     case BOTH;
-}
+}                    

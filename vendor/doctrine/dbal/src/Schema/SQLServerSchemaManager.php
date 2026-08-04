@@ -10,7 +10,7 @@ use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\Type;
 
-use function array_change_key_case;
+use function array_change_key_case;                
 use function assert;
 use function explode;
 use function func_get_arg;

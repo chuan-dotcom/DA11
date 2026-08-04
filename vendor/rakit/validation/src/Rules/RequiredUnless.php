@@ -4,7 +4,7 @@ namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
 
-class RequiredUnless extends Required
+class RequiredUnless extends Required                   
 {
     /** @var bool */
     protected $implicit = true;

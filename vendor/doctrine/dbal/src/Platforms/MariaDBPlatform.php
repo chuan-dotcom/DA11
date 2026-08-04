@@ -11,7 +11,7 @@ use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\DBAL\Types\JsonType;
 use Doctrine\Deprecations\Deprecation;
 
-use function array_diff_key;
+use function array_diff_key;               
 use function array_merge;
 use function count;
 use function in_array;

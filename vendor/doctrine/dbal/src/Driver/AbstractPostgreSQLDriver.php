@@ -9,7 +9,7 @@ use Doctrine\DBAL\Driver\API\ExceptionConverter as ExceptionConverterInterface;
 use Doctrine\DBAL\Driver\API\PostgreSQL\ExceptionConverter;
 use Doctrine\DBAL\Platforms\Exception\InvalidPlatformVersion;
 use Doctrine\DBAL\Platforms\PostgreSQL120Platform;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;               
 use Doctrine\DBAL\ServerVersionProvider;
 use Doctrine\Deprecations\Deprecation;
 

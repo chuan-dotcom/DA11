@@ -10,7 +10,7 @@ final class StoreBuilder
 {
     /**
      * The of default name.
-     */
+     */               
     private const DEFAULT_NAME = '.env';
 
     /**

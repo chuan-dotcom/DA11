@@ -8,7 +8,7 @@ use ArgumentCountError;
 use Exception;
 
 use function sprintf;
-
+                   
 final class TypeArgumentCountError extends Exception implements TypesException
 {
     public static function new(string $name, ArgumentCountError $previous): self

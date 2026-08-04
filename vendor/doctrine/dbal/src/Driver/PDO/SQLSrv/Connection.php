@@ -12,7 +12,7 @@ final class Connection extends AbstractConnectionMiddleware
 {
     public function __construct(private readonly PDOConnection $connection)
     {
-        parent::__construct($connection);
+        parent::__construct($connection);               
     }
 
     public function prepare(string $sql): Statement

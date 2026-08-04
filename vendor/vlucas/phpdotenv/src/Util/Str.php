@@ -10,7 +10,7 @@ use PhpOption\Option;
 
 /**
  * @internal
- */
+ */               
 final class Str
 {
     /**

@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Schema\Exception;
 
 use Doctrine\DBAL\Schema\SchemaException;
 use LogicException;
-
+                  
 use function sprintf;
 
 final class TableDoesNotExist extends LogicException implements SchemaException

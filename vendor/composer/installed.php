@@ -9,7 +9,7 @@
         'aliases' => array(),
         'dev' => true,
     ),
-    'versions' => array(
+    'versions' => array(                  
         'bramus/router' => array(
             'pretty_version' => '1.6.1',
             'version' => '1.6.1.0',

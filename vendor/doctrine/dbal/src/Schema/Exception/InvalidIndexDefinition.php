@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\SchemaException;
 use LogicException;
 
-use function sprintf;
+use function sprintf;                
 
 final class InvalidIndexDefinition extends LogicException implements SchemaException
 {

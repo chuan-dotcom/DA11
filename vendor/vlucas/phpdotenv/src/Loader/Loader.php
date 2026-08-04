@@ -9,7 +9,7 @@ use Dotenv\Parser\Value;
 use Dotenv\Repository\RepositoryInterface;
 
 final class Loader implements LoaderInterface
-{
+{            
     /**
      * Load the given entries into the repository.
      *

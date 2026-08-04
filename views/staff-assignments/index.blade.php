@@ -1,7 +1,7 @@
 ﻿@extends('layouts.admin')
 
 @section('title', $title)
-
+                  
 @section('content')
 <style>
     .status-assigned { background-color: #0d6efd; }

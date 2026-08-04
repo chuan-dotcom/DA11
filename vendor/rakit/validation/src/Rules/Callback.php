@@ -4,7 +4,7 @@ namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
 use InvalidArgumentException;
-use Closure;
+use Closure;                    
 
 class Callback extends Rule
 {

@@ -10,7 +10,7 @@ trait FileTrait
 
     /**
      * Check whether value is from $_FILES
-     *
+     *                       
      * @param mixed $value
      * @return bool
      */

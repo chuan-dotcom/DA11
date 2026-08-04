@@ -12,7 +12,7 @@ use Doctrine\DBAL\Schema\TableDiff;
  *
  * @deprecated This class will be removed once support for MariaDB 10.4 is dropped.
  */
-class MariaDB1052Platform extends MariaDBPlatform
+class MariaDB1052Platform extends MariaDBPlatform                    
 {
     /**
      * {@inheritDoc}

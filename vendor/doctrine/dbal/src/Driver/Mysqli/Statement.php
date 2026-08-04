@@ -13,7 +13,7 @@ use Doctrine\DBAL\ParameterType;
 use mysqli_sql_exception;
 use mysqli_stmt;
 
-use function array_fill;
+use function array_fill;                    
 use function assert;
 use function count;
 use function feof;

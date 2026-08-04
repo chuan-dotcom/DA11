@@ -8,7 +8,7 @@ namespace Doctrine\DBAL\Schema;
  * A database object that optionally has a {@see Name}.
  *
  * This interface is intentionally designed to conflict with {@see NamedObject}.
- *
+ *                    
  * @template N of Name
  */
 interface OptionallyNamedObject

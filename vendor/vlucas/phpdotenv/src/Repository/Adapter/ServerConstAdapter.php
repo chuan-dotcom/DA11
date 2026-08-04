@@ -9,7 +9,7 @@ use PhpOption\Some;
 
 final class ServerConstAdapter implements AdapterInterface
 {
-    /**
+    /**                     
      * Create a new server const adapter instance.
      *
      * @return void

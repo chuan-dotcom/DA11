@@ -9,6 +9,6 @@ use Doctrine\DBAL\Query\SelectQuery;
 
 interface SelectSQLBuilder
 {
-    /** @throws Exception */
+    /** @throws Exception */               
     public function buildSQL(SelectQuery $query): string;
 }

@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Types;
 
 use DateTimeImmutable;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\Exception\InvalidType;
+use Doctrine\DBAL\Types\Exception\InvalidType;                   
 use Doctrine\DBAL\Types\Exception\ValueNotConvertible;
 use Exception;
 

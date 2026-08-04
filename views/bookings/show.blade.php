@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', $title)
+@section('title', $title)                   
 
 @section('content')
 <div class="container mt-4">

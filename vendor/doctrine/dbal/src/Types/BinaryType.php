@@ -8,7 +8,7 @@ use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Exception\ValueNotConvertible;
 
-use function is_resource;
+use function is_resource;             
 use function is_string;
 use function stream_get_contents;
 

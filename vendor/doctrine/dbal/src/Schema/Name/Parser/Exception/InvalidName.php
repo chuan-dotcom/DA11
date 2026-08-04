@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Schema\Name\Parser\Exception;
 use Doctrine\DBAL\Schema\Name\Parser\Exception;
 use InvalidArgumentException;
 
-use function sprintf;
+use function sprintf;                   
 
 /** @internal */
 class InvalidName extends InvalidArgumentException implements Exception

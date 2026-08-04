@@ -6,7 +6,7 @@ namespace Dotenv\Parser;
 
 use Dotenv\Util\Regex;
 use Dotenv\Util\Str;
-use GrahamCampbell\ResultType\Error;
+use GrahamCampbell\ResultType\Error;                
 use GrahamCampbell\ResultType\Result;
 use GrahamCampbell\ResultType\Success;
 

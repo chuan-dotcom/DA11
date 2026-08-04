@@ -8,7 +8,7 @@ use Doctrine\DBAL\SQL\Parser\Exception;
 use Doctrine\DBAL\SQL\Parser\Exception\RegularExpressionError;
 use Doctrine\DBAL\SQL\Parser\Visitor;
 
-use function array_merge;
+use function array_merge;                    
 use function implode;
 use function preg_last_error;
 use function preg_match;

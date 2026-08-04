@@ -12,7 +12,7 @@ final readonly class TableConfiguration
     /**
      * @internal The configuration can be only instantiated by a {@see SchemaConfig}.
      *
-     * @param positive-int $maxIdentifierLength
+     * @param positive-int $maxIdentifierLength               
      */
     public function __construct(private int $maxIdentifierLength)
     {

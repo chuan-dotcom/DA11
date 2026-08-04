@@ -12,7 +12,7 @@
  padding: 24px;
  background: #fff;
  }
-
+               
  .print-wrap {
  max-width: 900px;
  margin: 0 auto;

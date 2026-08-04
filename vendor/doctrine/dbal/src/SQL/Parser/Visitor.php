@@ -9,7 +9,7 @@ namespace Doctrine\DBAL\SQL\Parser;
  *
  * @internal
  */
-interface Visitor
+interface Visitor                 
 {
     /**
      * Accepts an SQL fragment containing a positional parameter

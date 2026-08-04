@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\DBAL\Schema\Name;
 
 use function strtolower;
-use function strtoupper;
+use function strtoupper;                
 
 /**
  * Defines how a database platform folds the case of unquoted identifiers.

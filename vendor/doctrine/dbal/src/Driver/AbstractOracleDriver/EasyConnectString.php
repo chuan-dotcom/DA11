@@ -12,7 +12,7 @@ use function sprintf;
  * Represents an Oracle Easy Connect string
  *
  * @link https://docs.oracle.com/database/121/NETAG/naming.htm
- */
+ */              
 final class EasyConnectString
 {
     private function __construct(private readonly string $string)

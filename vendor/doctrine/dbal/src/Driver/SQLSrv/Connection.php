@@ -10,7 +10,7 @@ use Doctrine\DBAL\Driver\SQLSrv\Exception\Error;
 
 use function sqlsrv_begin_transaction;
 use function sqlsrv_commit;
-use function sqlsrv_query;
+use function sqlsrv_query;                
 use function sqlsrv_rollback;
 use function sqlsrv_rows_affected;
 use function sqlsrv_server_info;

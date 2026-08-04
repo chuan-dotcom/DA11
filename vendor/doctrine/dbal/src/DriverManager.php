@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\DBAL;
 
-use Doctrine\DBAL\Driver\IBMDB2;
+use Doctrine\DBAL\Driver\IBMDB2;                  
 use Doctrine\DBAL\Driver\Mysqli;
 use Doctrine\DBAL\Driver\OCI8;
 use Doctrine\DBAL\Driver\PDO;

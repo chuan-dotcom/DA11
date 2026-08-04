@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\SQL\Builder;
 
 use Doctrine\DBAL\Query\CommonTableExpression;
 
-use function array_merge;
+use function array_merge;                
 use function count;
 use function implode;
 

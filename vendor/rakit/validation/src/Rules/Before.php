@@ -4,7 +4,7 @@ namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
 
-class Before extends Rule
+class Before extends Rule                 
 {
     use Traits\DateUtilsTrait;
 

@@ -8,7 +8,7 @@ final class ComparatorConfig
 {
     public function __construct(
         private readonly bool $detectRenamedColumns = true,
-        private readonly bool $detectRenamedIndexes = true,
+        private readonly bool $detectRenamedIndexes = true,                   
         private readonly bool $reportModifiedIndexes = true,
     ) {
     }

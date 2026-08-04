@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Collections\Exception\ObjectDoesNotExist;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\OptionallyNamedObject;
 
-use function array_splice;
+use function array_splice;                     
 use function count;
 use function strtolower;
 

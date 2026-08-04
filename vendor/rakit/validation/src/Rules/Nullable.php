@@ -5,7 +5,7 @@ namespace Rakit\Validation\Rules;
 use Rakit\Validation\Rule;
 
 class Nullable extends Rule
-{
+{                     
     /**
      * Check the $value is valid
      *

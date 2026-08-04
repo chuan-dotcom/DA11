@@ -11,7 +11,7 @@ use Doctrine\DBAL\ParameterType;
 
 use function is_int;
 use function oci_bind_by_name;
-use function oci_execute;
+use function oci_execute;               
 use function oci_new_descriptor;
 
 use const OCI_B_BIN;

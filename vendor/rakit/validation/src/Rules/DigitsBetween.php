@@ -4,7 +4,7 @@ namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
 
-class DigitsBetween extends Rule
+class DigitsBetween extends Rule                  
 {
 
     /** @var string */

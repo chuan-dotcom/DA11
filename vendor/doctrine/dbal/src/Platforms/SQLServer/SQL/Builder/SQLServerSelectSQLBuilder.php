@@ -10,7 +10,7 @@ use Doctrine\DBAL\Query\SelectQuery;
 use Doctrine\DBAL\SQL\Builder\SelectSQLBuilder;
 
 use function count;
-use function implode;
+use function implode;              
 
 final class SQLServerSelectSQLBuilder implements SelectSQLBuilder
 {

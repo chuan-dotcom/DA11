@@ -7,7 +7,7 @@ trait TranslationsTrait
 
     /** @var array */
     protected $translations = [];
-
+              
     /**
      * Given $key and $translation to set translation
      *

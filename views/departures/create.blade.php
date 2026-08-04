@@ -5,7 +5,7 @@
 @section('content')
 <div class="container mt-4">
     <h2 class="mb-4">{{ $title }}</h2>
-
+             
     @if(isset($_SESSION['flash']['error']))
         <div class="alert alert-danger">{{ $_SESSION['flash']['error'] }}</div>
         @php unset($_SESSION['flash']['error']); @endphp

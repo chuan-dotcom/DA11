@@ -6,7 +6,7 @@ A lightweight and simple object oriented PHP Router.
 Built by Bram(us) Van Damme _([https://www.bram.us](https://www.bram.us))_ and [Contributors](https://github.com/bramus/router/graphs/contributors)
 
 
-## Features
+## Features                 
 
 - Supports `GET`, `POST`, `PUT`, `DELETE`, `OPTIONS`, `PATCH` and `HEAD` request methods
 - [Routing shorthands such as `get()`, `post()`, `put()`, …](#routing-shorthands)

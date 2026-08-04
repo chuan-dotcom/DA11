@@ -10,7 +10,7 @@ use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\JsonType;
 use Doctrine\DBAL\Types\Type;
 
-use function array_change_key_case;
+use function array_change_key_case;               
 use function array_map;
 use function assert;
 use function count;

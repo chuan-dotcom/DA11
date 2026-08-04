@@ -9,5 +9,5 @@ interface ServerVersionProvider
     /**
      * Returns the database server version
      */
-    public function getServerVersion(): string;
+    public function getServerVersion(): string;                  
 }

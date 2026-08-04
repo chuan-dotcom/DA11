@@ -7,7 +7,7 @@
     <!-- use colors in output -->
     <arg name="colors"/>
 
-    <!-- inherit rules from: -->
+    <!-- inherit rules from: -->               
     <rule ref="PSR2"/>
     <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
 

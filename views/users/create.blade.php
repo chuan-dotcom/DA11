@@ -7,7 +7,7 @@
     <h2 class="mb-4">
         <i class="bi bi-person-plus"></i> {{ $title }}
     </h2>
-
+               
     @if(isset($_SESSION['error']))
         <div class="alert alert-danger">{{ $_SESSION['error'] }}</div>
         @php unset($_SESSION['error']); @endphp

@@ -1,6 +1,6 @@
 <?php
 namespace App\Controllers;
-
+   
 use App\Controller;
 use App\Models\TourCategory;
 use Rakit\Validation\Validator;

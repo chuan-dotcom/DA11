@@ -4,7 +4,7 @@
     "keywords": ["router", "routing"],
     "homepage": "https://github.com/bramus/router",
     "type": "library",
-    "license": "MIT",
+    "license": "MIT",                   
     "authors": [
         {
             "name": "Bram(us) Van Damme",

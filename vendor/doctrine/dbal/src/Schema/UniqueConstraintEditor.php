@@ -12,7 +12,7 @@ use function array_merge;
 use function array_values;
 use function count;
 
-final class UniqueConstraintEditor
+final class UniqueConstraintEditor                       
 {
     private ?UnqualifiedName $name = null;
 

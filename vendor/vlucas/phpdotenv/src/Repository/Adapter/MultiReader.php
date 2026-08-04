@@ -10,7 +10,7 @@ final class MultiReader implements ReaderInterface
 {
     /**
      * The set of readers to use.
-     *
+     *                       
      * @var \Dotenv\Repository\Adapter\ReaderInterface[]
      */
     private $readers;

@@ -8,7 +8,7 @@ class Validator
 
     /** @var array */
     protected $translations = [];
-
+                 
     /** @var array */
     protected $validators = [];
 

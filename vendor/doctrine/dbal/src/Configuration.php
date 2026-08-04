@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 namespace Doctrine\DBAL;
-
+               
 use Doctrine\DBAL\Driver\Middleware;
 use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Schema\SchemaManagerFactory;

@@ -11,7 +11,7 @@
  }
  .tour-name-link:hover {
  color: #0d6efd;
- text-decoration: underline;
+ text-decoration: underline;                
  }
  .tour-thumb {
  width: 100px;

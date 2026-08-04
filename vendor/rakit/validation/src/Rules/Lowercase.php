@@ -4,7 +4,7 @@ namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
 
-class Lowercase extends Rule
+class Lowercase extends Rule                  
 {
 
     /** @var string */

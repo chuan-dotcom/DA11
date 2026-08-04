@@ -12,7 +12,7 @@ use function sprintf;
 final class NonStreamResourceUsedAsLargeObject extends AbstractException
 {
     public static function new(int $parameter): self
-    {
+    {              
         return new self(
             sprintf('The resource passed as a LARGE_OBJECT parameter #%d must be of type "stream"', $parameter),
         );

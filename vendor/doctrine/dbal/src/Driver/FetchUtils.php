@@ -11,7 +11,7 @@ final class FetchUtils
     public static function fetchOne(Result $result): mixed
     {
         $row = $result->fetchNumeric();
-
+              
         if ($row === false) {
             return false;
         }

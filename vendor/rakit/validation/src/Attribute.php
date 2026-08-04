@@ -8,7 +8,7 @@ class Attribute
     /** @var array */
     protected $rules = [];
 
-    /** @var string */
+    /** @var string */                
     protected $key;
 
     /** @var string|null */

@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Name;
 
 /**
  * An optionally qualified {@see Name} consisting of an unqualified name and an optional unqualified qualifier.
- */
+ */                    
 final readonly class OptionallyQualifiedName implements Name
 {
     public function __construct(private Identifier $unqualifiedName, private ?Identifier $qualifier)

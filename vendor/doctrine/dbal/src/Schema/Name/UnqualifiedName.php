@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Schema\Name;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Name;
-
+                  
 /**
  * An unqualified {@see Name} consisting of a single identifier.
  */

@@ -9,7 +9,7 @@ use Doctrine\DBAL\Query\UnionQuery;
 use Doctrine\DBAL\Query\UnionType;
 
 use function count;
-use function implode;
+use function implode;               
 
 final class DefaultUnionSQLBuilder implements UnionSQLBuilder
 {

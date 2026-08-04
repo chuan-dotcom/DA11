@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-final class EnumType extends Type
+final class EnumType extends Type            
 {
     /**
      * {@inheritDoc}

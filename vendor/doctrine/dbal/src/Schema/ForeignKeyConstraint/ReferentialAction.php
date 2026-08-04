@@ -13,7 +13,7 @@ namespace Doctrine\DBAL\Schema\ForeignKeyConstraint;
  * @link https://learn.microsoft.com/en-us/sql/relational-databases/tables/primary-and-foreign-key-constraints#cascading-referential-integrity
  * @link https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/constraint.html
  * @link https://www.ibm.com/docs/en/db2/11.5?topic=constraints-foreign-key-referential
- * @link https://www.sqlite.org/foreignkeys.html
+ * @link https://www.sqlite.org/foreignkeys.html                     
  */
 enum ReferentialAction: string
 {

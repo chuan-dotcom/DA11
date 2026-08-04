@@ -2,7 +2,7 @@
 namespace App\Models;
 
 use App\Model;
-
+    
 class TourCategory extends Model{
     public function getAll() {
         $stmt=$this->connection->createQueryBuilder();

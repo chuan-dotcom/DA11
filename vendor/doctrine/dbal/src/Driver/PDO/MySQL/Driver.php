@@ -13,7 +13,7 @@ use PDO;
 use PDOException;
 use SensitiveParameter;
 
-use function is_string;
+use function is_string;                
 
 final class Driver extends AbstractMySQLDriver
 {

@@ -6,7 +6,7 @@ use Rakit\Validation\Rule;
 
 class Integer extends Rule
 {
-
+                 
     /** @var string */
     protected $message = "The :attribute must be integer";
 

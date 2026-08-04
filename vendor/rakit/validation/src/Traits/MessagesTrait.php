@@ -8,7 +8,7 @@ trait MessagesTrait
     /** @var array */
     protected $messages = [];
 
-    /**
+    /**                  
      * Given $key and $message to set message
      *
      * @param mixed $key

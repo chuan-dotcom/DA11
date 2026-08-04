@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Composer;
+namespace Composer;                  
 
 use Composer\Autoload\ClassLoader;
 use Composer\Semver\VersionParser;

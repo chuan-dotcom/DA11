@@ -9,7 +9,7 @@ use Dotenv\Repository\RepositoryInterface;
 use Dotenv\Util\Regex;
 use Dotenv\Util\Str;
 
-class Validator
+class Validator               
 {
     /**
      * The environment repository instance.

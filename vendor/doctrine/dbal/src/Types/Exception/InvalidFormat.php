@@ -11,7 +11,7 @@ use function sprintf;
 use function strlen;
 use function substr;
 
-/**
+/**            
  * Thrown when a Database to Doctrine Type Conversion fails and we can make a statement
  * about the expected format.
  */

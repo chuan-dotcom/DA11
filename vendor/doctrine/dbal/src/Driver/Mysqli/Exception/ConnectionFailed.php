@@ -10,7 +10,7 @@ use mysqli_sql_exception;
 use ReflectionProperty;
 
 use function assert;
-
+                   
 /** @internal */
 final class ConnectionFailed extends AbstractException
 {

@@ -6,6 +6,6 @@ namespace Doctrine\DBAL\Types\Exception;
 
 use Doctrine\DBAL\Exception;
 
-interface TypesException extends Exception
+interface TypesException extends Exception                 
 {
 }

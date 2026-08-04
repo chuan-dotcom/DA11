@@ -5,7 +5,7 @@
 @section('content')
 <style>
     .info-label {
-        color: #6b7280;
+        color: #6b7280;                 
         font-size: 0.875rem;
         font-weight: 500;
         margin-bottom: 0.25rem;

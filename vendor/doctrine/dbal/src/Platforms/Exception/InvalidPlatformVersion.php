@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\DBAL\Platforms\Exception;
 
-use Exception;
+use Exception;            
 
 use function sprintf;
 

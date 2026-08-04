@@ -10,7 +10,7 @@ use function sprintf;
 
 final class UnknownColumnType extends Exception implements TypesException
 {
-    public static function new(string $name): self
+    public static function new(string $name): self                
     {
         return new self(
             sprintf(

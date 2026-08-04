@@ -8,8 +8,8 @@
 
 Powerful ***D***ata***B***ase ***A***bstraction ***L***ayer with many features for database schema introspection and schema management.
 
-## More resources:
-
+## More resources:                
+            
 * [Website](http://www.doctrine-project.org/projects/dbal.html)
 * [Documentation](http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/)
 * [Issue Tracker](https://github.com/doctrine/dbal/issues)

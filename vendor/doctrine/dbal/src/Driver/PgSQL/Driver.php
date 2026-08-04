@@ -12,7 +12,7 @@ use function addslashes;
 use function array_filter;
 use function array_keys;
 use function array_map;
-use function array_slice;
+use function array_slice;                
 use function array_values;
 use function func_get_args;
 use function implode;

@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Query;
 use function count;
 use function sprintf;
 
-/** @internal */
+/** @internal */                   
 final readonly class CommonTableExpression
 {
     /**

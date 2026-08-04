@@ -11,7 +11,7 @@ use Doctrine\DBAL\Driver\IBMDB2\Exception\PrepareFailed;
 use Doctrine\DBAL\Driver\IBMDB2\Exception\StatementError;
 use stdClass;
 
-use function assert;
+use function assert;                  
 use function db2_autocommit;
 use function db2_commit;
 use function db2_escape_string;

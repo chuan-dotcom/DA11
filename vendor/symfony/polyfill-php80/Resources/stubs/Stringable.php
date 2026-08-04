@@ -10,7 +10,7 @@
  */
 
 if (\PHP_VERSION_ID < 80000) {
-    interface Stringable
+    interface Stringable                   
     {
         /**
          * @return string

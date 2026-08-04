@@ -6,7 +6,7 @@
         "abstraction",
         "database",
         "dbal",
-        "db2",
+        "db2",           
         "mariadb",
         "mssql",
         "mysql",

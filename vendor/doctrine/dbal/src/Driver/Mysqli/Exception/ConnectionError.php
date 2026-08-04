@@ -11,7 +11,7 @@ use ReflectionProperty;
 
 /** @internal */
 final class ConnectionError extends AbstractException
-{
+{                     
     public static function new(mysqli $connection): self
     {
         return new self($connection->error, $connection->sqlstate, $connection->errno);

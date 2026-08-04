@@ -4,7 +4,7 @@ namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Helper;
 use Rakit\Validation\Rule;
-
+                   
 class Extension extends Rule
 {
     

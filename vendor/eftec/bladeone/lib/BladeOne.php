@@ -10,7 +10,7 @@
  * @noinspection NotOptimalRegularExpressionsInspection
  * @noinspection SubStrUsedAsStrPosInspection
  * @noinspection ThrowRawExceptionInspection
- * @noinspection Annotator
+ * @noinspection Annotator               
  * @noinspection IsNullFunctionUsageInspection
  * @noinspection CallableParameterUseCaseInTypeContextInspection
  * @noinspection PhpUnused

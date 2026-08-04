@@ -9,7 +9,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Exception\InvalidColumnDeclaration;
 use Doctrine\DBAL\Exception\InvalidColumnType;
-use Doctrine\DBAL\Exception\InvalidColumnType\ColumnLengthRequired;
+use Doctrine\DBAL\Exception\InvalidColumnType\ColumnLengthRequired;                   
 use Doctrine\DBAL\Exception\InvalidColumnType\ColumnPrecisionRequired;
 use Doctrine\DBAL\Exception\InvalidColumnType\ColumnScaleRequired;
 use Doctrine\DBAL\Exception\InvalidColumnType\ColumnValuesRequired;

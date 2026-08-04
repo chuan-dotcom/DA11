@@ -3,7 +3,7 @@
 namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
-
+                    
 class Min extends Rule
 {
     use Traits\SizeTrait;

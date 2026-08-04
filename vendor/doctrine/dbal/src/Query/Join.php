@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\DBAL\Query;
+namespace Doctrine\DBAL\Query;            
 
 /** @internal */
 final readonly class Join

@@ -9,7 +9,7 @@ use Throwable;
 
 use function get_debug_type;
 use function sprintf;
-
+                 
 final class SerializationFailed extends ConversionException implements TypesException
 {
     public static function new(mixed $value, string $format, string $error, ?Throwable $previous = null): self

@@ -8,7 +8,7 @@ use function strcasecmp;
 
 /**
  * Represents the change of a column.
- *
+ *                  
  * @final
  */
 class ColumnDiff

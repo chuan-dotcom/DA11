@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Schema;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
- * Represents a database object name.
+ * Represents a database object name.                 
  */
 interface Name
 {

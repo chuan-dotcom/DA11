@@ -10,7 +10,7 @@ use App\Controllers\DepartureController;
 use App\Controllers\StaffAssignmentController;
 use App\Controllers\ServiceController;
 use App\Controllers\GuestGroupController;
-
+    
 use Bramus\Router\Router;
 
 $router = new Router();

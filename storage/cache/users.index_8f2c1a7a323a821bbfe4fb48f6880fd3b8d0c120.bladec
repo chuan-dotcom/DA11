@@ -11,7 +11,7 @@
  border-radius: 50%;
  border: 2px solid #e5e7eb;
  }
- .user-avatar-sm {
+ .user-avatar-sm {               
  width: 40px;
  height: 40px;
  object-fit: cover;

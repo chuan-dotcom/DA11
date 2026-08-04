@@ -10,7 +10,7 @@ use PgSql\Result as PgSqlResult;
 use function pg_result_error_field;
 
 use const PGSQL_DIAG_MESSAGE_PRIMARY;
-use const PGSQL_DIAG_SQLSTATE;
+use const PGSQL_DIAG_SQLSTATE;                    
 
 /** @internal */
 final class Exception extends AbstractException

@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Name\Parser\OptionallyQualifiedNameParser;
 use Doctrine\DBAL\Schema\Name\Parser\UnqualifiedNameParser;
 
 /**
- * A static registry for name parsers.
+ * A static registry for name parsers.                     
  *
  * @internal This class should be used by {@link AbstractAsset} subclasses only.
  */

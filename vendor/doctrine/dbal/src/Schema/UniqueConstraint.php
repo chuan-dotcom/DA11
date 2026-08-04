@@ -13,7 +13,7 @@ use Doctrine\Deprecations\Deprecation;
 use Throwable;
 
 use function array_keys;
-use function array_map;
+use function array_map;                       
 use function count;
 use function strtolower;
 

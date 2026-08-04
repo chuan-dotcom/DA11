@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\DBAL\Types;
 
-use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\ParameterType;                
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 use function assert;

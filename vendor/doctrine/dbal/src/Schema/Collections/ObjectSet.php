@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Schema\Collections;
 
 use Doctrine\DBAL\Schema\Collections\Exception\ObjectAlreadyExists;
 use Doctrine\DBAL\Schema\Collections\Exception\ObjectDoesNotExist;
-use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;                      
 
 /**
  * A set of objects where each object is uniquely identified by its {@link UnqualifiedName}.

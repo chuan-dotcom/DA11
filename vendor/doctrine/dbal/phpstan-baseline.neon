@@ -10,7 +10,7 @@ parameters:
 			message: '#^Method Doctrine\\DBAL\\Driver\\OCI8\\Connection\:\:exec\(\) never returns numeric\-string so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
-			path: src/Driver/OCI8/Connection.php
+			path: src/Driver/OCI8/Connection.php                 
 
 		-
 			message: '#^Method Doctrine\\DBAL\\Driver\\OCI8\\Result\:\:fetchAllAssociative\(\) should return list\<array\<string, mixed\>\> but returns array\<mixed\>\.$#'

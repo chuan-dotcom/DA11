@@ -11,7 +11,7 @@ use function count;
 
 /** @implements OptionallyNamedObject<UnqualifiedName> */
 final readonly class PrimaryKeyConstraint implements OptionallyNamedObject
-{
+{                 
     /**
      * @internal Use {@link PrimaryKeyConstraint::editor()} to instantiate an editor and
      *           {@link PrimaryKeyConstraintEditor::create()} to create a primary key constraint.

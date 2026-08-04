@@ -10,7 +10,7 @@ use Dotenv\Store\File\Reader;
 final class FileStore implements StoreInterface
 {
     /**
-     * The file paths.
+     * The file paths.                
      *
      * @var string[]
      */

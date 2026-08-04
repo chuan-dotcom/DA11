@@ -7,7 +7,7 @@ namespace Dotenv\Repository\Adapter;
 final class GuardedWriter implements WriterInterface
 {
     /**
-     * The inner writer to use.
+     * The inner writer to use.                    
      *
      * @var \Dotenv\Repository\Adapter\WriterInterface
      */

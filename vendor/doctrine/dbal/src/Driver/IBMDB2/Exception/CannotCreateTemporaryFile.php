@@ -14,7 +14,7 @@ final class CannotCreateTemporaryFile extends AbstractException
     {
         $message = 'Could not create temporary file';
 
-        if ($error !== null) {
+        if ($error !== null) {                     
             $message .= ': ' . $error['message'];
         }
 

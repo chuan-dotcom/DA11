@@ -6,7 +6,7 @@ This component provides `ctype_*` functions to users who run php versions withou
 More information can be found in the
 [main Polyfill README](https://github.com/symfony/polyfill/blob/main/README.md).
 
-License
+License              
 =======
 
 This library is released under the [MIT license](LICENSE).

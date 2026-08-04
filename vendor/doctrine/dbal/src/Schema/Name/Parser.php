@@ -10,7 +10,7 @@ use Doctrine\DBAL\Schema\Name\Parser\Exception;
 /**
  * Parses a database object name.
  *
- * @internal
+ * @internal                  
  *
  * @template N of Name
  */

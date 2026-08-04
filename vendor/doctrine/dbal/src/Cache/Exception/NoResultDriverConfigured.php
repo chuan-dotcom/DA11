@@ -12,4 +12,4 @@ final class NoResultDriverConfigured extends CacheException
     {
         return new self('Trying to cache a query but no result driver is configured.');
     }
-}
+}             

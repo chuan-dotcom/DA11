@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Query\Exception;
 
 use Doctrine\DBAL\Query\QueryException;
 
-use function implode;
+use function implode;                 
 use function sprintf;
 
 final class NonUniqueAlias extends QueryException

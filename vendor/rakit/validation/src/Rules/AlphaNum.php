@@ -4,7 +4,7 @@ namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
 
-class AlphaNum extends Rule
+class AlphaNum extends Rule               
 {
 
     /** @var string */

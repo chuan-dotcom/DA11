@@ -3,7 +3,7 @@
 namespace Rakit\Validation;
 
 class MimeTypeGuesser
-{
+{                  
 
     /** @var array */
     protected $mimeTypes = [

@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-
+             
 namespace Doctrine\DBAL\Logging;
 
 use Doctrine\DBAL\Driver\Connection as ConnectionInterface;

@@ -1,6 +1,6 @@
 <?php
 namespace App\Controllers;
-
+    
 use App\Controller;
 use App\Models\User;
 use Rakit\Validation\Validator;

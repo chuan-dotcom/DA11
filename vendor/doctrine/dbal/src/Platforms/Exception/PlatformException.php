@@ -9,3 +9,4 @@ use Doctrine\DBAL\Exception;
 interface PlatformException extends Exception
 {
 }
+           

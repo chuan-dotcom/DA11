@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Platforms\Keywords;
 
 use Doctrine\Deprecations\Deprecation;
 
-use function array_flip;
+use function array_flip;               
 use function array_map;
 use function strtoupper;
 

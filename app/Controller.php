@@ -50,4 +50,4 @@ class Controller
 
         throw new \Exception('Lỗi upload file!');
     }
-}   
+}       

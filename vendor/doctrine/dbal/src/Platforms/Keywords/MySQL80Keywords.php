@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\DBAL\Platforms\Keywords;
 
 use function array_merge;
-
+              
 /**
  * MySQL 8.0 reserved keywords list.
  *

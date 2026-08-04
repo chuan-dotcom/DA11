@@ -12,7 +12,7 @@ use Doctrine\DBAL\Schema\Exception\InvalidState;
  *
  * @template N of Name
  * @extends AbstractAsset<N>
- * @implements NamedObject<N>
+ * @implements NamedObject<N>                
  */
 abstract class AbstractNamedObject extends AbstractAsset implements NamedObject
 {

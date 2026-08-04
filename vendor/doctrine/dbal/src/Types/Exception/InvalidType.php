@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Types\Exception;
 
 use Doctrine\DBAL\Types\ConversionException;
 use Throwable;
-
+               
 use function get_debug_type;
 use function implode;
 use function is_scalar;

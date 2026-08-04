@@ -8,7 +8,7 @@
                 "type": "git",
                 "url": "https://github.com/bramus/router.git",
                 "reference": "55657b76da8a0a509250fb55b9dd24e1aa237eba"
-            },
+            },                 
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/bramus/router/zipball/55657b76da8a0a509250fb55b9dd24e1aa237eba",

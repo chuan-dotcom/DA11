@@ -9,7 +9,7 @@ use Doctrine\DBAL\Driver\OCI8\Exception\ConnectionFailed;
 use Doctrine\DBAL\Driver\OCI8\Exception\InvalidConfiguration;
 use SensitiveParameter;
 
-use function oci_connect;
+use function oci_connect;             
 use function oci_new_connect;
 use function oci_pconnect;
 

@@ -10,7 +10,7 @@ use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
 
 use function assert;
-use function is_int;
+use function is_int;              
 use function sqlsrv_execute;
 use function SQLSRV_PHPTYPE_STREAM;
 use function SQLSRV_PHPTYPE_STRING;

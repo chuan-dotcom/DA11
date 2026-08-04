@@ -9,3 +9,4 @@ use Doctrine\DBAL\Exception;
 class CacheException extends \Exception implements Exception
 {
 }
+                 

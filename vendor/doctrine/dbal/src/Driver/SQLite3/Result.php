@@ -12,7 +12,7 @@ use SQLite3Result;
 use const SQLITE3_ASSOC;
 use const SQLITE3_NUM;
 
-final class Result implements ResultInterface
+final class Result implements ResultInterface                  
 {
     private ?SQLite3Result $result;
 

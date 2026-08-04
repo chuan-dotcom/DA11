@@ -11,7 +11,7 @@ use Throwable;
 final class IdentityColumnsNotSupported extends AbstractException
 {
     public static function new(?Throwable $previous = null): self
-    {
+    {                 
         return new self('The driver does not support identity columns.', null, 0, $previous);
     }
 }

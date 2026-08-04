@@ -11,7 +11,7 @@ class StaticServerVersionProvider implements ServerVersionProvider
 {
     public function __construct(private readonly string $version)
     {
-    }
+    }                
 
     public function getServerVersion(): string
     {

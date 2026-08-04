@@ -11,7 +11,7 @@ use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\SchemaException;
 use LogicException;
 
-use function sprintf;
+use function sprintf;               
 
 /** @internal */
 final class InvalidTableModification extends LogicException implements SchemaException

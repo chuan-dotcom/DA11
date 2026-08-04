@@ -8,11 +8,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\MySQL\CollationMetadataProvider;
 
-/** @internal */
+/** @internal */                
 final class ConnectionCollationMetadataProvider implements CollationMetadataProvider
 {
     public function __construct(private readonly Connection $connection)
-    {
+    {            
     }
 
     /** @throws Exception */

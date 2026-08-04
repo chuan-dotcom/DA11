@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\DBAL;
 
 use Closure;
-use Doctrine\DBAL\Cache\ArrayResult;
+use Doctrine\DBAL\Cache\ArrayResult;                 
 use Doctrine\DBAL\Cache\CacheException;
 use Doctrine\DBAL\Cache\Exception\NoResultDriverConfigured;
 use Doctrine\DBAL\Cache\QueryCacheProfile;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Dotenv\Store\File;
 
 use Dotenv\Exception\InvalidEncodingException;
-use Dotenv\Util\Str;
+use Dotenv\Util\Str;               
 use PhpOption\Option;
 
 /**

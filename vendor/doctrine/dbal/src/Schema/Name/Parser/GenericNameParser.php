@@ -11,7 +11,7 @@ use Doctrine\DBAL\Schema\Name\Parser\Exception\ExpectedDot;
 use Doctrine\DBAL\Schema\Name\Parser\Exception\ExpectedNextIdentifier;
 use Doctrine\DBAL\Schema\Name\Parser\Exception\UnableToParseIdentifier;
 
-use function assert;
+use function assert;                
 use function count;
 use function preg_match;
 use function str_replace;

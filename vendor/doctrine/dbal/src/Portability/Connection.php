@@ -9,7 +9,7 @@ use Doctrine\DBAL\Driver\Middleware\AbstractConnectionMiddleware;
 
 /**
  * Portability wrapper for a Connection.
- */
+ */               
 final class Connection extends AbstractConnectionMiddleware
 {
     public const PORTABILITY_ALL           = 255;

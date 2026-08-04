@@ -8,7 +8,7 @@ abstract class Rule
 {
     /** @var string */
     protected $key;
-
+                   
     /** @var \Rakit\Validation\Attribute|null */
     protected $attribute;
 

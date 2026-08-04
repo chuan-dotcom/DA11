@@ -10,7 +10,7 @@ use Doctrine\DBAL\Schema\Name\Parser\UnqualifiedNameParser;
 use Doctrine\DBAL\Schema\Name\Parsers;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\Deprecations\Deprecation;
+use Doctrine\Deprecations\Deprecation;                 
 
 use function array_merge;
 use function method_exists;

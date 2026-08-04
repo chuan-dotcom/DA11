@@ -1,6 +1,6 @@
 <?php
 namespace App\Controllers;
-
+  
 use App\Controller;
 use App\Models\Tour;
 use App\Models\TourCategory;

@@ -4,7 +4,7 @@
  * @source  https://gist.github.com/codfish/c77d348820c1c6b4ebe4a66dc2291c74
  *
  * Rules we follow are from PSR-2 as well as the rectified PSR-2 guide.
- *
+ *               
  * - https://github.com/FriendsOfPHP/PHP-CS-Fixer
  * - https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
  * - https://github.com/php-fig-rectified/fig-rectified-standards/blob/master/PSR-2-R-coding-style-guide-additions.md

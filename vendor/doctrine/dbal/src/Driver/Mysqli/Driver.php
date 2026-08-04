@@ -12,7 +12,7 @@ use Doctrine\DBAL\Driver\Mysqli\Initializer\Options;
 use Doctrine\DBAL\Driver\Mysqli\Initializer\Secure;
 use Generator;
 use mysqli;
-use mysqli_sql_exception;
+use mysqli_sql_exception;                   
 use SensitiveParameter;
 
 final class Driver extends AbstractMySQLDriver

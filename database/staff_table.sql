@@ -27,3 +27,4 @@ INSERT INTO hdv (Hoten, Ngaysinh, Gioitinh, Lienhe, Ngonngu, Diachi, chungchiHDV
 ('Lê Hoàng Cường', '1988-12-10', 'Nam', '0903456789 - cuong.le@email.com', 'Tiếng Nhật, Tiếng Anh', '789 Trần Hưng Đạo, Q.5, TP.HCM', 'HDV Quốc tế #8820', 8, '2019-06-20', 'Tốt', 'Chuyên tuyến tour Nhật Bản và Đông Nam Á', 4.9, 'Rất chuyên nghiệp, nhiều kinh nghiệm xử lý sự cố.', 1, 'active', NOW()),
 ('Phạm Minh Đức', '1993-03-25', 'Nam', '0904567890 - duc.pham@email.com', 'Tiếng Hàn', '321 Hai Bà Trưng, Q.1, TP.HCM', 'HDV Nội địa #5123', 2, '2023-01-10', 'Tốt', 'Đang học thêm tiếng Anh nâng cao', 4.2, 'Năng nổ, hòa đồng.', 2, 'on_leave', NOW()),
 ('Hoàng Thị Em', '1997-07-30', 'Nữ', '0905678901 - em.hoang@email.com', 'Tiếng Pháp', '654 Võ Văn Tần, Q.3, TP.HCM', 'HDV Quốc tế #3301', 4, '2021-09-05', 'Bình thường', 'Đã hết hạn hợp đồng', 4.0, 'Hoàn thành tốt các công việc được giao.', 3, 'inactive', NOW());
+    

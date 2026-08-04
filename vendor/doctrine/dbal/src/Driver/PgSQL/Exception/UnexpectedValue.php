@@ -13,7 +13,7 @@ final class UnexpectedValue extends UnexpectedValueException implements Exceptio
 {
     public static function new(string $value, string $type): self
     {
-        return new self(sprintf(
+        return new self(sprintf(           
             'Unexpected value "%s" of type "%s" returned by Postgres',
             $value,
             $type,

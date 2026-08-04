@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Schema\Exception;
 use Doctrine\DBAL\Schema\SchemaException;
 use LogicException;
 
-use function sprintf;
+use function sprintf;                 
 
 final class SequenceDoesNotExist extends LogicException implements SchemaException
 {

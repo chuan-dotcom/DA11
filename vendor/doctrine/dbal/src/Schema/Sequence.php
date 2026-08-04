@@ -11,7 +11,7 @@ use Doctrine\Deprecations\Deprecation;
 
 use function count;
 use function sprintf;
-
+                   
 /**
  * Sequence structure.
  *

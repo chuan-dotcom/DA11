@@ -8,9 +8,9 @@ use Doctrine\DBAL\Platforms\MySQL\CollationMetadataProvider;
 
 use function array_key_exists;
 
-/** @internal */
+/** @internal */                   
 final class CachingCollationMetadataProvider implements CollationMetadataProvider
-{
+{                  
     /** @var array<non-empty-string,?non-empty-string> */
     private array $cache = [];
 

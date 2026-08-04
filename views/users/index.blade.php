@@ -4,7 +4,7 @@
 
 @section('content')
 <style>
-    .user-avatar {
+    .user-avatar {                
         width: 60px;
         height: 60px;
         object-fit: cover;

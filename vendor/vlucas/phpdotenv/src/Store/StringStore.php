@@ -8,7 +8,7 @@ final class StringStore implements StoreInterface
 {
     /**
      * The file content.
-     *
+     *              
      * @var string
      */
     private $content;

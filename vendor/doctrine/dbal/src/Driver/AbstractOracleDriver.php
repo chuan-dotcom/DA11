@@ -8,7 +8,7 @@ use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\AbstractOracleDriver\EasyConnectString;
 use Doctrine\DBAL\Driver\API\ExceptionConverter as ExceptionConverterInterface;
 use Doctrine\DBAL\Driver\API\OCI\ExceptionConverter;
-use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;              
 use Doctrine\DBAL\ServerVersionProvider;
 
 /**

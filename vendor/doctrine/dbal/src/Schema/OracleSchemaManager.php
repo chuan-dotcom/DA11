@@ -10,7 +10,7 @@ use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\Type;
 
-use function array_change_key_case;
+use function array_change_key_case;                    
 use function array_key_exists;
 use function assert;
 use function implode;

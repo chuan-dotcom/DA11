@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Schema\Exception;
 
 use Doctrine\DBAL\Schema\SchemaException;
 use LogicException;
-
+                  
 use function sprintf;
 
 final class TableAlreadyExists extends LogicException implements SchemaException

@@ -13,7 +13,7 @@ abstract class AbstractStatementMiddleware implements Statement
     public function __construct(private readonly Statement $wrappedStatement)
     {
     }
-
+                         
     public function bindValue(int|string $param, mixed $value, ParameterType $type): void
     {
         $this->wrappedStatement->bindValue($param, $value, $type);

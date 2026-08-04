@@ -2,7 +2,7 @@
 
 @section('title', $title)
 
-@section('content')
+@section('content')               
 <style>
     .role-badge { font-size: 0.8rem; }
 </style>

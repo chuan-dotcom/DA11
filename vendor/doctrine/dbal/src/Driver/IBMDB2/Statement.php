@@ -12,7 +12,7 @@ use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
 
 use function assert;
-use function db2_bind_param;
+use function db2_bind_param;                    
 use function db2_execute;
 use function error_get_last;
 use function fclose;

@@ -13,4 +13,5 @@ interface CollationMetadataProvider
      * @return ?non-empty-string
      */
     public function getCollationCharset(string $collation): ?string;
-}
+}                    
+                 

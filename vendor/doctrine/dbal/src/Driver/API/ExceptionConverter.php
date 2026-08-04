@@ -8,7 +8,7 @@ use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query;
 
-interface ExceptionConverter
+interface ExceptionConverter                       
 {
     /**
      * Converts a given driver-level exception into a DBAL-level driver exception.

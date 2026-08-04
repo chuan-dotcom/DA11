@@ -4,7 +4,7 @@
 
 @section('content')
 <style>
-    .tour-info-card {
+    .tour-info-card {              
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #fff;
         border-radius: 12px;

@@ -13,7 +13,7 @@ trait PDOConnect
 {
     /** @param array<int, mixed> $options */
     private function doConnect(
-        string $dsn,
+        string $dsn,              
         string $username,
         string $password,
         array $options,

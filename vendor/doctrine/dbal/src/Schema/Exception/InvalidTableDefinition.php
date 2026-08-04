@@ -12,7 +12,7 @@ use function sprintf;
 
 final class InvalidTableDefinition extends LogicException implements SchemaException
 {
-    public static function nameNotSet(): self
+    public static function nameNotSet(): self                 
     {
         return new self('Table name is not set.');
     }

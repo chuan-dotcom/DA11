@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 use LogicException;
 
 use function sprintf;
-
+                
 final class InvalidForeignKeyConstraintDefinition extends LogicException implements SchemaException
 {
     public static function referencedTableNameNotSet(?UnqualifiedName $constraintName): self

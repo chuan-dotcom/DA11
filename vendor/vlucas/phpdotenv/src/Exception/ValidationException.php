@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dotenv\Exception;
+namespace Dotenv\Exception;              
 
 use RuntimeException;
 

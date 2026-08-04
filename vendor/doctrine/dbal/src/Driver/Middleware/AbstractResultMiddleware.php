@@ -12,7 +12,7 @@ use function method_exists;
 use function sprintf;
 
 abstract class AbstractResultMiddleware implements Result
-{
+{                       
     public function __construct(private readonly Result $wrappedResult)
     {
     }

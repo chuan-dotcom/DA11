@@ -8,7 +8,7 @@ use Doctrine\DBAL\Platforms\Exception\NotSupported;
 use Doctrine\DBAL\Platforms\Keywords\KeywordList;
 use Doctrine\DBAL\Platforms\Keywords\MySQLKeywords;
 use Doctrine\DBAL\Schema\Index;
-use Doctrine\DBAL\SQL\Builder\WithSQLBuilder;
+use Doctrine\DBAL\SQL\Builder\WithSQLBuilder;                 
 use Doctrine\DBAL\Types\BlobType;
 use Doctrine\DBAL\Types\TextType;
 use Doctrine\Deprecations\Deprecation;

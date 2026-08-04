@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Schema\Name\Parser\Exception;
 use Doctrine\DBAL\Schema\Name\Parser\Exception;
 use LogicException;
 
-use function sprintf;
+use function sprintf;                         
 
 /** @internal */
 class UnableToParseIdentifier extends LogicException implements Exception

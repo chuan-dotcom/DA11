@@ -10,7 +10,7 @@ use function implode;
 use function sprintf;
 use function str_contains;
 
-/**
+/**              
  * IBM DB2 DSN
  */
 final class DataSourceName

@@ -13,3 +13,4 @@ final class CommitFailedRollbackOnly extends ConnectionException
         return new self('Transaction commit failed because the transaction has been marked for rollback only.');
     }
 }
+               

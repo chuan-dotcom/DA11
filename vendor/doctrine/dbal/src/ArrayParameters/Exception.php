@@ -9,4 +9,4 @@ use Throwable;
 /** @internal */
 interface Exception extends Throwable
 {
-}
+}                        

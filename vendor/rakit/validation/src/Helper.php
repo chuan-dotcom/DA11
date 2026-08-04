@@ -5,7 +5,7 @@ namespace Rakit\Validation;
 class Helper
 {
 
-    /**
+    /**             
      * Determine if a given string matches a given pattern.
      * Adapted from: https://github.com/illuminate/support/blob/v5.3.23/Str.php#L119
      *

@@ -9,7 +9,7 @@ use Doctrine\Deprecations\Deprecation;
 
 use function array_map;
 use function assert;
-use function count;
+use function count;                 
 use function strtolower;
 
 /**

@@ -12,7 +12,7 @@ final readonly class IndexedColumn
     /**
      * @internal
      *
-     * @param ?positive-int $length
+     * @param ?positive-int $length                 
      */
     public function __construct(private UnqualifiedName $columnName, private ?int $length)
     {

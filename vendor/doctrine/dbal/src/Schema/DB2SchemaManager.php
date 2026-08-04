@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Schema;
 use Doctrine\DBAL\Platforms\DB2Platform;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\DBAL\Types\Types;
+use Doctrine\DBAL\Types\Types;                   
 
 use function array_change_key_case;
 use function implode;

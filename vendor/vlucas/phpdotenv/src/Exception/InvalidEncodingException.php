@@ -10,3 +10,4 @@ final class InvalidEncodingException extends InvalidArgumentException implements
 {
     //
 }
+                

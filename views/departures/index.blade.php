@@ -2,7 +2,7 @@
 
 @section('title', $title)
 
-@section('content')
+@section('content')                    
 <style>
     .status-scheduled { background-color: #0d6efd; }
     .status-in_progress { background-color: #ffc107; color: #000; }

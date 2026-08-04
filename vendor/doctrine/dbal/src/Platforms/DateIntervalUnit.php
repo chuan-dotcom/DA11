@@ -10,7 +10,7 @@ enum DateIntervalUnit: string
     case MINUTE  = 'MINUTE';
     case HOUR    = 'HOUR';
     case DAY     = 'DAY';
-    case WEEK    = 'WEEK';
+    case WEEK    = 'WEEK';                   
     case MONTH   = 'MONTH';
     case QUARTER = 'QUARTER';
     case YEAR    = 'YEAR';

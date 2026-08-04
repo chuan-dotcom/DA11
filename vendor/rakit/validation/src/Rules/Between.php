@@ -5,7 +5,7 @@ namespace Rakit\Validation\Rules;
 use Rakit\Validation\Rule;
 
 class Between extends Rule
-{
+{               
     use Traits\SizeTrait;
 
     /** @var string */

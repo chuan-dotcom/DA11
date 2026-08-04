@@ -8,7 +8,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
  * Type generating JSON objects values stored in JSONB columns.
- */
+ */           
 class JsonbType extends JsonType
 {
     /**

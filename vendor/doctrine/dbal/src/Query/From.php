@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\Query;
 /** @internal */
 final readonly class From
 {
-    public function __construct(
+    public function __construct(                
         public string $table,
         public ?string $alias = null,
     ) {

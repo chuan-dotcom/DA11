@@ -9,7 +9,7 @@ namespace Doctrine\DBAL\Schema;
  *
  * This interface is intentionally designed to conflict with {@see OptionallyNamedObject}.
  *
- * @template N of Name
+ * @template N of Name                 
  */
 interface NamedObject
 {

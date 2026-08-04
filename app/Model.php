@@ -32,3 +32,4 @@ class Model
         $this->connection = null;
     }
 }
+        

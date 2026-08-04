@@ -2,7 +2,7 @@
 
 @section('title', $title)
 
-@section('content')
+@section('content')                
 <style>
     .guest-group-shell {
         background: #f7f8fb;

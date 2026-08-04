@@ -4,7 +4,7 @@ namespace Rakit\Validation\Rules;
 
 use Rakit\Validation\Rule;
 
-class Numeric extends Rule
+class Numeric extends Rule                    
 {
 
     /** @var string */

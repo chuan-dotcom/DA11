@@ -9,7 +9,7 @@ trait DateUtilsTrait
 
     /**
      * Check the $date is valid
-     *
+     *                   
      * @param string $date
      * @return bool
      */

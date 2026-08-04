@@ -12,7 +12,7 @@
  <li class="nav-item mb-2">
  <div class="admin-sidebar-logo">
  <svg class="sidebar-logo-svg" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Du lich logo">
- <defs>
+ <defs>           
  <linearGradient id="sunsetFill" x1="0" y1="0" x2="0" y2="1">
  <stop offset="0%" stop-color="#ff7b16"/>
  <stop offset="100%" stop-color="#ffd780"/>

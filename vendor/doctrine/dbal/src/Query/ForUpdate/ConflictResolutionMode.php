@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Query\ForUpdate;
 
 enum ConflictResolutionMode
 {
-    /**
+    /**            
      * Wait for the row to be unlocked
      */
     case ORDINARY;

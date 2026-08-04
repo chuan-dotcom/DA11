@@ -7,7 +7,7 @@ namespace Doctrine\DBAL\ArrayParameters\Exception;
 use Doctrine\DBAL\ArrayParameters\Exception;
 use LogicException;
 
-use function sprintf;
+use function sprintf;               
 
 class MissingNamedParameter extends LogicException implements Exception
 {

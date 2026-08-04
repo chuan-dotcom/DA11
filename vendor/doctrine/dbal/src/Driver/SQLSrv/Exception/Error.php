@@ -11,7 +11,7 @@ use function sqlsrv_errors;
 
 use const SQLSRV_ERR_ERRORS;
 
-/** @internal */
+/** @internal */                 
 final class Error extends AbstractException
 {
     public static function new(): self

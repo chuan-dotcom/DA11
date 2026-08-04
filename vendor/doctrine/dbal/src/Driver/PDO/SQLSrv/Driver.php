@@ -12,7 +12,7 @@ use Doctrine\DBAL\Driver\PDO\Exception as PDOException;
 use Doctrine\DBAL\Driver\PDO\Exception\InvalidConfiguration;
 use Doctrine\DBAL\Driver\PDO\PDOConnect;
 use PDO;
-use SensitiveParameter;
+use SensitiveParameter;                
 
 use function is_int;
 use function is_string;

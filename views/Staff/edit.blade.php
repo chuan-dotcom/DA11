@@ -5,7 +5,7 @@
 @section('content')
 <div class="container mt-4">
     <h2 class="mb-4">
-        <i class="bi bi-pencil-square"></i> {{ $title }}
+        <i class="bi bi-pencil-square"></i> {{ $title }}                 
     </h2>
 
     @if(isset($_SESSION['error']))

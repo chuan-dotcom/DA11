@@ -11,7 +11,7 @@ use Doctrine\DBAL\Exception\InvalidColumnIndex;
 use PgSql\Result as PgSqlResult;
 use ValueError;
 
-use function array_keys;
+use function array_keys;                  
 use function array_map;
 use function assert;
 use function hex2bin;

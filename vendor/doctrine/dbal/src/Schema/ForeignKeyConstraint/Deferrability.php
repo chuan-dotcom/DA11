@@ -6,7 +6,7 @@ namespace Doctrine\DBAL\Schema\ForeignKeyConstraint;
 
 /**
  * Represents the information about whether the constraint is or can be deferred.
- */
+ */              
 enum Deferrability: string
 {
     case NOT_DEFERRABLE = 'NOT DEFERRABLE';

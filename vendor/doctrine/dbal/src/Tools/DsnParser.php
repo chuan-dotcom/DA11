@@ -12,7 +12,7 @@ use SensitiveParameter;
 use function array_merge;
 use function assert;
 use function is_a;
-use function is_string;
+use function is_string;               
 use function parse_str;
 use function parse_url;
 use function preg_replace;

@@ -6,7 +6,7 @@ use Rakit\Validation\Helper;
 use Rakit\Validation\MimeTypeGuesser;
 use Rakit\Validation\Rule;
 use Rakit\Validation\Rules\Interfaces\BeforeValidate;
-
+               
 class UploadedFile extends Rule implements BeforeValidate
 {
     use Traits\FileTrait, Traits\SizeTrait;

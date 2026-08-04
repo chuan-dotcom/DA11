@@ -9,7 +9,7 @@ namespace Doctrine\DBAL;
  */
 enum LockMode
 {
-    case NONE;
+    case NONE;                     
     case OPTIMISTIC;
     case PESSIMISTIC_READ;
     case PESSIMISTIC_WRITE;

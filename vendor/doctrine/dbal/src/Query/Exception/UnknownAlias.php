@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\DBAL\Query\Exception;
 
 use Doctrine\DBAL\Query\QueryException;
-
+                        
 use function implode;
 use function sprintf;
 

@@ -10,7 +10,7 @@ use Doctrine\DBAL\SQL\Parser\Visitor;
 use Doctrine\DBAL\Types\Type;
 
 use function array_fill;
-use function array_key_exists;
+use function array_key_exists;                   
 use function count;
 use function implode;
 use function substr;
