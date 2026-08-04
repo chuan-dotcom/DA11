@@ -15,7 +15,7 @@ function view($name, $data = []) {
     $blade = new \eftec\bladeone\BladeOne(
         __DIR__ . '/views',
         __DIR__ . '/storage/cache',
-        \eftec\bladeone\BladeOne::MODE_DEBUG
+        \eftec\bladeone\BladeOne::MODE_DEBUG 
     );
     if (!is_dir(__DIR__ . '/storage/cache')) {
         @mkdir(__DIR__ . '/storage/cache', 0755, true);

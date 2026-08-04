@@ -12,7 +12,7 @@ if (!function_exists('view')) {
         $blade = new BladeOne($views, $cache, BladeOne::MODE_DEBUG);
 
         echo $blade->run($view, $data);
-    }
+    } 
 }
 
 if (!function_exists('is_upload')) {

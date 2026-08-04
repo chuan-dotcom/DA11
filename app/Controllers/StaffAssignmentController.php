@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Controller;
+use App\Controller; 
 use App\Models\StaffAssignment;
 use App\Models\Departure;
 use App\Models\Staff;

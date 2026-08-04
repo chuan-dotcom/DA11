@@ -1,5 +1,5 @@
 <?php
-namespace App\Controllers;
+namespace App\Controllers; 
 
 use App\Controller;
 use App\Models\TourCategory;
