@@ -20,14 +20,28 @@
         <div>
             <div class="text-muted small">Vai trò</div>
             <div class="fw-semibold">
-                {{ ($user['role'] ?? '') === 'admin' ? 'Quản trị viên' : 'Người dùng' }}
+                @if(($user['role'] ?? '') === 'admin')
+                    Quản trị viên
+                @elseif(($user['role'] ?? '') === 'hdv')
+                    Hướng dẫn viên
+                @else
+                    Người dùng
+                @endif
             </div>
         </div>
+        @if(($user['role'] ?? '') === 'hdv')
+            <div>
+                <div class="text-muted small">Hồ sơ HDV</div>
+                <div class="fw-semibold">{{ $user['hdv_name'] ?? 'Chưa gán' }}</div>
+            </div>
+        @endif
     </div>
 
     <div class="d-grid gap-2">
         @if(($user['role'] ?? '') === 'admin')
             <a href="{{ route('admin/dashboard') }}" class="btn btn-info text-white btn-lg fw-semibold">Vào trang quản trị</a>
+        @elseif(($user['role'] ?? '') === 'hdv')
+            <a href="{{ route('hdv/thong-tin-tour') }}" class="btn btn-info text-white btn-lg fw-semibold">Vào trang HDV</a>
         @endif
         <a href="{{ route('auth/logout') }}" class="btn btn-outline-danger btn-lg fw-semibold">Đăng xuất</a>
     </div>

@@ -54,6 +54,11 @@ $router->before('GET|POST', '/hdv.*', function () {
         setFlash('error', 'Vui lòng đăng nhập để tiếp tục.');
         redirect('auth/login');
     }
+
+    if (!Auth::isAdmin() && !Auth::isHdv()) {
+        setFlash('error', 'Bạn không có quyền truy cập khu vực HDV.');
+        redirect('auth/account');
+    }
 });
 
 /*

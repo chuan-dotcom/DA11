@@ -5,6 +5,7 @@ namespace App\Controllers\Hdv;
 use App\Controller;
 use App\Models\Staff;
 use App\Models\StaffAssignment;
+use App\Support\Auth;
 
 class ScheduleController extends Controller
 {
@@ -19,6 +20,10 @@ class ScheduleController extends Controller
 
     private function getActiveHdvId()
     {
+        if (Auth::isHdv()) {
+            $_SESSION['hdv_id'] = (int) (Auth::user()['hdv_id'] ?? 0);
+            return $_SESSION['hdv_id'];
+        }
         if (isset($_GET['hdv_id']) && (int)$_GET['hdv_id'] > 0) {
             $_SESSION['hdv_id'] = (int)$_GET['hdv_id'];
         }
@@ -33,7 +38,7 @@ class ScheduleController extends Controller
     {
         $hdvId = $this->getActiveHdvId();
         $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = $this->modelStaff->getAll();
+        $allHdv = Auth::isAdmin() ? $this->modelStaff->getAll() : [$activeHdv];
 
         $db = (new \App\Model())->getConnection();
 

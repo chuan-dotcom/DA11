@@ -76,11 +76,26 @@
                             <label for="role" class="form-label">Vai trò <span class="text-danger">*</span></label>
                             <select class="form-select" id="role" name="role" required>
                                 <option value="user" {{ $user['role'] == 'user' ? 'selected' : '' }}>
-                                    <i class="bi bi-person"></i> User
+                                    Người dùng
+                                </option>
+                                <option value="hdv" {{ $user['role'] == 'hdv' ? 'selected' : '' }}>
+                                    Hướng dẫn viên
                                 </option>
                                 <option value="admin" {{ $user['role'] == 'admin' ? 'selected' : '' }}>
-                                    <i class="bi bi-shield-check"></i> Admin
+                                    Quản trị viên
                                 </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3 {{ $user['role'] == 'hdv' ? '' : 'd-none' }}" id="hdv-select-wrapper">
+                            <label for="hdv_id" class="form-label">Gắn với HDV <span class="text-danger">*</span></label>
+                            <select class="form-select" id="hdv_id" name="hdv_id">
+                                <option value="">Chọn hướng dẫn viên</option>
+                                @foreach($staffs as $staff)
+                                    <option value="{{ $staff['HDV_id'] }}" {{ (int) ($user['hdv_id'] ?? 0) === (int) $staff['HDV_id'] ? 'selected' : '' }}>
+                                        #{{ $staff['HDV_id'] }} - {{ $staff['Hoten'] }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -125,5 +140,21 @@
             reader.readAsDataURL(file);
         }
     });
+
+    const roleSelect = document.getElementById('role');
+    const hdvWrapper = document.getElementById('hdv-select-wrapper');
+    const hdvSelect = document.getElementById('hdv_id');
+
+    function toggleHdvSelect() {
+        const isHdv = roleSelect.value === 'hdv';
+        hdvWrapper.classList.toggle('d-none', !isHdv);
+        hdvSelect.required = isHdv;
+        if (!isHdv) {
+            hdvSelect.value = '';
+        }
+    }
+
+    roleSelect.addEventListener('change', toggleHdvSelect);
+    toggleHdvSelect();
 </script>
 @endsection

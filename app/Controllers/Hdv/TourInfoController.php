@@ -7,6 +7,7 @@ use App\Models\StaffAssignment;
 use App\Models\Departure;
 use App\Models\BookingGuest;
 use App\Models\Staff;
+use App\Support\Auth;
 use App\Models\Tour;
 use App\Models\TourLog;
 
@@ -31,6 +32,11 @@ class TourInfoController extends Controller
 
     private function getActiveHdvId()
     {
+        if (Auth::isHdv()) {
+            $_SESSION['hdv_id'] = (int) (Auth::user()['hdv_id'] ?? 0);
+            return $_SESSION['hdv_id'];
+        }
+
         if (isset($_GET['hdv_id']) && (int)$_GET['hdv_id'] > 0) {
             $_SESSION['hdv_id'] = (int)$_GET['hdv_id'];
         }
@@ -47,7 +53,7 @@ class TourInfoController extends Controller
     {
         $hdvId = $this->getActiveHdvId();
         $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = $this->modelStaff->getAll();
+        $allHdv = Auth::isAdmin() ? $this->modelStaff->getAll() : [$activeHdv];
 
         $activeTab = $_GET['tab'] ?? 'danh-sach';
         $selectedDepartureId = isset($_GET['departure_id']) ? (int)$_GET['departure_id'] : null;

@@ -103,6 +103,10 @@
                                 <span class="badge px-3 py-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                                     <i class="bi bi-shield-check me-1"></i> Quản trị viên
                                 </span>
+                            @elseif($user['role'] == 'hdv')
+                                <span class="badge px-3 py-2" style="background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);">
+                                    <i class="bi bi-person-badge me-1"></i> Hướng dẫn viên
+                                </span>
                             @else
                                 <span class="badge px-3 py-2" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
                                     <i class="bi bi-person me-1"></i> Người dùng
@@ -150,7 +154,22 @@
                                 <i class="bi bi-person-badge me-1"></i> Vai trò
                             </div>
                             <div class="info-value">
-                                {{ $user['role'] == 'admin' ? 'Quản trị viên' : 'Người dùng' }}
+                                @if($user['role'] == 'admin')
+                                    Quản trị viên
+                                @elseif($user['role'] == 'hdv')
+                                    Hướng dẫn viên
+                                @else
+                                    Người dùng
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="info-label">
+                                <i class="bi bi-person-vcard me-1"></i> Hồ sơ HDV
+                            </div>
+                            <div class="info-value">
+                                {{ $user['hdv_name'] ?? '—' }}
                             </div>
                         </div>
 

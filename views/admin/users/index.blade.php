@@ -24,6 +24,9 @@
     .role-badge-user {
         background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
     }
+    .role-badge-hdv {
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    }
 </style>
 
 <div class="container mt-4">
@@ -103,10 +106,17 @@
                                             <span class="badge role-badge-admin px-3 py-2">
                                                 <i class="bi bi-shield-check me-1"></i>Admin
                                             </span>
+                                        @elseif($user['role'] == 'hdv')
+                                            <span class="badge role-badge-hdv px-3 py-2">
+                                                <i class="bi bi-person-badge me-1"></i>HDV
+                                            </span>
                                         @else
                                             <span class="badge role-badge-user px-3 py-2">
                                                 <i class="bi bi-person me-1"></i>User
                                             </span>
+                                        @endif
+                                        @if($user['role'] == 'hdv' && !empty($user['hdv_name']))
+                                            <div class="small text-muted mt-1">Gắn với: {{ $user['hdv_name'] }}</div>
                                         @endif
                                     </td>
                                     <td>

@@ -9,8 +9,9 @@ class User extends Model
     public function getAll()
     {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('u.*')
+        $stmt->select('u.*', 'h.Hoten AS hdv_name')
             ->from('users', 'u')
+            ->leftJoin('u', 'hdv', 'h', 'h.HDV_id = u.hdv_id')
             ->orderBy('u.id', 'DESC');
 
         return $stmt->fetchAllAssociative();
@@ -19,8 +20,9 @@ class User extends Model
     public function findById($id)
     {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('u.*')
+        $stmt->select('u.*', 'h.Hoten AS hdv_name')
             ->from('users', 'u')
+            ->leftJoin('u', 'hdv', 'h', 'h.HDV_id = u.hdv_id')
             ->where('u.id = :id')
             ->setParameter('id', $id);
 
@@ -30,8 +32,9 @@ class User extends Model
     public function findByEmail($email)
     {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('u.*')
+        $stmt->select('u.*', 'h.Hoten AS hdv_name')
             ->from('users', 'u')
+            ->leftJoin('u', 'hdv', 'h', 'h.HDV_id = u.hdv_id')
             ->where('u.email = :email')
             ->setParameter('email', $email);
 
@@ -46,6 +49,7 @@ class User extends Model
             'password' => password_hash($data['password'], PASSWORD_DEFAULT),
             'phone' => $data['phone'] ?? null,
             'role' => $data['role'] ?? 'user',
+            'hdv_id' => !empty($data['hdv_id']) ? (int) $data['hdv_id'] : null,
             'avatar' => $data['avatar'] ?? null,
             'status' => $data['status'] ?? 1,
             'created_at' => date('Y-m-d H:i:s'),
@@ -59,6 +63,7 @@ class User extends Model
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'role' => $data['role'] ?? 'user',
+            'hdv_id' => !empty($data['hdv_id']) ? (int) $data['hdv_id'] : null,
             'status' => $data['status'] ?? 1,
             'updated_at' => date('Y-m-d H:i:s'),
         ];

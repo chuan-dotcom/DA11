@@ -19,6 +19,11 @@ class Auth
         return self::check() && (self::user()['role'] ?? null) === 'admin';
     }
 
+    public static function isHdv(): bool
+    {
+        return self::check() && (self::user()['role'] ?? null) === 'hdv';
+    }
+
     public static function login(array $user): void
     {
         session_regenerate_id(true);
@@ -30,12 +35,18 @@ class Auth
             'role' => $user['role'] ?? 'user',
             'status' => $user['status'] ?? 1,
             'avatar' => $user['avatar'] ?? null,
+            'hdv_id' => isset($user['hdv_id']) ? (int) $user['hdv_id'] : null,
+            'hdv_name' => $user['hdv_name'] ?? null,
         ];
+
+        if (($user['role'] ?? null) === 'hdv' && !empty($user['hdv_id'])) {
+            $_SESSION['hdv_id'] = (int) $user['hdv_id'];
+        }
     }
 
     public static function logout(): void
     {
-        unset($_SESSION['auth'], $_SESSION['old_input']);
+        unset($_SESSION['auth'], $_SESSION['old_input'], $_SESSION['hdv_id']);
         session_regenerate_id(true);
     }
 
@@ -47,9 +58,17 @@ class Auth
             return 'auth/login';
         }
 
-        return ($user['role'] ?? 'user') === 'admin'
-            ? 'admin/dashboard'
-            : 'auth/account';
+        $role = $user['role'] ?? 'user';
+
+        if ($role === 'admin') {
+            return 'admin/dashboard';
+        }
+
+        if ($role === 'hdv') {
+            return 'hdv/thong-tin-tour';
+        }
+
+        return 'auth/account';
     }
 
     public static function storeOldInput(array $input, array $except = ['password', 'password_confirmation']): void

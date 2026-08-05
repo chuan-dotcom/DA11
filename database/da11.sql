@@ -426,7 +426,8 @@ CREATE TABLE `users` (
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `role` enum('admin','user') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'user',
+  `role` enum('admin','user','hdv') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'user',
+  `hdv_id` int DEFAULT NULL,
   `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` tinyint DEFAULT '1',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -437,10 +438,11 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `phone`, `role`, `avatar`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Administrator', 'admin@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0901234567', 'admin', NULL, 1, '2026-07-27 16:37:31', '2026-07-27 16:37:31'),
-(2, 'Người dùng 1', 'user1@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0902345678', 'user', NULL, 1, '2026-07-27 16:37:31', '2026-07-27 16:37:31'),
-(3, 'Người dùng 2', 'user2@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0903456789', 'user', NULL, 1, '2026-07-27 16:37:31', '2026-07-27 16:37:31');
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `phone`, `role`, `hdv_id`, `avatar`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Administrator', 'admin@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0901234567', 'admin', NULL, NULL, 1, '2026-07-27 16:37:31', '2026-07-27 16:37:31'),
+(2, 'Người dùng 1', 'user1@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0902345678', 'user', NULL, NULL, 1, '2026-07-27 16:37:31', '2026-07-27 16:37:31'),
+(3, 'Người dùng 2', 'user2@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0903456789', 'user', NULL, NULL, 1, '2026-07-27 16:37:31', '2026-07-27 16:37:31'),
+(4, 'HDV Nguyễn Văn An', 'hdv1@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0901234567', 'hdv', 1, NULL, 1, '2026-08-05 10:00:00', '2026-08-05 10:00:00');
 
 --
 -- Indexes for dumped tables
@@ -526,7 +528,8 @@ ALTER TABLE `tour_logs`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `idx_users_hdv_id` (`hdv_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -596,7 +599,7 @@ ALTER TABLE `tour_logs`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
@@ -633,6 +636,12 @@ ALTER TABLE `services`
 ALTER TABLE `staff_assignments`
   ADD CONSTRAINT `fk_staff_departure` FOREIGN KEY (`departure_id`) REFERENCES `departures` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_staff_hdv` FOREIGN KEY (`staff_id`) REFERENCES `hdv` (`HDV_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `fk_users_hdv` FOREIGN KEY (`hdv_id`) REFERENCES `hdv` (`HDV_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `tours`

@@ -2,17 +2,20 @@
 namespace App\Controllers\Admin;
 
 use App\Controller;
+use App\Models\Staff;
 use App\Models\User;
 use Rakit\Validation\Validator;
 
 class UserController extends Controller
 {
     private $modelUser;
+    private $modelStaff;
     private $validator;
 
     public function __construct()
     {
         $this->modelUser = new User();
+        $this->modelStaff = new Staff();
         $this->validator = new Validator();
     }
 
@@ -26,7 +29,8 @@ class UserController extends Controller
     public function create()
     {
         $title = 'Thêm mới tài khoản';
-        return view('admin.users.create', compact('title'));
+        $staffs = $this->modelStaff->getAll();
+        return view('admin.users.create', compact('title', 'staffs'));
     }
 
     public function store()
@@ -38,6 +42,7 @@ class UserController extends Controller
             'password_confirmation' => $_POST['password_confirmation'],
             'phone' => $_POST['phone'] ?? '',
             'role' => $_POST['role'],
+            'hdv_id' => $_POST['hdv_id'] ?? null,
             'status' => $_POST['status'],
         ];
 
@@ -46,13 +51,24 @@ class UserController extends Controller
             'email' => 'required|email|max:255',
             'password' => 'required|min:6',
             'password_confirmation' => 'required|same:password',
-            'role' => 'required|in:admin,user',
+            'role' => 'required|in:admin,user,hdv',
             'status' => 'required|in:0,1',
         ];
+
+        if ($data['role'] === 'hdv') {
+            $rules['hdv_id'] = 'required|integer';
+        }
 
         $errors = $this->validate($this->validator, $data, $rules);
         if (!empty($errors)) {
             setFlash('error', reset($errors));
+            return redirect('admin/users/create');
+        }
+
+        if ($data['role'] !== 'hdv') {
+            $data['hdv_id'] = null;
+        } elseif (!$this->modelStaff->findById((int) $data['hdv_id'])) {
+            setFlash('error', 'Hướng dẫn viên được chọn không tồn tại.');
             return redirect('admin/users/create');
         }
 
@@ -75,11 +91,12 @@ class UserController extends Controller
     {
         $title = 'Cập nhật tài khoản';
         $user = $this->modelUser->findById($id);
+        $staffs = $this->modelStaff->getAll();
         if (!$user) {
             setFlash('error', 'Tài khoản không tồn tại');
             redirect('admin/users');
         }
-        return view('admin.users.edit', compact('title', 'user'));
+        return view('admin.users.edit', compact('title', 'user', 'staffs'));
     }
 
     public function update($id)
@@ -95,15 +112,20 @@ class UserController extends Controller
             'email' => $_POST['email'],
             'phone' => $_POST['phone'] ?? '',
             'role' => $_POST['role'],
+            'hdv_id' => $_POST['hdv_id'] ?? null,
             'status' => $_POST['status'],
         ];
 
         $rules = [
             'name' => 'required|max:255',
             'email' => 'required|email|max:255',
-            'role' => 'required|in:admin,user',
+            'role' => 'required|in:admin,user,hdv',
             'status' => 'required|in:0,1',
         ];
+
+        if ($data['role'] === 'hdv') {
+            $rules['hdv_id'] = 'required|integer';
+        }
 
         if (!empty($_POST['password'])) {
             $data['password'] = $_POST['password'];
@@ -115,6 +137,13 @@ class UserController extends Controller
         $errors = $this->validate($this->validator, $data, $rules);
         if (!empty($errors)) {
             setFlash('error', reset($errors));
+            return redirect('admin/users/edit/' . $id);
+        }
+
+        if ($data['role'] !== 'hdv') {
+            $data['hdv_id'] = null;
+        } elseif (!$this->modelStaff->findById((int) $data['hdv_id'])) {
+            setFlash('error', 'Hướng dẫn viên được chọn không tồn tại.');
             return redirect('admin/users/edit/' . $id);
         }
 
