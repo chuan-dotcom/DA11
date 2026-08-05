@@ -29,7 +29,7 @@
 <div class="hdv-card mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="fw-bold text-dark mb-0"><i class="bi bi-journal-text text-info me-2"></i> {{ $title }}</h4>
-        <a href="{{ route('hdv/nhat-ky-tour/create') }}" class="btn btn-primary rounded-pill px-4 fw-bold">
+        <a href="{{ route('hdv/nhat-ky-tour/create') }}{{ !empty($selectedDepartureId) ? '?departure_id=' . $selectedDepartureId : '' }}" class="btn btn-primary rounded-pill px-4 fw-bold">
             <i class="bi bi-plus-lg me-1"></i> Viết nhật ký mới
         </a>
     </div>
@@ -41,6 +41,12 @@
         <div class="stat-box shadow-sm">
             <div class="small opacity-75 mb-1">Tổng số nhật ký đã viết</div>
             <div class="fs-2 fw-bold">{{ $totalDiaries ?? 0 }} bài</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-box shadow-sm">
+            <div class="small opacity-75 mb-1">Chuyến đang lọc</div>
+            <div class="fs-5 fw-bold">{{ !empty($selectedDepartureId) ? ('#' . $selectedDepartureId) : 'Tất cả chuyến' }}</div>
         </div>
     </div>
 </div>
@@ -79,7 +85,7 @@
                     <th style="width: 50px;">ID</th>
                     <th style="width: 100px;">Hình ảnh</th>
                     <th>Tiêu đề nhật ký</th>
-                    <th>Tour / Đoàn khởi hành</th>
+                            <th>Tour / Danh mục / Đoàn</th>
                     <th>Ngày nhật ký</th>
                     <th>Thời tiết</th>
                     <th class="text-center">Thao tác</th>
@@ -121,7 +127,13 @@
                             </td>
                             <td>
                                 <div class="fw-bold small">{{ $diary['tour_name'] ?? '—' }}</div>
-                                <div class="text-muted small">Chuyến #{{ $diary['departure_id'] }}</div>
+                                <div class="text-muted small">Danh mục: {{ $diary['category_name'] ?? 'Chưa phân loại' }}</div>
+                                <div class="text-muted small">
+                                    {{ $diary['departure_group_name'] ?: ('Chuyến #' . $diary['departure_id']) }}
+                                    @if(!empty($diary['tour_departure_date']))
+                                        - {{ date('d/m/Y', strtotime($diary['tour_departure_date'])) }}
+                                    @endif
+                                </div>
                             </td>
                             <td>
                                 <div class="fw-semibold">{{ !empty($diary['diary_date']) ? date('d/m/Y', strtotime($diary['diary_date'])) : '—' }}</div>

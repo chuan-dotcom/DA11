@@ -226,6 +226,12 @@
                 </div>
             </div>
             <div class="info-tile mb-3">
+                <div class="info-tile-label">Người viết nhật ký</div>
+                <div class="info-tile-value">
+                    {{ $diary['author_hdv_name'] ?? 'Chưa lưu người viết' }}
+                </div>
+            </div>
+            <div class="info-tile mb-3">
                 <div class="info-tile-label">Thời tiết</div>
                 <div class="info-tile-value">
                     @if(!empty($diary['weather']))

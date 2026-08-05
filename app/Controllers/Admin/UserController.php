@@ -170,6 +170,35 @@ class UserController extends Controller
         return redirect('admin/users');
     }
 
+    public function bulkDelete()
+    {
+        $ids = $_POST['ids'] ?? [];
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
+
+        $ids = array_filter(array_map('intval', $ids));
+        if (empty($ids)) {
+            setFlash('error', 'Vui lòng chọn ít nhất 1 tài khoản để xóa.');
+            return redirect('admin/users');
+        }
+
+        $currentUserId = $_SESSION['auth']['id'] ?? null;
+        if ($currentUserId !== null && in_array($currentUserId, $ids, true)) {
+            setFlash('error', 'Không thể xóa tài khoản đang đăng nhập.');
+            return redirect('admin/users');
+        }
+
+        $deletedCount = $this->modelUser->deleteMultiple($ids);
+        if ($deletedCount > 0) {
+            setFlash('success', "Xóa thành công {$deletedCount} tài khoản!");
+        } else {
+            setFlash('error', 'Không có tài khoản nào bị xóa.');
+        }
+
+        return redirect('admin/users');
+    }
+
     public function show($id)
     {
         $title = 'Chi tiết tài khoản';

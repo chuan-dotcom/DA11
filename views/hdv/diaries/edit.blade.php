@@ -21,8 +21,9 @@
                 <label class="form-label fw-bold">Chuyến khởi hành phân công <span class="text-danger">*</span></label>
                 <select name="departure_id" class="form-select" required>
                     @foreach($departures as $d)
-                        <option value="{{ $d['id'] }}" {{ $diary['departure_id'] == $d['id'] ? 'selected' : '' }}>
-                            #{{ $d['id'] }} - {{ $d['tour_name'] }} ({{ date('d/m/Y', strtotime($d['departure_date'])) }})
+                        @php $selId = old('departure_id', $diary['departure_id']); @endphp
+                        <option value="{{ $d['id'] }}" {{ (int) $selId === (int) $d['id'] ? 'selected' : '' }}>
+                            #{{ $d['id'] }} - {{ $d['tour_name'] }} - {{ $d['category_name'] ?? 'Chưa phân loại' }} ({{ date('d/m/Y', strtotime($d['departure_date'])) }})
                         </option>
                     @endforeach
                 </select>
@@ -31,30 +32,30 @@
             <!-- Ngày nhật ký -->
             <div class="col-md-6">
                 <label class="form-label fw-bold">Ngày ghi nhật ký <span class="text-danger">*</span></label>
-                <input type="date" name="diary_date" class="form-control" value="{{ $diary['diary_date'] }}" required>
+                <input type="date" name="diary_date" class="form-control" value="{{ old('diary_date', $diary['diary_date']) }}" required>
             </div>
 
             <!-- Tiêu đề -->
             <div class="col-12">
                 <label class="form-label fw-bold">Tiêu đề bài viết <span class="text-danger">*</span></label>
-                <input type="text" name="title" class="form-control" value="{{ $diary['title'] }}" required>
+                <input type="text" name="title" class="form-control" value="{{ old('title', $diary['title']) }}" required>
             </div>
 
             <!-- Thời tiết & Tâm trạng -->
             <div class="col-md-6">
                 <label class="form-label fw-bold">Thời tiết trong ngày</label>
-                <input type="text" name="weather" class="form-control" value="{{ $diary['weather'] }}">
+                <input type="text" name="weather" class="form-control" value="{{ old('weather', $diary['weather']) }}">
             </div>
 
             <div class="col-md-6">
                 <label class="form-label fw-bold">Tâm trạng / Không khí đoàn</label>
-                <input type="text" name="mood" class="form-control" value="{{ $diary['mood'] }}">
+                <input type="text" name="mood" class="form-control" value="{{ old('mood', $diary['mood']) }}">
             </div>
 
             <!-- Nội dung chi tiết -->
             <div class="col-12">
                 <label class="form-label fw-bold">Nội dung nhật ký chi tiết <span class="text-danger">*</span></label>
-                <textarea name="content" class="form-control" rows="6" required>{{ $diary['content'] }}</textarea>
+                <textarea name="content" class="form-control" rows="6" required>{{ old('content', $diary['content']) }}</textarea>
             </div>
 
             <!-- Hình ảnh đã có -->

@@ -88,6 +88,24 @@ class User extends Model
         return $this->connection->delete('users', ['id' => $id]);
     }
 
+    public function deleteMultiple(array $ids)
+    {
+        $ids = array_values(array_filter(array_map('intval', $ids)));
+        if (empty($ids)) {
+            return 0;
+        }
+
+        $idList = implode(',', $ids);
+        $users = $this->connection->fetchAllAssociative("SELECT id, avatar FROM users WHERE id IN ($idList)");
+        foreach ($users as $user) {
+            if (!empty($user['avatar']) && file_exists($user['avatar'])) {
+                unlink($user['avatar']);
+            }
+        }
+
+        return $this->connection->executeStatement("DELETE FROM users WHERE id IN ($idList)");
+    }
+
     public function getTotalUsers()
     {
         $stmt = $this->connection->createQueryBuilder();

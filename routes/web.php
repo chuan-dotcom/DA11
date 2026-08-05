@@ -89,6 +89,7 @@ $router->post('admin/users/store', AdminUserController::class . '@store');
 $router->get('admin/users/edit/(\d+)', AdminUserController::class . '@edit');
 $router->post('admin/users/update/(\d+)', AdminUserController::class . '@update');
 $router->get('admin/users/delete/(\d+)', AdminUserController::class . '@delete');
+$router->post('admin/users/delete-multiple', AdminUserController::class . '@bulkDelete');
 $router->get('admin/users/show/(\d+)', AdminUserController::class . '@show');
 
 // Admin: Quản lý Danh mục Tour

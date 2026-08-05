@@ -49,14 +49,67 @@ class DiaryController extends Controller
                 d.group_name, 
                 d.departure_date, 
                 d.return_date, 
-                t.name AS tour_name
+                d.meeting_point,
+                d.meeting_time,
+                t.id AS tour_id,
+                t.name AS tour_name,
+                tc.name AS category_name
             FROM staff_assignments sa
             INNER JOIN departures d ON d.id = sa.departure_id
             INNER JOIN tours t ON t.id = d.tour_id
+            LEFT JOIN tour_categories tc ON tc.id = t.category_id
             WHERE sa.staff_id = :hdv_id
             ORDER BY d.departure_date DESC
         ";
         return $db->fetchAllAssociative($sql, ['hdv_id' => $hdvId]);
+    }
+
+    private function cleanupUploadedPhotos(array $photos): void
+    {
+        foreach ($photos as $photo) {
+            if (is_string($photo) && $photo !== '' && file_exists($photo)) {
+                unlink($photo);
+            }
+        }
+    }
+
+    private function findAssignedDepartureById(array $departures, int $departureId): ?array
+    {
+        foreach ($departures as $departure) {
+            if ((int) ($departure['id'] ?? 0) === $departureId) {
+                return $departure;
+            }
+        }
+
+        return null;
+    }
+
+    private function validateDiaryDateForDeparture(array $departure, string $diaryDate): ?string
+    {
+        if ($diaryDate === '') {
+            return 'Vui lòng chọn ngày ghi nhật ký.';
+        }
+
+        $diaryTs = strtotime($diaryDate);
+        if ($diaryTs === false) {
+            return 'Ngày ghi nhật ký không hợp lệ.';
+        }
+
+        if (!empty($departure['departure_date'])) {
+            $departTs = strtotime($departure['departure_date']);
+            if ($departTs !== false && $diaryTs < $departTs) {
+                return 'Ngày nhật ký không thể sớm hơn ngày khởi hành (' . date('d/m/Y', $departTs) . ').';
+            }
+        }
+
+        if (!empty($departure['return_date'])) {
+            $returnTs = strtotime($departure['return_date']);
+            if ($returnTs !== false && $diaryTs > $returnTs) {
+                return 'Ngày nhật ký không thể muộn hơn ngày kết thúc tour (' . date('d/m/Y', $returnTs) . ').';
+            }
+        }
+
+        return null;
     }
 
     public function index()
@@ -75,10 +128,19 @@ class DiaryController extends Controller
         $diaries = [];
         if (!empty($departureIds)) {
             $qb = $db->createQueryBuilder();
-            $qb->select('td.*', 'd.group_name as departure_group_name', 't.name as tour_name')
+            $qb->select(
+                'td.*',
+                'd.group_name as departure_group_name',
+                'd.departure_date as tour_departure_date',
+                'd.return_date as tour_return_date',
+                't.id as tour_id',
+                't.name as tour_name',
+                'tc.name as category_name'
+            )
                 ->from('tour_diaries', 'td')
                 ->innerJoin('td', 'departures', 'd', 'd.id = td.departure_id')
                 ->innerJoin('d', 'tours', 't', 't.id = d.tour_id')
+                ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
                 ->where('td.departure_id IN (:departure_ids)')
                 ->setParameter('departure_ids', $departureIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
 
@@ -116,6 +178,12 @@ class DiaryController extends Controller
 
         $departures = $this->getAssignedDepartures($hdvId);
         $selectedDepartureId = isset($_GET['departure_id']) ? (int)$_GET['departure_id'] : null;
+        if ($selectedDepartureId <= 0 && !empty($_SESSION['old_input']['departure_id'])) {
+            $selectedDepartureId = (int) $_SESSION['old_input']['departure_id'];
+        }
+        $selectedDeparture = $selectedDepartureId > 0
+            ? $this->findAssignedDepartureById($departures, $selectedDepartureId)
+            : null;
 
         $title = 'Viết nhật ký tour mới';
 
@@ -125,13 +193,15 @@ class DiaryController extends Controller
             'activeHdv',
             'allHdv',
             'departures',
-            'selectedDepartureId'
+            'selectedDepartureId',
+            'selectedDeparture'
         ));
     }
 
     public function store()
     {
         $hdvId = $this->getActiveHdvId();
+        $departures = $this->getAssignedDepartures($hdvId);
         $photos = [];
         if (isset($_FILES['photos']) && is_array($_FILES['photos']['name'])) {
             foreach ($_FILES['photos']['name'] as $index => $fileName) {
@@ -170,14 +240,38 @@ class DiaryController extends Controller
 
         $errors = $this->validate($this->validator, $data, $rules);
         if (!empty($errors)) {
+            $this->cleanupUploadedPhotos($photos);
             $_SESSION['old_input'] = $_POST;
             setFlash('error', reset($errors));
+            $redirect = 'hdv/nhat-ky-tour/create';
+            if (!empty($data['departure_id'])) {
+                $redirect .= '?departure_id=' . (int) $data['departure_id'];
+            }
+            return redirect($redirect);
+        }
+
+        $selectedDeparture = $this->findAssignedDepartureById($departures, (int) $data['departure_id']);
+        if (!$selectedDeparture) {
+            $this->cleanupUploadedPhotos($photos);
+            $_SESSION['old_input'] = $_POST;
+            setFlash('error', 'Bạn chỉ có thể viết nhật ký cho chuyến được phân công.');
             return redirect('hdv/nhat-ky-tour/create');
         }
 
+        $dateError = $this->validateDiaryDateForDeparture($selectedDeparture, (string) $data['diary_date']);
+        if ($dateError) {
+            $this->cleanupUploadedPhotos($photos);
+            $_SESSION['old_input'] = $_POST;
+            setFlash('error', $dateError);
+            return redirect('hdv/nhat-ky-tour/create?departure_id=' . (int) $data['departure_id']);
+        }
+
+        $data['created_by_hdv_id'] = $hdvId;
+
         $this->modelDiary->insert($data);
+        unset($_SESSION['old_input']);
         setFlash('success', 'Đã thêm nhật ký tour thành công!');
-        return redirect('hdv/nhat-ky-tour');
+        return redirect('hdv/nhat-ky-tour?departure_id=' . (int) $data['departure_id']);
     }
 
     public function show($id)
@@ -187,8 +281,10 @@ class DiaryController extends Controller
         $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
 
         $diary = $this->modelDiary->findById($id);
+        $departures = $this->getAssignedDepartures($hdvId);
+        $assignedDepartureIds = array_map('intval', array_column($departures, 'id'));
 
-        if (!$diary) {
+        if (!$diary || !in_array((int) ($diary['departure_id'] ?? 0), $assignedDepartureIds, true)) {
             setFlash('error', 'Nhật ký không tồn tại!');
             return redirect('hdv/nhat-ky-tour');
         }
@@ -213,12 +309,14 @@ class DiaryController extends Controller
         $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
 
         $diary = $this->modelDiary->findById($id);
-        if (!$diary) {
+        $departures = $this->getAssignedDepartures($hdvId);
+        $assignedDepartureIds = array_map('intval', array_column($departures, 'id'));
+
+        if (!$diary || !in_array((int) ($diary['departure_id'] ?? 0), $assignedDepartureIds, true)) {
             setFlash('error', 'Nhật ký không tồn tại!');
             return redirect('hdv/nhat-ky-tour');
         }
 
-        $departures = $this->getAssignedDepartures($hdvId);
         $photos = !empty($diary['photos']) ? explode(',', $diary['photos']) : [];
         $title = 'Chỉnh sửa nhật ký tour';
 
@@ -235,8 +333,12 @@ class DiaryController extends Controller
 
     public function update($id)
     {
+        $hdvId = $this->getActiveHdvId();
+        $departures = $this->getAssignedDepartures($hdvId);
         $diary = $this->modelDiary->findById($id);
-        if (!$diary) {
+        $assignedDepartureIds = array_map('intval', array_column($departures, 'id'));
+
+        if (!$diary || !in_array((int) ($diary['departure_id'] ?? 0), $assignedDepartureIds, true)) {
             setFlash('error', 'Nhật ký không tồn tại!');
             return redirect('hdv/nhat-ky-tour');
         }
@@ -271,18 +373,58 @@ class DiaryController extends Controller
             'delete_photos'=> $_POST['delete_photos'] ?? [],
         ];
 
+        $rules = [
+            'departure_id' => 'required|integer',
+            'title'        => 'required|max:255',
+            'content'      => 'required',
+            'diary_date'   => 'required',
+        ];
+
+        $errors = $this->validate($this->validator, $data, $rules);
+        if (!empty($errors)) {
+            $this->cleanupUploadedPhotos($newPhotos);
+            $_SESSION['old_input'] = $_POST;
+            setFlash('error', reset($errors));
+            return redirect('hdv/nhat-ky-tour/edit/' . $id);
+        }
+
+        $selectedDeparture = $this->findAssignedDepartureById($departures, (int) $data['departure_id']);
+        if (!$selectedDeparture) {
+            $this->cleanupUploadedPhotos($newPhotos);
+            $_SESSION['old_input'] = $_POST;
+            setFlash('error', 'Bạn chỉ có thể gắn nhật ký vào chuyến được phân công.');
+            return redirect('hdv/nhat-ky-tour/edit/' . $id);
+        }
+
+        $dateError = $this->validateDiaryDateForDeparture($selectedDeparture, (string) $data['diary_date']);
+        if ($dateError) {
+            $this->cleanupUploadedPhotos($newPhotos);
+            $_SESSION['old_input'] = $_POST;
+            setFlash('error', $dateError);
+            return redirect('hdv/nhat-ky-tour/edit/' . $id);
+        }
+
         $this->modelDiary->update($id, $data);
+        unset($_SESSION['old_input']);
         setFlash('success', 'Đã cập nhật nhật ký tour!');
-        return redirect('hdv/nhat-ky-tour');
+        return redirect('hdv/nhat-ky-tour/show/' . $id);
     }
 
     public function delete($id)
     {
+        $hdvId = $this->getActiveHdvId();
         $diary = $this->modelDiary->findById($id);
-        if ($diary) {
+        $departures = $this->getAssignedDepartures($hdvId);
+        $assignedDepartureIds = array_map('intval', array_column($departures, 'id'));
+
+        if ($diary && in_array((int) ($diary['departure_id'] ?? 0), $assignedDepartureIds, true)) {
+            $departureId = (int) ($diary['departure_id'] ?? 0);
             $this->modelDiary->delete($id);
             setFlash('success', 'Đã xóa nhật ký tour thành công!');
+            return redirect('hdv/nhat-ky-tour?departure_id=' . $departureId);
         }
+
+        setFlash('error', 'Nhật ký không tồn tại hoặc bạn không có quyền thao tác.');
         return redirect('hdv/nhat-ky-tour');
     }
 }

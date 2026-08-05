@@ -10,6 +10,7 @@ class TourDiary extends Model
     {
         parent::__construct();
         $this->ensureTableExists();
+        $this->ensureAuditColumns();
     }
 
     private function ensureTableExists()
@@ -42,13 +43,55 @@ class TourDiary extends Model
         }
     }
 
+    private function ensureAuditColumns()
+    {
+        try {
+            $column = $this->connection->fetchAssociative(
+                "SHOW COLUMNS FROM tour_diaries LIKE 'created_by_hdv_id'"
+            );
+
+            if (!$column) {
+                $this->connection->executeStatement(
+                    "ALTER TABLE tour_diaries ADD COLUMN created_by_hdv_id INT NULL AFTER departure_id"
+                );
+            }
+        } catch (\Throwable $e) {
+        }
+
+        try {
+            $index = $this->connection->fetchAssociative(
+                "SHOW INDEX FROM tour_diaries WHERE Key_name = 'idx_created_by_hdv_id'"
+            );
+
+            if (!$index) {
+                $this->connection->executeStatement(
+                    "ALTER TABLE tour_diaries ADD INDEX idx_created_by_hdv_id (created_by_hdv_id)"
+                );
+            }
+        } catch (\Throwable $e) {
+        }
+    }
+
     public function getAll($departureId = null)
     {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('td.*', 'd.group_name as departure_group_name', 't.name as tour_name')
+        $stmt->select(
+            'td.*',
+            'd.group_name as departure_group_name',
+            'd.departure_date as tour_departure_date',
+            'd.return_date as tour_return_date',
+            't.id as tour_id',
+            't.name as tour_name',
+            't.category_id as category_id',
+            'tc.name as category_name',
+            'author_h.Hoten as author_hdv_name',
+            'author_h.Lienhe as author_hdv_phone'
+        )
             ->from('tour_diaries', 'td')
             ->leftJoin('td', 'departures', 'd', 'd.id = td.departure_id')
-            ->leftJoin('d', 'tours', 't', 't.id = d.tour_id');
+            ->leftJoin('d', 'tours', 't', 't.id = d.tour_id')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->leftJoin('td', 'hdv', 'author_h', 'author_h.HDV_id = td.created_by_hdv_id');
 
         if (!empty($departureId)) {
             $stmt->andWhere('td.departure_id = :departure_id')
@@ -64,11 +107,27 @@ class TourDiary extends Model
     public function findById($id)
     {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('td.*', 'd.group_name as departure_group_name', 't.name as tour_name',
-                'd.departure_date as tour_departure_date', 'd.return_date as tour_return_date')
+        $stmt->select(
+                'td.*',
+                'd.group_name as departure_group_name',
+                'd.departure_date as tour_departure_date',
+                'd.return_date as tour_return_date',
+                'd.meeting_point',
+                'd.meeting_time',
+                'd.vehicle',
+                't.id as tour_id',
+                't.name as tour_name',
+                't.category_id as category_id',
+                'tc.name as category_name',
+                'author_h.Hoten as author_hdv_name',
+                'author_h.Lienhe as author_hdv_phone',
+                'author_h.chungchiHDV as author_hdv_certificate'
+            )
             ->from('tour_diaries', 'td')
             ->leftJoin('td', 'departures', 'd', 'd.id = td.departure_id')
             ->leftJoin('d', 'tours', 't', 't.id = d.tour_id')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->leftJoin('td', 'hdv', 'author_h', 'author_h.HDV_id = td.created_by_hdv_id')
             ->where('td.id = :id')
             ->setParameter('id', $id);
 
@@ -78,10 +137,22 @@ class TourDiary extends Model
     public function getByDepartureId($departureId)
     {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('td.*', 'd.group_name as departure_group_name', 't.name as tour_name', 'd.departure_date as tour_departure_date', 'd.return_date as tour_return_date')
+        $stmt->select(
+            'td.*',
+            'd.group_name as departure_group_name',
+            'd.departure_date as tour_departure_date',
+            'd.return_date as tour_return_date',
+            't.id as tour_id',
+            't.name as tour_name',
+            't.category_id as category_id',
+            'tc.name as category_name',
+            'author_h.Hoten as author_hdv_name'
+        )
             ->from('tour_diaries', 'td')
             ->leftJoin('td', 'departures', 'd', 'd.id = td.departure_id')
             ->leftJoin('d', 'tours', 't', 't.id = d.tour_id')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->leftJoin('td', 'hdv', 'author_h', 'author_h.HDV_id = td.created_by_hdv_id')
             ->where('td.departure_id = :departure_id')
             ->setParameter('departure_id', (int) $departureId)
             ->orderBy('td.diary_date', 'ASC')
@@ -98,6 +169,7 @@ class TourDiary extends Model
 
         return $this->connection->insert('tour_diaries', [
             'departure_id' => (int) $data['departure_id'],
+            'created_by_hdv_id' => !empty($data['created_by_hdv_id']) ? (int) $data['created_by_hdv_id'] : null,
             'title'        => $data['title'],
             'content'      => $data['content'],
             'diary_date'   => $data['diary_date'],
@@ -121,7 +193,9 @@ class TourDiary extends Model
         $photosString = !empty($allPhotos) ? implode(',', $allPhotos) : null;
 
         if (!empty($data['delete_photos']) && is_array($data['delete_photos'])) {
-            foreach ($data['delete_photos'] as $photoPath) {
+            $allowedDeletePhotos = array_values(array_intersect($existingPhotos, $data['delete_photos']));
+
+            foreach ($allowedDeletePhotos as $photoPath) {
                 if (file_exists($photoPath)) {
                     unlink($photoPath);
                 }
@@ -172,10 +246,12 @@ class TourDiary extends Model
     public function getRecentDiaries($limit = 5)
     {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('td.*', 'd.group_name as departure_group_name', 't.name as tour_name')
+        $stmt->select('td.*', 'd.group_name as departure_group_name', 't.name as tour_name', 'tc.name as category_name', 'author_h.Hoten as author_hdv_name')
             ->from('tour_diaries', 'td')
             ->leftJoin('td', 'departures', 'd', 'd.id = td.departure_id')
             ->leftJoin('d', 'tours', 't', 't.id = d.tour_id')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->leftJoin('td', 'hdv', 'author_h', 'author_h.HDV_id = td.created_by_hdv_id')
             ->orderBy('td.diary_date', 'DESC')
             ->setMaxResults((int) $limit);
 
