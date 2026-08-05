@@ -38,22 +38,36 @@
     .table td .btn {
         min-width: 88px;
     }
+    .users-header {
+        gap: 1rem;
+    }
+    .users-header h2 {
+        line-height: 1.1;
+    }
     .bulk-actions {
-        justify-content: space-between;
+        justify-content: flex-end;
+        align-items: center;
+        width: auto;
     }
     .bulk-actions .btn {
         white-space: nowrap;
     }
+    @media (max-width: 767.98px) {
+        .bulk-actions {
+            justify-content: flex-start;
+            width: 100%;
+        }
+    }
 </style>
 
 <div class="container mt-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-3">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start users-header mb-3">
         <div>
             <h2 class="mb-0">
                 <i class="bi bi-people"></i> {{ $title }}
             </h2>
         </div>
-        <div class="d-flex flex-wrap gap-2 bulk-actions w-100 w-md-auto">
+        <div class="d-flex flex-wrap gap-2 bulk-actions">
             <a href="{{ route('admin/users/create') }}" class="btn btn-primary">
                 <i class="bi bi-person-plus"></i> Thêm mới tài khoản
             </a>
@@ -190,90 +204,6 @@
     document.getElementById('selectAllUsers')?.addEventListener('change', function () {
         const checked = this.checked;
         document.querySelectorAll('input[name="ids[]"]')?.forEach(function (checkbox) {
-            checkbox.checked = checked;
-        });
-    });
-</script>
-@endsection
-
-                                            <img src="{{ file_url($user['avatar']) }}" alt="{{ $user['name'] }}" class="user-avatar-sm">
-                                        @else
-                                            <div class="d-flex align-items-center justify-content-center user-avatar-sm bg-light text-muted">
-                                                <i class="bi bi-person fs-5"></i>
-                                            </div>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('admin/users/show/' . $user['id']) }}" class="text-decoration-none fw-semibold text-dark">
-                                            {{ $user['name'] }}
-                                        </a>
-                                    </td>
-                                    <td class="text-muted">{{ $user['email'] }}</td>
-                                    <td>{{ $user['phone'] ?: '<span class="text-muted">—</span>' }}</td>
-                                    <td>
-                                        @if($user['role'] == 'admin')
-                                            <span class="badge role-badge-admin px-3 py-2">
-                                                <i class="bi bi-shield-check me-1"></i>Admin
-                                            </span>
-                                        @elseif($user['role'] == 'hdv')
-                                            <span class="badge role-badge-hdv px-3 py-2">
-                                                <i class="bi bi-person-badge me-1"></i>HDV
-                                            </span>
-                                        @else
-                                            <span class="badge role-badge-user px-3 py-2">
-                                                <i class="bi bi-person me-1"></i>User
-                                            </span>
-                                        @endif
-                                        @if($user['role'] == 'hdv' && !empty($user['hdv_name']))
-                                            <div class="small text-muted mt-1">Gắn với: {{ $user['hdv_name'] }}</div>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($user['status'] == 1)
-                                            <span class="badge bg-success px-3 py-2">
-                                                <i class="bi bi-check-circle me-1"></i>Hoạt động
-                                            </span>
-                                        @else
-                                            <span class="badge bg-secondary px-3 py-2">
-                                                <i class="bi bi-x-circle me-1"></i>Khóa
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="text-nowrap">
-                                        <a href="{{ route('admin/users/show/' . $user['id']) }}" class="btn btn-sm btn-info text-white" title="Xem chi tiết">
-                                            <i class="bi bi-eye"></i> Xem
-                                        </a>
-                                        <a href="{{ route('admin/users/edit/' . $user['id']) }}" class="btn btn-sm btn-warning" title="Sửa">
-                                            <i class="bi bi-pencil"></i> Sửa
-                                        </a>
-                                        <a href="{{ route('admin/users/delete/' . $user['id']) }}"
-                                           class="btn btn-sm btn-danger"
-                                           title="Xóa"
-                                           onclick="return confirm('Bạn có chắc muốn xóa tài khoản này? Hành động này không thể hoàn tác!')">
-                                            <i class="bi bi-trash"></i> Xóa
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card-footer bg-light py-2">
-            <small class="text-muted">
-                <i class="bi bi-info-circle me-1"></i>
-                Tổng số tài khoản: <strong>{{ count($users) }}</strong>
-            </small>
-        </div>
-    </div>
-</div>
-
-@section('scripts')
-<script>
-    document.getElementById('selectAllUsers')?.addEventListener('change', function () {
-        const checked = this.checked;
-        document.querySelectorAll('input[name="ids[]"]').forEach(function (checkbox) {
             checkbox.checked = checked;
         });
     });
