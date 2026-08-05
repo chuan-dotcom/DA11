@@ -195,69 +195,7 @@
     });
 </script>
 @endsection
-        <div class="alert alert-success">{{ $_SESSION['success'] }}</div>
-        @php unset($_SESSION['success']); @endphp
-    @endif
-    @if(isset($_SESSION['error']))
-        <div class="alert alert-danger">{{ $_SESSION['error'] }}</div>
-        @php unset($_SESSION['error']); @endphp
-    @endif
-    @if(isset($_SESSION['flash']['success']))
-        <div class="alert alert-success">{{ $_SESSION['flash']['success'] }}</div>
-        @php unset($_SESSION['flash']['success']); @endphp
-    @endif
-    @if(isset($_SESSION['flash']['error']))
-        <div class="alert alert-danger">{{ $_SESSION['flash']['error'] }}</div>
-        @php unset($_SESSION['flash']['error']); @endphp
-    @endif
 
-    <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
-        <a href="{{ route('admin/users/create') }}" class="btn btn-primary">
-            <i class="bi bi-person-plus"></i> Thêm mới tài khoản
-        </a>
-        <form id="bulkDeleteForm" action="{{ route('admin/users/delete-multiple') }}" method="POST" class="d-inline-block">
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn xóa các tài khoản đã chọn? Hành động này không thể hoàn tác!')">
-                <i class="bi bi-trash"></i> Xóa tài khoản đã chọn
-            </button>
-        </form>
-    </div>
-
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th width="40" class="text-center align-middle">
-                                <input type="checkbox" id="selectAllUsers" />
-                            </th>
-                            <th width="60">ID</th>
-                            <th width="80">Ảnh đại diện</th>
-                            <th>Họ tên</th>
-                            <th>Email</th>
-                            <th>Số điện thoại</th>
-                            <th>Vai trò</th>
-                            <th>Trạng thái</th>
-                            <th width="220">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(empty($users))
-                            <tr>
-                                <td colspan="9" class="text-center py-4 text-muted">
-                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                                    Chưa có tài khoản nào
-                                </td>
-                            </tr>
-                        @else
-                            @foreach($users as $user)
-                                <tr>
-                                    <td class="text-center align-middle">
-                                        <input type="checkbox" name="ids[]" value="{{ $user['id'] }}" form="bulkDeleteForm" />
-                                    </td>
-                                    <td class="fw-semibold text-center">{{ $user['id'] }}</td>
-                                    <td class="text-center">
-                                        @if($user['avatar'])
                                             <img src="{{ file_url($user['avatar']) }}" alt="{{ $user['name'] }}" class="user-avatar-sm">
                                         @else
                                             <div class="d-flex align-items-center justify-content-center user-avatar-sm bg-light text-muted">
