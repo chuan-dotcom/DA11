@@ -1,5 +1,6 @@
 <?php
 
+use App\Controllers\AuthController;
 use App\Controllers\Admin\TourController as AdminTourController;
 use App\Controllers\Admin\TourCategoryController as AdminTourCategoryController;
 use App\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -16,18 +17,63 @@ use App\Controllers\Hdv\TourInfoController as HdvTourInfoController;
 use App\Controllers\Hdv\AssignedTourController as HdvAssignedTourController;
 use App\Controllers\Hdv\ScheduleController as HdvScheduleController;
 use App\Controllers\Hdv\DiaryController as HdvDiaryController;
+use App\Support\Auth;
     
 use Bramus\Router\Router;
 
 $router = new Router();
 $router->setBasePath(app_base_path());
 
+$router->before('GET|POST', '/auth/(login|register)', function () {
+    if (Auth::check()) {
+        redirect(Auth::redirectPath());
+    }
+});
+
+$router->before('GET|POST', '/auth/account', function () {
+    if (!Auth::check()) {
+        setFlash('error', 'Vui lòng đăng nhập để tiếp tục.');
+        redirect('auth/login');
+    }
+});
+
+$router->before('GET|POST', '/admin.*', function () {
+    if (!Auth::check()) {
+        setFlash('error', 'Vui lòng đăng nhập để vào trang quản trị.');
+        redirect('auth/login');
+    }
+
+    if (!Auth::isAdmin()) {
+        setFlash('error', 'Bạn không có quyền truy cập khu vực quản trị.');
+        redirect('auth/account');
+    }
+});
+
+$router->before('GET|POST', '/hdv.*', function () {
+    if (!Auth::check()) {
+        setFlash('error', 'Vui lòng đăng nhập để tiếp tục.');
+        redirect('auth/login');
+    }
+});
+
+/*
+|--------------------------------------------------------------------------
+| XÁC THỰC TÀI KHOẢN
+|--------------------------------------------------------------------------
+*/
+$router->get('/', AuthController::class . '@index');
+$router->get('auth/login', AuthController::class . '@showLogin');
+$router->post('auth/login', AuthController::class . '@login');
+$router->get('auth/register', AuthController::class . '@showRegister');
+$router->post('auth/register', AuthController::class . '@register');
+$router->get('auth/logout', AuthController::class . '@logout');
+$router->get('auth/account', AuthController::class . '@account');
+
 /*
 |--------------------------------------------------------------------------
 | QUẢN TRỊ ADMIN
 |--------------------------------------------------------------------------
 */
-$router->get('/', AdminDashboardController::class . '@index');
 $router->get('admin', AdminDashboardController::class . '@index');
 $router->get('admin/dashboard', AdminDashboardController::class . '@index');
 

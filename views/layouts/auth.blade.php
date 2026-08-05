@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'Xác thực tài khoản')</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f9ff 0%, #ecfeff 100%);
+        }
+
+        .auth-shell {
+            min-height: 100vh;
+        }
+
+        .auth-card {
+            border: 0;
+            border-radius: 24px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+        }
+
+        .auth-brand {
+            font-weight: 800;
+            color: #0f172a;
+            text-decoration: none;
+        }
+
+        .auth-brand i {
+            color: #06b6d4;
+        }
+
+        .auth-muted {
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+<div class="container auth-shell d-flex align-items-center justify-content-center py-5">
+    <div class="row justify-content-center w-100">
+        <div class="col-12 col-md-8 col-lg-5">
+            <div class="card auth-card">
+                <div class="card-body p-4 p-md-5">
+                    <a href="{{ route('auth/login') }}" class="auth-brand d-inline-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-airplane-engines-fill fs-3"></i>
+                        <span>Đức Long Travel</span>
+                    </a>
+
+                    @if(isset($_SESSION['flash']['success']))
+                        <div class="alert alert-success">{{ $_SESSION['flash']['success'] }}</div>
+                        @php unset($_SESSION['flash']['success']); @endphp
+                    @endif
+
+                    @if(isset($_SESSION['flash']['error']))
+                        <div class="alert alert-danger">{{ $_SESSION['flash']['error'] }}</div>
+                        @php unset($_SESSION['flash']['error']); @endphp
+                    @endif
+
+                    @yield('content')
+                    @php unset($_SESSION['old_input']); @endphp
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

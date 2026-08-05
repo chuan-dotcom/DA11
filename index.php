@@ -70,7 +70,7 @@ function file_url($path) {
 }
 
 function setFlash($key, $value) {
-    $_SESSION[$key] = $value;
+    $_SESSION['flash'][$key] = $value;
 }
 
 function old($key, $default = null) {

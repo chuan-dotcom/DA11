@@ -74,6 +74,19 @@
         .admin-sidebar .nav-link i {
             margin-right: 0.35rem;
         }
+
+        .admin-topbar {
+            background: #ffffff;
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            margin-bottom: 1.25rem;
+        }
+
+        .admin-user-meta {
+            color: #475569;
+            font-size: 0.95rem;
+        }
     </style>
     
 </head>
@@ -86,6 +99,22 @@
         </div>
 
         <div class="col-12 col-md-9 col-lg-10 p-3">
+            <div class="admin-topbar d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <div class="fw-bold text-dark">Xin chào, {{ $_SESSION['auth']['name'] ?? 'Người dùng' }}</div>
+                    <div class="admin-user-meta">
+                        {{ $_SESSION['auth']['email'] ?? '' }}
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('auth/account') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-person-circle"></i> Tài khoản
+                    </a>
+                    <a href="{{ route('auth/logout') }}" class="btn btn-danger">
+                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                    </a>
+                </div>
+            </div>
             @yield('content')
         </div>
     </div>

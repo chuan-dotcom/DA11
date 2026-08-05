@@ -288,6 +288,13 @@
                         </select>
                     </div>
                 @endif
+
+                <div class="px-1 text-white-50 small mb-2">
+                    Đăng nhập: <strong class="text-white">{{ $_SESSION['auth']['name'] ?? 'Người dùng' }}</strong>
+                </div>
+                <a href="{{ route('auth/logout') }}" class="hdv-logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                </a>
             </div>
         </div>
 
@@ -297,6 +304,9 @@
                 <div class="hdv-header-title">
                     {{ $currentTourDetail['tour_name'] ?? 'Kênh Quản Lý Hướng Dẫn Viên' }}
                 </div>
+                <a href="{{ route('auth/account') }}" class="hdv-top-logout">
+                    <i class="bi bi-person-circle me-1"></i> {{ $_SESSION['auth']['name'] ?? 'Tài khoản' }}
+                </a>
             </div>
 
             @if(isset($_SESSION['flash']['success']))
