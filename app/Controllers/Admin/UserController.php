@@ -8,43 +8,55 @@ use Rakit\Validation\Validator;
 
 class UserController extends Controller
 {
-    private $modelUser;
-    private $modelStaff;
-    private $validator;
+    private User $userModel;
+    private Staff $staffModel;
+    private Validator $validator;
 
     public function __construct()
     {
-        $this->modelUser = new User();
-        $this->modelStaff = new Staff();
+        $this->userModel = new User();
+        $this->staffModel = new Staff();
         $this->validator = new Validator();
     }
 
     public function index()
     {
+        $pageTitle = 'Quản lý tài khoản';
         $title = 'Danh sách tài khoản';
-        $users = $this->modelUser->getAll();
-        return view('admin.users.index', compact('title', 'users'));
+        $users = $this->userModel->getAll();
+        $stats = [
+            'total' => count($users),
+            'active' => count(array_filter($users, static fn ($u) => ($u['status'] ?? 0) == 1)),
+            'admin' => count(array_filter($users, static fn ($u) => ($u['role'] ?? '') === 'admin')),
+            'hdv' => count(array_filter($users, static fn ($u) => ($u['role'] ?? '') === 'hdv')),
+        ];
+
+        return view('admin.users.index', compact('pageTitle', 'title', 'users', 'stats'));
     }
 
     public function create()
     {
+        $pageTitle = 'Quản lý tài khoản';
         $title = 'Thêm mới tài khoản';
-        $staffs = $this->modelStaff->getAll();
-        return view('admin.users.create', compact('title', 'staffs'));
+        $staffs = $this->staffModel->getAll();
+
+        $this->keepOldInput();
+
+        return view('admin.users.create', compact('pageTitle', 'title', 'staffs'));
     }
 
     public function store()
     {
-        $data = [
-            'name' => $_POST['name'],
-            'email' => $_POST['email'],
-            'password' => $_POST['password'],
-            'password_confirmation' => $_POST['password_confirmation'],
-            'phone' => $_POST['phone'] ?? '',
-            'role' => $_POST['role'],
+        $input = $this->normalizeInput([
+            'name' => trim($_POST['name'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'password' => $_POST['password'] ?? '',
+            'password_confirmation' => $_POST['password_confirmation'] ?? '',
+            'phone' => trim($_POST['phone'] ?? ''),
+            'role' => $_POST['role'] ?? 'user',
             'hdv_id' => $_POST['hdv_id'] ?? null,
-            'status' => $_POST['status'],
-        ];
+            'status' => $_POST['status'] ?? '1',
+        ]);
 
         $rules = [
             'name' => 'required|max:255',
@@ -55,62 +67,78 @@ class UserController extends Controller
             'status' => 'required|in:0,1',
         ];
 
-        $errors = $this->validate($this->validator, $data, $rules);
+        $errors = $this->validate($this->validator, $input, $rules);
         if (!empty($errors)) {
+            $this->flashOldInput($input);
             setFlash('error', reset($errors));
             return redirect('admin/users/create');
         }
 
-        if ($data['role'] !== 'hdv') {
-            $data['hdv_id'] = null;
-        } elseif (!empty($data['hdv_id']) && !$this->modelStaff->findById((int) $data['hdv_id'])) {
+        if ($input['role'] !== 'hdv') {
+            $input['hdv_id'] = null;
+        } elseif (!empty($input['hdv_id']) && !$this->staffModel->findById((int) $input['hdv_id'])) {
+            $this->flashOldInput($input);
             setFlash('error', 'Hướng dẫn viên được chọn không tồn tại.');
             return redirect('admin/users/create');
         }
 
-        if ($this->modelUser->emailExists($data['email'])) {
+        if ($this->userModel->emailExists($input['email'])) {
+            $this->flashOldInput($input);
             setFlash('error', 'Email đã tồn tại!');
             return redirect('admin/users/create');
         }
 
-        $data['avatar'] = null;
+        $input['avatar'] = null;
         if (is_upload('avatar')) {
-            $data['avatar'] = $this->uploadFile($_FILES['avatar'], 'users');
+            try {
+                $input['avatar'] = $this->uploadFile($_FILES['avatar'], 'users');
+            } catch (\Throwable $e) {
+                $this->logError('Upload user avatar failed: ' . $e->getMessage());
+                $this->flashOldInput($input);
+                setFlash('error', 'Không thể tải ảnh đại diện, vui lòng thử lại.');
+                return redirect('admin/users/create');
+            }
         }
 
-        $this->modelUser->insert($data);
+        $this->userModel->insert($input);
         setFlash('success', 'Thêm mới tài khoản thành công!');
+
         return redirect('admin/users');
     }
 
     public function edit($id)
     {
+        $pageTitle = 'Quản lý tài khoản';
         $title = 'Cập nhật tài khoản';
-        $user = $this->modelUser->findById($id);
-        $staffs = $this->modelStaff->getAll();
+        $user = $this->userModel->findById($id);
+        $staffs = $this->staffModel->getAll();
+
         if (!$user) {
             setFlash('error', 'Tài khoản không tồn tại');
             redirect('admin/users');
         }
-        return view('admin.users.edit', compact('title', 'user', 'staffs'));
+
+        $this->keepOldInput();
+
+        return view('admin.users.edit', compact('pageTitle', 'title', 'user', 'staffs'));
     }
 
     public function update($id)
     {
-        $user = $this->modelUser->findById($id);
+        $user = $this->userModel->findById($id);
         if (!$user) {
             setFlash('error', 'Tài khoản không tồn tại');
             redirect('admin/users');
         }
 
-        $data = [
-            'name' => $_POST['name'],
-            'email' => $_POST['email'],
-            'phone' => $_POST['phone'] ?? '',
-            'role' => $_POST['role'],
+        $input = $this->normalizeInput([
+            'name' => trim($_POST['name'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'phone' => trim($_POST['phone'] ?? ''),
+            'role' => $_POST['role'] ?? 'user',
             'hdv_id' => $_POST['hdv_id'] ?? null,
-            'status' => $_POST['status'],
-        ];
+            'status' => $_POST['status'] ?? '1',
+        ]);
 
         $rules = [
             'name' => 'required|max:255',
@@ -119,54 +147,69 @@ class UserController extends Controller
             'status' => 'required|in:0,1',
         ];
 
-        if (!empty($_POST['password'])) {
-            $data['password'] = $_POST['password'];
-            $data['password_confirmation'] = $_POST['password_confirmation'];
+        $password = $_POST['password'] ?? '';
+        $passwordConfirm = $_POST['password_confirmation'] ?? '';
+        if ($password !== '' || $passwordConfirm !== '') {
+            $input['password'] = $password;
+            $input['password_confirmation'] = $passwordConfirm;
             $rules['password'] = 'min:6';
             $rules['password_confirmation'] = 'same:password';
         }
 
-        $errors = $this->validate($this->validator, $data, $rules);
+        $errors = $this->validate($this->validator, $input, $rules);
         if (!empty($errors)) {
             setFlash('error', reset($errors));
             return redirect('admin/users/edit/' . $id);
         }
 
-        if ($data['role'] !== 'hdv') {
-            $data['hdv_id'] = null;
-        } elseif (!empty($data['hdv_id']) && !$this->modelStaff->findById((int) $data['hdv_id'])) {
+        if ($input['role'] !== 'hdv') {
+            $input['hdv_id'] = null;
+        } elseif (!empty($input['hdv_id']) && !$this->staffModel->findById((int) $input['hdv_id'])) {
             setFlash('error', 'Hướng dẫn viên được chọn không tồn tại.');
             return redirect('admin/users/edit/' . $id);
         }
 
-        if ($this->modelUser->emailExists($data['email'], $id)) {
+        if ($this->userModel->emailExists($input['email'], $id)) {
             setFlash('error', 'Email đã tồn tại!');
             return redirect('admin/users/edit/' . $id);
         }
 
-        $data['avatar'] = $user['avatar'];
+        $input['avatar'] = $user['avatar'];
         if (is_upload('avatar')) {
-            if ($user['avatar'] && file_exists($user['avatar'])) {
-                unlink($user['avatar']);
+            try {
+                if (!empty($user['avatar']) && file_exists($user['avatar'])) {
+                    unlink($user['avatar']);
+                }
+                $input['avatar'] = $this->uploadFile($_FILES['avatar'], 'users');
+            } catch (\Throwable $e) {
+                $this->logError('Update user avatar failed: ' . $e->getMessage());
+                setFlash('error', 'Không thể tải ảnh đại diện, vui lòng thử lại.');
+                return redirect('admin/users/edit/' . $id);
             }
-            $data['avatar'] = $this->uploadFile($_FILES['avatar'], 'users');
         }
 
-        $this->modelUser->update($id, $data);
+        $this->userModel->update($id, $input);
         setFlash('success', 'Cập nhật tài khoản thành công!');
+
         return redirect('admin/users');
     }
 
     public function delete($id)
     {
-        $user = $this->modelUser->findById($id);
+        $user = $this->userModel->findById($id);
         if (!$user) {
             setFlash('error', 'Tài khoản không tồn tại');
             redirect('admin/users');
         }
 
-        $this->modelUser->delete($id);
+        if ($this->isCurrentUser($id)) {
+            setFlash('error', 'Không thể xóa tài khoản đang đăng nhập.');
+            return redirect('admin/users');
+        }
+
+        $this->userModel->delete($id);
         setFlash('success', 'Xóa tài khoản thành công!');
+
         return redirect('admin/users');
     }
 
@@ -177,19 +220,20 @@ class UserController extends Controller
             $ids = [$ids];
         }
 
-        $ids = array_filter(array_map('intval', $ids));
+        $ids = array_values(array_filter(array_map('intval', $ids)));
         if (empty($ids)) {
             setFlash('error', 'Vui lòng chọn ít nhất 1 tài khoản để xóa.');
             return redirect('admin/users');
         }
 
-        $currentUserId = $_SESSION['auth']['id'] ?? null;
-        if ($currentUserId !== null && in_array($currentUserId, $ids, true)) {
-            setFlash('error', 'Không thể xóa tài khoản đang đăng nhập.');
-            return redirect('admin/users');
+        foreach ($ids as $id) {
+            if ($this->isCurrentUser($id)) {
+                setFlash('error', 'Không thể xóa tài khoản đang đăng nhập.');
+                return redirect('admin/users');
+            }
         }
 
-        $deletedCount = $this->modelUser->deleteMultiple($ids);
+        $deletedCount = $this->userModel->deleteMultiple($ids);
         if ($deletedCount > 0) {
             setFlash('success', "Xóa thành công {$deletedCount} tài khoản!");
         } else {
@@ -201,14 +245,52 @@ class UserController extends Controller
 
     public function show($id)
     {
+        $pageTitle = 'Quản lý tài khoản';
         $title = 'Chi tiết tài khoản';
-        $user = $this->modelUser->findById($id);
+        $user = $this->userModel->findById($id);
 
         if (!$user) {
             setFlash('error', 'Tài khoản không tồn tại');
             return redirect('admin/users');
         }
 
-        return view('admin.users.show', compact('title', 'user'));
+        return view('admin.users.show', compact('pageTitle', 'title', 'user'));
+    }
+
+    private function normalizeInput(array $input): array
+    {
+        foreach ($input as $key => $value) {
+            if (is_string($value)) {
+                $input[$key] = $value === '' ? null : preg_replace('/\s+/u', ' ', $value);
+            }
+        }
+
+        return $input;
+    }
+
+    private function flashOldInput(array $input): void
+    {
+        $safe = [];
+        foreach ($input as $key => $value) {
+            if (is_string($value) || is_numeric($value)) {
+                $safe[$key] = $value;
+            }
+        }
+        $safe = array_diff_key($safe, array_flip(['password', 'password_confirmation']));
+        $_SESSION['old_input'] = $safe;
+    }
+
+    private function keepOldInput(): void
+    {
+        // Keep for one more render, then clear.
+        if (isset($_SESSION['old_input'])) {
+            // leave it intact so old() works on the form, then the next request cleans up.
+        }
+    }
+
+    private function isCurrentUser($id): bool
+    {
+        $currentUserId = $_SESSION['auth']['id'] ?? null;
+        return $currentUserId !== null && (int) $currentUserId === (int) $id;
     }
 }
