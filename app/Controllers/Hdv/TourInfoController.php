@@ -90,19 +90,19 @@ class TourInfoController extends Controller
         $assignedTours = $db->fetchAllAssociative($sql, ['hdv_id' => $hdvId]);
 
         // Categorize into Ongoing (Đang), Upcoming (Sẽ), Completed (Đã)
-        $today = date('Y-m-d');
+        $todayTimestamp = strtotime(date('Y-m-d'));
         $ongoingTours = [];
         $upcomingTours = [];
         $completedTours = [];
 
         foreach ($assignedTours as $item) {
-            $startDate = $item['departure_date'];
-            $endDate = $item['return_date'] ?: $startDate;
+            $startTimestamp = strtotime($item['departure_date']);
+            $endTimestamp = strtotime($item['return_date'] ?: $item['departure_date']);
 
-            if ($item['departure_status'] === 'completed' || $endDate < $today) {
+            if ($endTimestamp < $todayTimestamp) {
                 $item['progress_status'] = 'da_tien_hanh';
                 $completedTours[] = $item;
-            } elseif ($startDate <= $today && $endDate >= $today) {
+            } elseif ($startTimestamp <= $todayTimestamp && $endTimestamp >= $todayTimestamp) {
                 $item['progress_status'] = 'dang_tien_hanh';
                 $ongoingTours[] = $item;
             } else {
