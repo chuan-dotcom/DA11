@@ -5,7 +5,13 @@
 @section('content')
     <div class="mb-4">
         <h1 class="h3 fw-bold mb-2">Đăng nhập</h1>
-        <p class="auth-muted mb-0">Đăng nhập để truy cập hệ thống quản lý tour.</p>
+        <p class="auth-muted mb-0">Đăng nhập để truy cập hệ thống. Tài khoản HDV sẽ tự chuyển sang cổng HDV và có thể chọn hướng dẫn viên cần xem.</p>
+    </div>
+
+    <div class="alert alert-info">
+        <div class="fw-semibold mb-1">Tài khoản HDV dùng chung</div>
+        <div>Email: <code>hdv@example.com</code></div>
+        <div>Mật khẩu: <code>123456</code></div>
     </div>
 
     <form action="{{ route('auth/login') }}" method="POST">

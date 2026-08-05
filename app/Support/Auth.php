@@ -24,6 +24,16 @@ class Auth
         return self::check() && (self::user()['role'] ?? null) === 'hdv';
     }
 
+    public static function hasBoundHdv(): bool
+    {
+        return self::isHdv() && !empty(self::user()['hdv_id']);
+    }
+
+    public static function canSwitchHdv(): bool
+    {
+        return self::isAdmin() || (self::isHdv() && !self::hasBoundHdv());
+    }
+
     public static function login(array $user): void
     {
         session_regenerate_id(true);
@@ -65,7 +75,7 @@ class Auth
         }
 
         if ($role === 'hdv') {
-            return 'hdv/thong-tin-tour';
+            return 'hdv/dashboard';
         }
 
         return 'auth/account';

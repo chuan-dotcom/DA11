@@ -65,12 +65,6 @@ class AuthController extends Controller
             return redirect('auth/login');
         }
 
-        if (($user['role'] ?? null) === 'hdv' && empty($user['hdv_id'])) {
-            Auth::storeOldInput($data);
-            setFlash('error', 'Tài khoản HDV chưa được gán hồ sơ hướng dẫn viên.');
-            return redirect('auth/login');
-        }
-
         Auth::clearOldInput();
         Auth::login($user);
         setFlash('success', 'Đăng nhập thành công.');

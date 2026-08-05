@@ -26,7 +26,7 @@ class AssignedTourController extends Controller
 
     private function getActiveHdvId()
     {
-        if (Auth::isHdv()) {
+        if (Auth::hasBoundHdv()) {
             $_SESSION['hdv_id'] = (int) (Auth::user()['hdv_id'] ?? 0);
             return $_SESSION['hdv_id'];
         }
@@ -44,7 +44,7 @@ class AssignedTourController extends Controller
     {
         $hdvId = $this->getActiveHdvId();
         $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::isAdmin() ? $this->modelStaff->getAll() : [$activeHdv];
+        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
 
         $db = (new \App\Model())->getConnection();
 

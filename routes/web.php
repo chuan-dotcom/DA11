@@ -189,6 +189,7 @@ $router->get('admin/tour-diaries/delete/(\d+)', AdminTourDiaryController::class 
 |--------------------------------------------------------------------------
 */
 $router->get('hdv', HdvTourInfoController::class . '@index');
+$router->get('hdv/dashboard', HdvTourInfoController::class . '@index');
 $router->get('hdv/thong-tin-tour', HdvTourInfoController::class . '@index');
 
 $router->get('hdv/tour-phan-cong', HdvAssignedTourController::class . '@index');

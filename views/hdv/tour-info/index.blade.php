@@ -7,12 +7,12 @@
 <!-- Tabs Navigation -->
 <ul class="nav hdv-tabs">
     <li class="nav-item">
-        <a class="nav-link {{ $activeTab === 'danh-sach' ? 'active' : '' }}" href="{{ route('hdv/thong-tin-tour?tab=danh-sach') }}">
+        <a class="nav-link {{ $activeTab === 'danh-sach' ? 'active' : '' }}" href="{{ route('hdv/dashboard?tab=danh-sach') }}">
             <i class="bi bi-journal-text me-1"></i> Danh sách tour
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link {{ $activeTab === 'chi-tiet' ? 'active' : '' }}" href="{{ route('hdv/thong-tin-tour?tab=chi-tiet') }}">
+        <a class="nav-link {{ $activeTab === 'chi-tiet' ? 'active' : '' }}" href="{{ route('hdv/dashboard?tab=chi-tiet') }}">
             <i class="bi bi-bar-chart-steps me-1"></i> Chi tiết tour
         </a>
     </li>
@@ -72,7 +72,7 @@
                                         <p class="card-text mb-1"><i class="bi bi-calendar3 text-muted me-1"></i> <strong>Khởi hành:</strong> {{ date('d/m/Y', strtotime($t['departure_date'])) }}</p>
                                         <p class="card-text mb-1"><i class="bi bi-geo-alt text-muted me-1"></i> <strong>Điểm hẹn:</strong> {{ $t['meeting_point'] ?: 'Chưa cập nhật' }}</p>
                                         <p class="card-text mb-3"><i class="bi bi-truck text-muted me-1"></i> <strong>Xe:</strong> {{ $t['vehicle'] ?: 'Chưa gán' }}</p>
-                                        <a href="{{ route('hdv/thong-tin-tour?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="btn btn-sm btn-success w-100 fw-bold">
+                                        <a href="{{ route('hdv/dashboard?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="btn btn-sm btn-success w-100 fw-bold">
                                             <i class="bi bi-eye me-1"></i> Xem chi tiết
                                         </a>
                                     </div>
@@ -103,7 +103,7 @@
                                         <p class="card-text mb-1"><i class="bi bi-calendar3 text-muted me-1"></i> <strong>Khởi hành:</strong> {{ date('d/m/Y', strtotime($t['departure_date'])) }}</p>
                                         <p class="card-text mb-1"><i class="bi bi-clock text-muted me-1"></i> <strong>Giờ tập trung:</strong> {{ $t['meeting_time'] ?: 'Chưa cập nhật' }}</p>
                                         <p class="card-text mb-3"><i class="bi bi-geo-alt text-muted me-1"></i> <strong>Điểm hẹn:</strong> {{ $t['meeting_point'] ?: 'Chưa cập nhật' }}</p>
-                                        <a href="{{ route('hdv/thong-tin-tour?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="btn btn-sm btn-primary w-100 fw-bold">
+                                        <a href="{{ route('hdv/dashboard?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="btn btn-sm btn-primary w-100 fw-bold">
                                             <i class="bi bi-eye me-1"></i> Xem chi tiết
                                         </a>
                                     </div>
@@ -133,7 +133,7 @@
                                     <div class="card-body">
                                         <p class="card-text mb-1"><i class="bi bi-calendar-check text-muted me-1"></i> <strong>Khởi hành:</strong> {{ date('d/m/Y', strtotime($t['departure_date'])) }}</p>
                                         <p class="card-text mb-3"><i class="bi bi-flag text-muted me-1"></i> <strong>Kết thúc:</strong> {{ $t['return_date'] ? date('d/m/Y', strtotime($t['return_date'])) : '-' }}</p>
-                                        <a href="{{ route('hdv/thong-tin-tour?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="btn btn-sm btn-outline-secondary w-100 fw-bold">
+                                        <a href="{{ route('hdv/dashboard?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="btn btn-sm btn-outline-secondary w-100 fw-bold">
                                             <i class="bi bi-eye me-1"></i> Xem chi tiết
                                         </a>
                                     </div>
@@ -152,7 +152,7 @@
     @if(count($assignedTours) > 1)
         <div class="card mb-3 border-0 shadow-sm rounded-4">
             <div class="card-body py-2">
-                <form method="GET" action="{{ route('hdv/thong-tin-tour') }}" class="row align-items-center">
+                <form method="GET" action="{{ route('hdv/dashboard') }}" class="row align-items-center">
                     <input type="hidden" name="tab" value="chi-tiet">
                     <div class="col-auto">
                         <label class="fw-bold small text-muted"><i class="bi bi-filter me-1"></i> Chọn chuyến khởi hành xem chi tiết:</label>

@@ -49,15 +49,6 @@
     </li>
 
     <li class="nav-item mt-3">
-        <h6 class="sidebar-section-title px-3 mb-1">Kênh Hướng Dẫn Viên</h6>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link {{ $isActive('hdv/thong-tin-tour') ? 'is-active' : '' }}" href="{{ route('hdv/thong-tin-tour') }}">
-            <i class="bi bi-file-earmark-text"></i> Trang HDV (Guide App)
-        </a>
-    </li>
-
-    <li class="nav-item mt-3">
         <h6 class="sidebar-section-title px-3 mb-1">Quản lý Tour</h6>
     </li>
     <li class="nav-item">

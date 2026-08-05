@@ -55,10 +55,6 @@ class UserController extends Controller
             'status' => 'required|in:0,1',
         ];
 
-        if ($data['role'] === 'hdv') {
-            $rules['hdv_id'] = 'required|integer';
-        }
-
         $errors = $this->validate($this->validator, $data, $rules);
         if (!empty($errors)) {
             setFlash('error', reset($errors));
@@ -67,7 +63,7 @@ class UserController extends Controller
 
         if ($data['role'] !== 'hdv') {
             $data['hdv_id'] = null;
-        } elseif (!$this->modelStaff->findById((int) $data['hdv_id'])) {
+        } elseif (!empty($data['hdv_id']) && !$this->modelStaff->findById((int) $data['hdv_id'])) {
             setFlash('error', 'Hướng dẫn viên được chọn không tồn tại.');
             return redirect('admin/users/create');
         }
@@ -123,10 +119,6 @@ class UserController extends Controller
             'status' => 'required|in:0,1',
         ];
 
-        if ($data['role'] === 'hdv') {
-            $rules['hdv_id'] = 'required|integer';
-        }
-
         if (!empty($_POST['password'])) {
             $data['password'] = $_POST['password'];
             $data['password_confirmation'] = $_POST['password_confirmation'];
@@ -142,7 +134,7 @@ class UserController extends Controller
 
         if ($data['role'] !== 'hdv') {
             $data['hdv_id'] = null;
-        } elseif (!$this->modelStaff->findById((int) $data['hdv_id'])) {
+        } elseif (!empty($data['hdv_id']) && !$this->modelStaff->findById((int) $data['hdv_id'])) {
             setFlash('error', 'Hướng dẫn viên được chọn không tồn tại.');
             return redirect('admin/users/edit/' . $id);
         }

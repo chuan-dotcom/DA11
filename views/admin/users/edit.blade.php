@@ -88,9 +88,10 @@
                         </div>
 
                         <div class="mb-3 {{ $user['role'] == 'hdv' ? '' : 'd-none' }}" id="hdv-select-wrapper">
-                            <label for="hdv_id" class="form-label">Gắn với HDV <span class="text-danger">*</span></label>
+                            <label for="hdv_id" class="form-label">Gắn với HDV</label>
+                            <div class="form-text mb-2">Để trống nếu muốn dùng làm tài khoản HDV chung.</div>
                             <select class="form-select" id="hdv_id" name="hdv_id">
-                                <option value="">Chọn hướng dẫn viên</option>
+                                <option value="">Tài khoản HDV chung</option>
                                 @foreach($staffs as $staff)
                                     <option value="{{ $staff['HDV_id'] }}" {{ (int) ($user['hdv_id'] ?? 0) === (int) $staff['HDV_id'] ? 'selected' : '' }}>
                                         #{{ $staff['HDV_id'] }} - {{ $staff['Hoten'] }}
@@ -148,7 +149,6 @@
     function toggleHdvSelect() {
         const isHdv = roleSelect.value === 'hdv';
         hdvWrapper.classList.toggle('d-none', !isHdv);
-        hdvSelect.required = isHdv;
         if (!isHdv) {
             hdvSelect.value = '';
         }

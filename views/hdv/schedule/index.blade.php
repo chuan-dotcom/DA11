@@ -60,7 +60,7 @@
                                 <!-- Tour Details -->
                                 <div class="col-md-6">
                                     <h5 class="fw-bold text-dark mb-2">
-                                        <a href="{{ route('hdv/thong-tin-tour?tab=chi-tiet&departure_id=' . $s['departure_id']) }}" class="text-dark text-decoration-none hover-primary">
+                                        <a href="{{ route('hdv/dashboard?tab=chi-tiet&departure_id=' . $s['departure_id']) }}" class="text-dark text-decoration-none hover-primary">
                                             {{ $s['tour_name'] }}
                                         </a>
                                     </h5>
@@ -89,7 +89,7 @@
                                         <a href="{{ route('hdv/tour-phan-cong?departure_id=' . $s['departure_id']) }}" class="btn btn-sm btn-primary rounded-pill fw-bold">
                                             <i class="bi bi-people me-1"></i> Xem danh sách khách
                                         </a>
-                                        <a href="{{ route('hdv/thong-tin-tour?tab=chi-tiet&departure_id=' . $s['departure_id']) }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                        <a href="{{ route('hdv/dashboard?tab=chi-tiet&departure_id=' . $s['departure_id']) }}" class="btn btn-sm btn-outline-secondary rounded-pill">
                                             <i class="bi bi-info-circle me-1"></i> Chi tiết tour
                                         </a>
                                     </div>

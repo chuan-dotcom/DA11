@@ -26,7 +26,7 @@ class DiaryController extends Controller
 
     private function getActiveHdvId()
     {
-        if (Auth::isHdv()) {
+        if (Auth::hasBoundHdv()) {
             $_SESSION['hdv_id'] = (int) (Auth::user()['hdv_id'] ?? 0);
             return $_SESSION['hdv_id'];
         }
@@ -63,7 +63,7 @@ class DiaryController extends Controller
     {
         $hdvId = $this->getActiveHdvId();
         $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::isAdmin() ? $this->modelStaff->getAll() : [$activeHdv];
+        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
 
         $departures = $this->getAssignedDepartures($hdvId);
         $departureIds = array_column($departures, 'id');
@@ -112,7 +112,7 @@ class DiaryController extends Controller
     {
         $hdvId = $this->getActiveHdvId();
         $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::isAdmin() ? $this->modelStaff->getAll() : [$activeHdv];
+        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
 
         $departures = $this->getAssignedDepartures($hdvId);
         $selectedDepartureId = isset($_GET['departure_id']) ? (int)$_GET['departure_id'] : null;
@@ -184,7 +184,7 @@ class DiaryController extends Controller
     {
         $hdvId = $this->getActiveHdvId();
         $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::isAdmin() ? $this->modelStaff->getAll() : [$activeHdv];
+        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
 
         $diary = $this->modelDiary->findById($id);
 
@@ -210,7 +210,7 @@ class DiaryController extends Controller
     {
         $hdvId = $this->getActiveHdvId();
         $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::isAdmin() ? $this->modelStaff->getAll() : [$activeHdv];
+        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
 
         $diary = $this->modelDiary->findById($id);
         if (!$diary) {

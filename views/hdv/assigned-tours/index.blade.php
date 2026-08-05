@@ -43,7 +43,7 @@
                         <tr class="{{ (int)$selectedDepartureId === (int)$t['departure_id'] ? 'table-primary' : '' }}">
                             <td class="fw-bold text-dark">#{{ $t['primary_booking_id'] ?: $t['departure_id'] }}</td>
                             <td>
-                                <a href="{{ route('hdv/thong-tin-tour?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="fw-bold text-primary text-decoration-none">
+                                <a href="{{ route('hdv/dashboard?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="fw-bold text-primary text-decoration-none">
                                     {{ $t['tour_name'] }}
                                 </a>
                                 @if(!empty($t['group_name']))

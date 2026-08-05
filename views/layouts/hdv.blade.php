@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Kênh Hướng Dẫn Viên')</title>
+    <title>@yield('title', 'Cổng HDV')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
@@ -259,8 +259,8 @@
                 @endphp
 
                 <nav class="nav flex-column">
-                    <a href="{{ route('hdv/thong-tin-tour') }}" class="hdv-nav-item {{ str_contains($uri, 'thong-tin-tour') || $uri == '/hdv' ? 'active' : '' }}">
-                        <i class="bi bi-file-earmark-text"></i> Thông tin tour
+                    <a href="{{ route('hdv/dashboard') }}" class="hdv-nav-item {{ str_contains($uri, 'hdv/dashboard') || str_contains($uri, 'thong-tin-tour') || str_ends_with(parse_url($uri, PHP_URL_PATH) ?? '', '/hdv') ? 'active' : '' }}">
+                        <i class="bi bi-house-door"></i> Trang HDV
                     </a>
                     <a href="{{ route('hdv/tour-phan-cong') }}" class="hdv-nav-item {{ str_contains($uri, 'tour-phan-cong') ? 'active' : '' }}">
                         <i class="bi bi-person-badge"></i> Tour được phân công
@@ -278,8 +278,8 @@
                 <!-- HDV Selector Switcher -->
                 @if(isset($allHdv) && !empty($allHdv))
                     <div class="mb-3 px-1">
-                        <label class="form-label small text-white-50 mb-1"><i class="bi bi-person-circle"></i> Đang xem với tư cách:</label>
-                        <select class="form-select form-select-sm bg-light border-0 fw-semibold text-dark" onchange="window.location.href='?hdv_id='+this.value">
+                        <label class="form-label small text-white-50 mb-1"><i class="bi bi-person-circle"></i> Hướng dẫn viên đang xem:</label>
+                        <select id="hdv-switcher" class="form-select form-select-sm bg-light border-0 fw-semibold text-dark">
                             @foreach($allHdv as $h)
                                 <option value="{{ $h['HDV_id'] }}" {{ (isset($hdvId) && $hdvId == $h['HDV_id']) ? 'selected' : '' }}>
                                     {{ $h['Hoten'] }} (HDV #{{ $h['HDV_id'] }})
@@ -302,7 +302,7 @@
         <div class="col-12 col-md-9 col-lg-10 p-4">
             <div class="hdv-header">
                 <div class="hdv-header-title">
-                    {{ $currentTourDetail['tour_name'] ?? 'Kênh Quản Lý Hướng Dẫn Viên' }}
+                    {{ $currentTourDetail['tour_name'] ?? 'Cổng Hướng Dẫn Viên' }}
                 </div>
                 <a href="{{ route('auth/account') }}" class="hdv-top-logout">
                     <i class="bi bi-person-circle me-1"></i> {{ $_SESSION['auth']['name'] ?? 'Tài khoản' }}
@@ -330,5 +330,15 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const hdvSwitcher = document.getElementById('hdv-switcher');
+    if (hdvSwitcher) {
+        hdvSwitcher.addEventListener('change', function () {
+            const url = new URL(window.location.href);
+            url.searchParams.set('hdv_id', this.value);
+            window.location.href = url.toString();
+        });
+    }
+</script>
 </body>
 </html>
