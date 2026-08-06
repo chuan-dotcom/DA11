@@ -318,6 +318,11 @@
                             </div>
                         </div>
                         <p class="text-dark mb-2">{{ $log['content'] }}</p>
+                        @if(!empty($log['diary_id']))
+                            <a href="{{ route('hdv/nhat-ky-tour/show/' . $log['diary_id']) }}" class="btn btn-sm btn-outline-primary mb-2">
+                                <i class="bi bi-journal-text me-1"></i>Xem nhật ký: {{ $log['diary_title'] }}
+                            </a>
+                        @endif
                         <div class="d-flex flex-wrap gap-2 text-muted small">
                             @if(!empty($log['mood']))
                                 <span class="badge bg-light text-dark border">Tâm trạng: {{ $log['mood'] }}</span>

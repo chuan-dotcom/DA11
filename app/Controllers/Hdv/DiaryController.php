@@ -6,6 +6,7 @@ use App\Controller;
 use App\Models\TourDiary;
 use App\Models\Departure;
 use App\Models\Staff;
+use App\Models\TourLog;
 use App\Support\Auth;
 use Rakit\Validation\Validator;
 
@@ -15,6 +16,7 @@ class DiaryController extends Controller
     private $modelDeparture;
     private $modelStaff;
     private $validator;
+    private $modelTourLog;
 
     public function __construct()
     {
@@ -22,6 +24,7 @@ class DiaryController extends Controller
         $this->modelDeparture = new Departure();
         $this->modelStaff = new Staff();
         $this->validator = new Validator();
+        $this->modelTourLog = new TourLog();
     }
 
     private function getActiveHdvId()
@@ -112,6 +115,31 @@ class DiaryController extends Controller
         return null;
     }
 
+    private function getTimelineLogsForDepartures(array $departures): array
+    {
+        $logs = [];
+        foreach ($departures as $departure) {
+            foreach ($this->modelTourLog->getByDepartureId((int) $departure['id']) as $log) {
+                $logs[] = $log;
+            }
+        }
+        return $logs;
+    }
+
+    private function validateTimelineLog(int $tourLogId, int $departureId): ?string
+    {
+        if ($tourLogId <= 0) {
+            return null;
+        }
+
+        $log = $this->modelTourLog->findById($tourLogId);
+        if (!$log || (int) ($log['departure_id'] ?? 0) !== $departureId) {
+            return 'Mốc hoạt động được chọn không thuộc chuyến tour này.';
+        }
+
+        return null;
+    }
+
     public function index()
     {
         $hdvId = $this->getActiveHdvId();
@@ -184,6 +212,7 @@ class DiaryController extends Controller
         $selectedDeparture = $selectedDepartureId > 0
             ? $this->findAssignedDepartureById($departures, $selectedDepartureId)
             : null;
+        $timelineLogs = $this->getTimelineLogsForDepartures($departures);
 
         $title = 'Viết nhật ký tour mới';
 
@@ -194,7 +223,8 @@ class DiaryController extends Controller
             'allHdv',
             'departures',
             'selectedDepartureId',
-            'selectedDeparture'
+            'selectedDeparture',
+            'timelineLogs'
         ));
     }
 
@@ -223,6 +253,7 @@ class DiaryController extends Controller
 
         $data = [
             'departure_id' => $_POST['departure_id'],
+            'tour_log_id'  => (int) ($_POST['tour_log_id'] ?? 0),
             'title'        => trim($_POST['title']),
             'content'      => trim($_POST['content']),
             'diary_date'   => $_POST['diary_date'],
@@ -256,6 +287,14 @@ class DiaryController extends Controller
             $_SESSION['old_input'] = $_POST;
             setFlash('error', 'Bạn chỉ có thể viết nhật ký cho chuyến được phân công.');
             return redirect('hdv/nhat-ky-tour/create');
+        }
+
+        $timelineError = $this->validateTimelineLog((int) $data['tour_log_id'], (int) $data['departure_id']);
+        if ($timelineError) {
+            $this->cleanupUploadedPhotos($photos);
+            $_SESSION['old_input'] = $_POST;
+            setFlash('error', $timelineError);
+            return redirect('hdv/nhat-ky-tour/create?departure_id=' . (int) $data['departure_id']);
         }
 
         $dateError = $this->validateDiaryDateForDeparture($selectedDeparture, (string) $data['diary_date']);
@@ -318,6 +357,7 @@ class DiaryController extends Controller
         }
 
         $photos = !empty($diary['photos']) ? explode(',', $diary['photos']) : [];
+        $timelineLogs = $this->getTimelineLogsForDepartures($departures);
         $title = 'Chỉnh sửa nhật ký tour';
 
         return view('hdv.diaries.edit', compact(
@@ -327,7 +367,8 @@ class DiaryController extends Controller
             'allHdv',
             'diary',
             'departures',
-            'photos'
+            'photos',
+            'timelineLogs'
         ));
     }
 
@@ -364,6 +405,7 @@ class DiaryController extends Controller
 
         $data = [
             'departure_id' => $_POST['departure_id'],
+            'tour_log_id'  => (int) ($_POST['tour_log_id'] ?? 0),
             'title'        => trim($_POST['title']),
             'content'      => trim($_POST['content']),
             'diary_date'   => $_POST['diary_date'],
@@ -393,6 +435,14 @@ class DiaryController extends Controller
             $this->cleanupUploadedPhotos($newPhotos);
             $_SESSION['old_input'] = $_POST;
             setFlash('error', 'Bạn chỉ có thể gắn nhật ký vào chuyến được phân công.');
+            return redirect('hdv/nhat-ky-tour/edit/' . $id);
+        }
+
+        $timelineError = $this->validateTimelineLog((int) $data['tour_log_id'], (int) $data['departure_id']);
+        if ($timelineError) {
+            $this->cleanupUploadedPhotos($newPhotos);
+            $_SESSION['old_input'] = $_POST;
+            setFlash('error', $timelineError);
             return redirect('hdv/nhat-ky-tour/edit/' . $id);
         }
 

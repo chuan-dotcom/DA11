@@ -14,8 +14,9 @@ class TourLog extends Model
     public function getByDepartureId($departureId)
     {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('tl.*')
+        $stmt->select('tl.*', 'td.id AS diary_id', 'td.title AS diary_title')
             ->from('tour_logs', 'tl')
+            ->leftJoin('tl', 'tour_diaries', 'td', 'td.tour_log_id = tl.id')
             ->where('tl.departure_id = :departure_id')
             ->setParameter('departure_id', (int) $departureId)
             ->orderBy('tl.log_date', 'ASC')

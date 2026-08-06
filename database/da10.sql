@@ -276,6 +276,7 @@ INSERT INTO `tour_categories` (`id`, `name`, `description`) VALUES
 CREATE TABLE `tour_diaries` (
   `id` int NOT NULL,
   `departure_id` int NOT NULL,
+  `tour_log_id` int DEFAULT NULL,
   `created_by_hdv_id` int DEFAULT NULL,
   `title` varchar(255) NOT NULL,
   `content` text NOT NULL,
@@ -424,6 +425,7 @@ ALTER TABLE `tour_categories`
 ALTER TABLE `tour_diaries`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_departure_id` (`departure_id`),
+  ADD KEY `idx_tour_log_id` (`tour_log_id`),
   ADD KEY `idx_diary_date` (`diary_date`),
   ADD KEY `idx_created_by_hdv_id` (`created_by_hdv_id`);
 
@@ -560,7 +562,8 @@ ALTER TABLE `tours`
 -- Constraints for table `tour_diaries`
 --
 ALTER TABLE `tour_diaries`
-  ADD CONSTRAINT `tour_diaries_ibfk_1` FOREIGN KEY (`departure_id`) REFERENCES `departures` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `tour_diaries_ibfk_1` FOREIGN KEY (`departure_id`) REFERENCES `departures` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_tour_diaries_tour_log` FOREIGN KEY (`tour_log_id`) REFERENCES `tour_logs` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `tour_logs`

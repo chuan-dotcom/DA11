@@ -42,6 +42,19 @@
                 <div id="diary-date-help" class="form-text">Chọn chuyến để xác định ngày hợp lệ.</div>
             </div>
 
+            <div class="col-12">
+                <label class="form-label fw-bold">Liên kết mốc hoạt động <span class="text-muted fw-normal">(không bắt buộc)</span></label>
+                <select name="tour_log_id" id="diary-tour-log" class="form-select">
+                    <option value="">-- Chọn hoạt động trong timeline --</option>
+                    @foreach($timelineLogs as $log)
+                        <option value="{{ $log['id'] }}" data-departure-id="{{ $log['departure_id'] }}" data-log-date="{{ date('Y-m-d', strtotime($log['log_date'])) }}" {{ (int) old('tour_log_id', 0) === (int) $log['id'] ? 'selected' : '' }}>
+                            {{ date('d/m/Y H:i', strtotime($log['log_date'])) }} — {{ $log['title'] }}@if(!empty($log['location'])) ({{ $log['location'] }}) @endif
+                        </option>
+                    @endforeach
+                </select>
+                <div class="form-text">Chọn mốc để liên kết nhật ký này với hoạt động thực tế của chuyến đi.</div>
+            </div>
+
             @if(!empty($selectedDeparture))
                 <div class="col-12">
                     <div class="alert alert-info mb-0">
@@ -97,6 +110,20 @@
         const departureSelect = document.getElementById('diary-departure');
         const diaryDate = document.getElementById('diary-date');
         const dateHelp = document.getElementById('diary-date-help');
+        const timelineSelect = document.getElementById('diary-tour-log');
+
+        function updateTimelineOptions() {
+            const departureId = departureSelect.value;
+            Array.from(timelineSelect.options).forEach(function (option, index) {
+                if (index === 0) return;
+                const belongsToDeparture = option.dataset.departureId === departureId;
+                option.hidden = !belongsToDeparture;
+                option.disabled = !belongsToDeparture;
+            });
+            if (timelineSelect.selectedIndex > 0 && timelineSelect.options[timelineSelect.selectedIndex].disabled) {
+                timelineSelect.value = '';
+            }
+        }
 
         function updateDiaryDateRange(resetDate) {
             const option = departureSelect.options[departureSelect.selectedIndex];
@@ -123,8 +150,14 @@
 
         departureSelect.addEventListener('change', function () {
             updateDiaryDateRange(true);
+            updateTimelineOptions();
+        });
+        timelineSelect.addEventListener('change', function () {
+            const option = timelineSelect.options[timelineSelect.selectedIndex];
+            if (option && option.dataset.logDate) diaryDate.value = option.dataset.logDate;
         });
         updateDiaryDateRange(false);
+        updateTimelineOptions();
     })();
 </script>
 

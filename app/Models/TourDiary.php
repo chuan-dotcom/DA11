@@ -11,6 +11,7 @@ class TourDiary extends Model
         parent::__construct();
         $this->ensureTableExists();
         $this->ensureAuditColumns();
+        $this->ensureTimelineLinkColumn();
     }
 
     private function ensureTableExists()
@@ -25,6 +26,7 @@ class TourDiary extends Model
                     CREATE TABLE tour_diaries (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         departure_id INT NOT NULL,
+                        tour_log_id INT NULL,
                         title VARCHAR(255) NOT NULL,
                         content TEXT NOT NULL,
                         diary_date DATE NOT NULL,
@@ -34,6 +36,7 @@ class TourDiary extends Model
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         INDEX idx_departure_id (departure_id),
+                        INDEX idx_tour_log_id (tour_log_id),
                         INDEX idx_diary_date (diary_date),
                         FOREIGN KEY (departure_id) REFERENCES departures(id) ON DELETE CASCADE
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
@@ -67,6 +70,22 @@ class TourDiary extends Model
                 $this->connection->executeStatement(
                     "ALTER TABLE tour_diaries ADD INDEX idx_created_by_hdv_id (created_by_hdv_id)"
                 );
+            }
+        } catch (\Throwable $e) {
+        }
+    }
+
+    private function ensureTimelineLinkColumn()
+    {
+        try {
+            $column = $this->connection->fetchAssociative("SHOW COLUMNS FROM tour_diaries LIKE 'tour_log_id'");
+            if (!$column) {
+                $this->connection->executeStatement('ALTER TABLE tour_diaries ADD COLUMN tour_log_id INT NULL AFTER departure_id');
+            }
+
+            $index = $this->connection->fetchAssociative("SHOW INDEX FROM tour_diaries WHERE Key_name = 'idx_tour_log_id'");
+            if (!$index) {
+                $this->connection->executeStatement('ALTER TABLE tour_diaries ADD INDEX idx_tour_log_id (tour_log_id)');
             }
         } catch (\Throwable $e) {
         }
@@ -169,6 +188,7 @@ class TourDiary extends Model
 
         return $this->connection->insert('tour_diaries', [
             'departure_id' => (int) $data['departure_id'],
+            'tour_log_id'  => !empty($data['tour_log_id']) ? (int) $data['tour_log_id'] : null,
             'created_by_hdv_id' => !empty($data['created_by_hdv_id']) ? (int) $data['created_by_hdv_id'] : null,
             'title'        => $data['title'],
             'content'      => $data['content'],
@@ -208,6 +228,7 @@ class TourDiary extends Model
 
         $updateData = [
             'departure_id' => (int) $data['departure_id'],
+            'tour_log_id'  => !empty($data['tour_log_id']) ? (int) $data['tour_log_id'] : null,
             'title'        => $data['title'],
             'content'      => $data['content'],
             'diary_date'   => $data['diary_date'],
