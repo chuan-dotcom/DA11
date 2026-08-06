@@ -64,6 +64,33 @@
                     <th>Ngày khởi hành</th>
                     <td>{{ $booking['booking_date'] }}</td>
                 </tr>
+                @php
+                    $endDate = null;
+                    $start = !empty($booking['booking_date']) ? $booking['booking_date'] : null;
+                    $duration = !empty($booking['tour_duration']) ? (int)$booking['tour_duration'] : 0;
+                    if ($start && $duration > 0) {
+                        $ts = strtotime($start);
+                        if ($ts !== false) {
+                            $endTs = strtotime('+' . ($duration - 1) . ' days', $ts);
+                            $endDate = date('d/m/Y', $endTs);
+                        }
+                    }
+                @endphp
+                <tr>
+                    <th>Ngày kết thúc</th>
+                    <td>
+                        @if($endDate)
+                            <i class="bi bi-calendar-check text-success me-1"></i>
+                            <strong>{{ $endDate }}</strong>
+                            <small class="text-muted ms-2">
+                                ({{ $duration }} ngày {{ $duration >= 2 ? ($duration - 1) . ' đêm' : '1 ngày' }}
+                                @if(!empty($booking['tour_duration'])) · theo thời lượng tour @endif)
+                            </small>
+                        @else
+                            <span class="text-muted">Chưa xác định</span>
+                        @endif
+                    </td>
+                </tr>
                 <tr>
                     <th>Tổng tiền</th>
                     <td><strong class="text-danger">{{ number_format($booking['total_price']) }} VNĐ</strong></td>

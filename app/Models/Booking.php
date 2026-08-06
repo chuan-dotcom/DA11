@@ -83,6 +83,7 @@ class Booking extends Model
                 't.name AS tour_name',
                 't.location AS tour_location',
                 't.price',
+                't.duration AS tour_duration',
                 'd.meeting_point AS departure_meeting_point',
                 'd.departure_date AS departure_date_info'
             )
