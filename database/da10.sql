@@ -318,7 +318,15 @@ INSERT INTO `tour_logs` (`id`, `departure_id`, `title`, `content`, `log_date`, `
 (1, 8, 'Tập trung và đón đoàn', 'Hướng dẫn viên điểm danh, kiểm tra hành lý và phổ biến quy định an toàn trước khi khởi hành.', '2026-08-08 06:00:00', '8B ngách 46 ngõ 1 Bùi Xương Trạch', 'Nắng nhẹ', 'Sẵn sàng khởi hành', NULL, 1, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
 (2, 8, 'Khởi hành đến Cà Mau', 'Đoàn bắt đầu di chuyển theo lịch trình. Hướng dẫn viên giới thiệu chương trình tour và các điểm dừng.', '2026-08-08 06:30:00', 'Điểm tập trung', 'Nắng nhẹ', 'Đúng kế hoạch', NULL, 1, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
 (3, 8, 'Tham quan Đất Mũi Cà Mau', 'Đoàn tham quan cột mốc tọa độ quốc gia, chụp ảnh lưu niệm và nghe thuyết minh về hệ sinh thái rừng ngập mặn.', '2026-08-09 09:00:00', 'Khu du lịch Đất Mũi, Cà Mau', 'Có mây', 'Hào hứng', NULL, 1, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
-(4, 8, 'Kết thúc tour và tiễn đoàn', 'Tổng kết hành trình, kiểm tra đầy đủ hành lý và cảm ơn đoàn khách trước khi chia tay.', '2026-08-10 20:00:00', 'Điểm trả khách', 'Mát mẻ', 'Hoàn thành', NULL, 1, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00');
+(4, 8, 'Kết thúc tour và tiễn đoàn', 'Tổng kết hành trình, kiểm tra đầy đủ hành lý và cảm ơn đoàn khách trước khi chia tay.', '2026-08-10 20:00:00', 'Điểm trả khách', 'Mát mẻ', 'Hoàn thành', NULL, 1, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
+(5, 7, 'Tập trung và đón đoàn', 'Hướng dẫn viên điểm danh, kiểm tra hành lý và phổ biến quy định an toàn trước khi khởi hành.', '2026-08-08 06:00:00', '8B ngách 46 ngõ 1 Bùi Xương Trạch', 'Nắng nhẹ', 'Sẵn sàng khởi hành', NULL, 2, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
+(6, 7, 'Khởi hành đi Hạ Long', 'Đoàn lên xe, bắt đầu hành trình tới Quảng Ninh. Hướng dẫn viên giới thiệu chương trình và các điểm dừng.', '2026-08-08 06:30:00', 'Điểm tập trung', 'Nắng nhẹ', 'Đúng kế hoạch', NULL, 2, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
+(7, 7, 'Tham quan Vịnh Hạ Long', 'Đoàn tham quan vịnh bằng du thuyền, ngắm cảnh các đảo đá vôi và trải nghiệm hoạt động theo chương trình.', '2026-08-09 09:00:00', 'Vịnh Hạ Long, Quảng Ninh', 'Có mây', 'Hào hứng', NULL, 2, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
+(8, 7, 'Kết thúc tour và tiễn đoàn', 'Tổng kết hành trình, kiểm tra đầy đủ hành lý và cảm ơn đoàn khách trước khi chia tay.', '2026-08-10 20:00:00', 'Điểm trả khách', 'Mát mẻ', 'Hoàn thành', NULL, 2, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
+(9, 9, 'Tập trung và đón đoàn', 'Hướng dẫn viên điểm danh, kiểm tra hành lý và phổ biến quy định an toàn trước khi khởi hành.', '2026-08-13 06:00:00', '8B ngách 46 ngõ 1 Bùi Xương Trạch', 'Nắng nhẹ', 'Sẵn sàng khởi hành', NULL, 1, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
+(10, 9, 'Khởi hành đi Hạ Long', 'Đoàn lên xe, bắt đầu hành trình tới Quảng Ninh. Hướng dẫn viên giới thiệu chương trình và các điểm dừng.', '2026-08-13 06:30:00', 'Điểm tập trung', 'Nắng nhẹ', 'Đúng kế hoạch', NULL, 1, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
+(11, 9, 'Tham quan Vịnh Hạ Long', 'Đoàn tham quan vịnh bằng du thuyền, ngắm cảnh các đảo đá vôi và trải nghiệm hoạt động theo chương trình.', '2026-08-14 09:00:00', 'Vịnh Hạ Long, Quảng Ninh', 'Có mây', 'Hào hứng', NULL, 1, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00'),
+(12, 9, 'Kết thúc tour và tiễn đoàn', 'Tổng kết hành trình, kiểm tra đầy đủ hành lý và cảm ơn đoàn khách trước khi chia tay.', '2026-08-15 20:00:00', 'Điểm trả khách', 'Mát mẻ', 'Hoàn thành', NULL, 1, 'published', '2026-08-07 04:00:00', '2026-08-07 04:00:00');
 
 -- --------------------------------------------------------
 
@@ -498,7 +506,7 @@ ALTER TABLE `tour_diaries`
 -- AUTO_INCREMENT for table `tour_logs`
 --
 ALTER TABLE `tour_logs`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`
