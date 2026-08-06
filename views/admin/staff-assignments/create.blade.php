@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', $title)
 
@@ -13,15 +13,6 @@
 
     <div class="card">
         <div class="card-body">
-            @if(!empty($returnDepartureId) && (int)$returnDepartureId > 0)
-                <div class="alert alert-info d-flex align-items-center gap-2">
-                    <i class="bi bi-info-circle-fill fs-5"></i>
-                    <div class="small">
-                        Bạn đang <strong>phân bổ nhân sự cho chuyến khởi hành #{{ (int)$returnDepartureId }}</strong>. Sau khi lưu sẽ tự động quay lại trang chi tiết đoàn.
-                        <a href="{{ route('admin/departures/edit/' . (int)$returnDepartureId) }}" class="text-decoration-none ms-2">(Quay lại ngay)</a>
-                    </div>
-                </div>
-            @endif
             <form action="{{ route('admin/staff-assignments/store') }}" method="POST" id="assignmentForm">
                 <div class="row">
                     <div class="col-md-6">
@@ -99,15 +90,9 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-save"></i> Lưu phân bổ
                 </button>
-                @if(!empty($returnDepartureId) && (int)$returnDepartureId > 0)
-                    <a href="{{ route('admin/departures/edit/' . (int)$returnDepartureId) }}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Quay lại đoàn
-                    </a>
-                @else
-                    <a href="{{ route('admin/staff-assignments') }}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Quay lại
-                    </a>
-                @endif
+                <a href="{{ route('admin/staff-assignments') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
             </form>
         </div>
     </div>

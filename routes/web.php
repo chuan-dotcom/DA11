@@ -121,6 +121,7 @@ $router->get('admin/bookings/show/(\d+)', AdminBookingController::class . '@show
 $router->get('admin/bookings/edit/(\d+)', AdminBookingController::class . '@edit');
 $router->post('admin/bookings/update/(\d+)', AdminBookingController::class . '@update');
 $router->get('admin/bookings/delete/(\d+)', AdminBookingController::class . '@delete');
+$router->get('admin/bookings/unassign-departure/(\d+)', AdminBookingController::class . '@unassignDeparture');
 
 // Admin: Staff / HDV
 $router->get('admin/staff', AdminStaffController::class . '@index');

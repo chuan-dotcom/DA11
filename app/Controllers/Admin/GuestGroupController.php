@@ -7,7 +7,6 @@ use App\Models\Booking;
 use App\Models\BookingGuest;
 use App\Models\Departure;
 use App\Models\Tour;
-use App\Models\StaffAssignment;
 
 class GuestGroupController extends Controller
 {
@@ -15,7 +14,6 @@ class GuestGroupController extends Controller
     private $modelBookingGuest;
     private $modelDeparture;
     private $modelTour;
-    private $modelStaffAssignment;
 
     public function __construct()
     {
@@ -23,7 +21,6 @@ class GuestGroupController extends Controller
         $this->modelBookingGuest = new BookingGuest();
         $this->modelDeparture = new Departure();
         $this->modelTour = new Tour();
-        $this->modelStaffAssignment = new StaffAssignment();
     }
 
     public function index()
@@ -43,41 +40,9 @@ class GuestGroupController extends Controller
         $tours = $this->modelTour->getAll();
         $guestGroups = $this->modelDeparture->getAllWithGuestStats($tourId, $status);
 
-        $assignedStaffByDeparture = [];
-        if (!empty($guestGroups)) {
-            foreach ($guestGroups as $g) {
-                $depId = (int)($g['id'] ?? 0);
-                if ($depId > 0) {
-                    $assigned = $this->modelStaffAssignment->getByDepartureId($depId);
-                    $hdvCount = 0;
-                    $hdvList = [];
-                    foreach ($assigned as $a) {
-                        $role = $a['role'] ?? 'other';
-                        if (in_array($role, ['lead_guide', 'assistant_guide', 'driver', 'other'], true)) {
-                            $hdvCount++;
-                            $name = trim((string)($a['staff_name'] ?? ''));
-                            if ($name === '' && !empty($a['staff_last_name']) && !empty($a['staff_first_name'])) {
-                                $name = trim($a['staff_last_name'] . ' ' . $a['staff_first_name']);
-                            }
-                            if ($name !== '') {
-                                $hdvList[] = $name;
-                            }
-                        }
-                    }
-                    $assignedStaffByDeparture[$depId] = [
-                        'count' => $hdvCount,
-                        'names' => $hdvList,
-                        'has_lead' => (bool) array_reduce($assigned, function ($carry, $item) {
-                            return $carry || ($item['role'] ?? '') === 'lead_guide';
-                        }, false),
-                    ];
-                }
-            }
-        }
-
         return view(
             'admin.guest-groups.index',
-            compact('title', 'guestGroups', 'tours', 'tourId', 'status', 'assignedStaffByDeparture')
+            compact('title', 'guestGroups', 'tours', 'tourId', 'status')
         );
     }
 
@@ -94,19 +59,6 @@ class GuestGroupController extends Controller
         $assignedBookings = $this->modelBooking->getByDepartureId($id);
         $availableBookings = $this->modelBooking->getAvailableForDeparture($guestGroup['tour_id']);
         $stats = $this->modelBooking->getAssignedStatsByDepartureId($id);
-
-        $assignedStaff = $this->modelStaffAssignment->getByDepartureId($id);
-        $hdvCount = 0;
-        $hasLeadGuide = false;
-        foreach ($assignedStaff as $a) {
-            $role = $a['role'] ?? 'other';
-            if (in_array($role, ['lead_guide', 'assistant_guide', 'driver', 'other'], true)) {
-                $hdvCount++;
-            }
-            if ($role === 'lead_guide') {
-                $hasLeadGuide = true;
-            }
-        }
 
         $selectedBookingId = isset($_GET['booking_id']) ? (int) $_GET['booking_id'] : 0;
         $selectedBooking = null;
@@ -139,7 +91,7 @@ class GuestGroupController extends Controller
 
         return view(
             'admin.guest-groups.show',
-            compact('title', 'guestGroup', 'assignedBookings', 'availableBookings', 'stats', 'selectedBookingId', 'selectedBooking', 'bookingGuests', 'bookingGuestStats', 'assignedStaff', 'hdvCount', 'hasLeadGuide')
+            compact('title', 'guestGroup', 'assignedBookings', 'availableBookings', 'stats', 'selectedBookingId', 'selectedBooking', 'bookingGuests', 'bookingGuestStats')
         );
     }
 

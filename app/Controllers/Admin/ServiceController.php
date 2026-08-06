@@ -57,14 +57,10 @@ class ServiceController extends Controller
         $preTourId      = $_GET['tour_id']      ?? null;
         $preDepartureId = $_GET['departure_id'] ?? null;
         $preQty         = $_GET['quantity']     ?? null;
-        $returnDepartureId = null;
-        if ($preDepartureId !== null && trim((string)$preDepartureId) !== '') {
-            $returnDepartureId = (int)$preDepartureId;
-        }
 
         return view(
             'admin.services.create',
-            compact('title', 'tours', 'departures', 'preTourId', 'preDepartureId', 'preQty', 'returnDepartureId')
+            compact('title', 'tours', 'departures', 'preTourId', 'preDepartureId', 'preQty')
         );
     }
 
@@ -147,8 +143,8 @@ class ServiceController extends Controller
             'Thêm dịch vụ đoàn thành công!' . ($departureId ? ' (Đã gắn vào chuyến khởi hành)' : '')
         );
 
-        if ($departureId > 0) {
-            return redirect('admin/departures/edit/' . (int)$departureId);
+        if ($departureId) {
+            return redirect('admin/services?departure_id=' . $departureId);
         }
         return redirect('admin/services');
     }
@@ -171,7 +167,6 @@ class ServiceController extends Controller
         $departures = $this->modelDeparture->getAll();
 
         $selectedTypes = array_map('trim', explode(',', $service['service_types']));
-        $returnDepartureId = !empty($service['departure_id']) ? (int)$service['departure_id'] : null;
 
         return view(
             'admin.services.edit',
@@ -180,8 +175,7 @@ class ServiceController extends Controller
                 'service',
                 'tours',
                 'departures',
-                'selectedTypes',
-                'returnDepartureId'
+                'selectedTypes'
             )
         );
     }
@@ -260,8 +254,8 @@ class ServiceController extends Controller
             'Cập nhật dịch vụ đoàn thành công!' . ($departureId ? ' (Đã gắn vào chuyến khởi hành)' : '')
         );
 
-        if ($departureId > 0) {
-            return redirect('admin/departures/edit/' . (int)$departureId);
+        if ($departureId) {
+            return redirect('admin/services?departure_id=' . $departureId);
         }
         return redirect('admin/services');
     }
@@ -287,8 +281,8 @@ class ServiceController extends Controller
             'Xóa dịch vụ đoàn thành công!'
         );
 
-        if ($departureId > 0) {
-            return redirect('admin/departures/edit/' . (int)$departureId);
+        if ($departureId) {
+            return redirect('admin/services?departure_id=' . $departureId);
         }
         return redirect('admin/services');
     }

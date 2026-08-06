@@ -1,12 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', $title)
+@section('title', $title)                   
 
 @section('content')
 <div class="container mt-4">
     <h2 class="mb-4">{{ $title }}</h2>
 
-<<<<<<< HEAD
     <div class="card">
         <div class="card-body">
             <table class="table table-bordered">
@@ -35,6 +34,70 @@
                     <th>Khách hàng</th>
                     <td>{{ $booking['customer_name'] }}</td>
                 </tr>
+                @php
+                    $departureStatusMap = [
+                        'scheduled'   => ['Lên lịch', 'bg-primary'],
+                        'in_progress' => ['Đang diễn ra', 'bg-warning text-dark'],
+                        'completed'   => ['Hoàn thành', 'bg-success'],
+                        'cancelled'   => ['Đã hủy', 'bg-secondary'],
+                    ];
+                @endphp
+                @if(!empty($booking['departure_id']))
+                <tr>
+                    <th>Chuyến khởi hành</th>
+                    <td>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-inline-flex align-items-center flex-wrap gap-2">
+                                <i class="bi bi-calendar-week text-primary"></i>
+                                <span class="fw-semibold">
+                                    {{ !empty($booking['departure_group_name']) ? $booking['departure_group_name'] : ('Đoàn #' . (int)$booking['departure_id']) }}
+                                </span>
+                                @php
+                                    $ds = !empty($booking['departure_status']) ? $departureStatusMap[$booking['departure_status']] ?? null : null;
+                                @endphp
+                                @if($ds)
+                                    <span class="badge {{ $ds[1] }}">{{ $ds[0] }}</span>
+                                @endif
+                            </div>
+                            <div class="small text-muted">
+                                @if(!empty($booking['departure_date_info']))
+                                    <i class="bi bi-calendar me-1"></i>
+                                    Khởi hành: {{ date('d/m/Y', strtotime($booking['departure_date_info'])) }}
+                                @endif
+                                @if(!empty($booking['departure_return_date']) && (!empty($booking['departure_date_info']) && $booking['departure_return_date'] !== $booking['departure_date_info']))
+                                    <span class="mx-2">·</span>
+                                    Trở về: {{ date('d/m/Y', strtotime($booking['departure_return_date'])) }}
+                                @endif
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{{ route('admin/departures/edit/' . (int)$booking['departure_id']) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>Mở chi tiết đoàn
+                                </a>
+                                <a href="{{ route('admin/guest-groups/show/' . (int)$booking['departure_id']) }}" class="btn btn-sm btn-outline-dark">
+                                    <i class="bi bi-people me-1"></i>Danh sách khách đoàn
+                                </a>
+                                <a href="{{ route('admin/bookings/unassign-departure/' . (int)$booking['id']) }}"
+                                   class="btn btn-sm btn-outline-warning"
+                                   onclick="return confirm('Gỡ Booking này ra khỏi chuyến khởi hành hiện tại?')">
+                                    <i class="bi bi-x-circle me-1"></i>Gỡ khỏi đoàn
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                @else
+                <tr>
+                    <th>Chuyến khởi hành</th>
+                    <td>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <span class="text-muted">Chưa gắn vào đoàn nào.</span>
+                            <a href="{{ route('admin/guest-groups/show/' . (int)$booking['tour_id']) }}" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-link-45deg me-1"></i>Gắn vào đoàn cùng tour
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                @endif
                 <tr>
                     <th>Email</th>
                     <td>{{ $booking['customer_email'] }}</td>
@@ -43,11 +106,17 @@
                     <th>Số điện thoại</th>
                     <td>{{ $booking['customer_phone'] }}</td>
                 </tr>
-                @if(!empty($booking['pickup_address']))
+                @php
+                    $pickup = !empty($booking['pickup_address']) ? $booking['pickup_address'] : (!empty($booking['departure_meeting_point']) ? $booking['departure_meeting_point'] : null);
+                @endphp
+                @if(!empty($pickup))
                 <tr>
                     <th>Địa chỉ đón khách hàng</th>
                     <td>
-                        <i class="bi bi-geo text-primary me-1"></i>{{ $booking['pickup_address'] }}
+                        <i class="bi bi-geo text-primary me-1"></i>{{ $pickup }}
+                        @if(!empty($booking['pickup_address']) && !empty($booking['departure_meeting_point']) && $booking['pickup_address'] !== $booking['departure_meeting_point'])
+                            <div class="mt-1"><small class="text-muted">Điểm tập kết đoàn: {{ $booking['departure_meeting_point'] }}</small></div>
+                        @endif
                     </td>
                 </tr>
                 @endif
@@ -108,6 +177,12 @@
                         @endphp
                     </td>
                 </tr>
+                @if(!empty($booking['departure_meeting_point']) && empty($booking['pickup_address']))
+                <tr>
+                    <th>Điểm tập kết (đoàn)</th>
+                    <td>{{ $booking['departure_meeting_point'] }}</td>
+                </tr>
+                @endif
                 <tr>
                     <th>Ghi chú</th>
                     <td>{!! !empty($booking['note']) ? nl2br(e($booking['note'])) : 'Không có ghi chú' !!}</td>
@@ -117,106 +192,9 @@
                     <td>{{ $booking['created_at'] }}</td>
                 </tr>
             </table>
-=======
-    @if(isset($_SESSION['flash']['success']))
-        <div class="alert alert-success py-2 mb-3">{{ $_SESSION['flash']['success'] }}</div>
-        @php unset($_SESSION['flash']['success']); @endphp
-    @endif
-    @if(isset($_SESSION['flash']['error']))
-        <div class="alert alert-danger py-2 mb-3">{{ $_SESSION['flash']['error'] }}</div>
-        @php unset($_SESSION['flash']['error']); @endphp
-    @endif
->>>>>>> aa059c0a460dbe3ab4b1a8320f08f6d7fe5b043c
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="d-flex gap-2 mb-3">
-                <a href="{{ route('admin/bookings') }}" class="btn btn-sm btn-secondary">
-                    <i class="bi bi-arrow-left me-1"></i> Quay lại
-                </a>
-                <a href="{{ route('admin/bookings/edit/' . $booking['id']) }}" class="btn btn-sm btn-warning">
-                    <i class="bi bi-pencil me-1"></i> Sửa booking
-                </a>
-                <a href="{{ route('admin/bookings/delete/' . $booking['id']) }}"
-                   class="btn btn-sm btn-danger ms-auto"
-                   onclick="return confirm('Bạn có chắc muốn xóa booking này?')">
-                    <i class="bi bi-trash me-1"></i> Xóa
-                </a>
-            </div>
-
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="card border-0 bg-light h-100">
-                        <div class="card-body">
-                            <h5 class="mb-3">
-                                <i class="bi bi-person-badge me-2 text-primary"></i> Thông tin khách hàng
-                            </h5>
-                            <dl class="row mb-0">
-                                <dt class="col-sm-4 text-muted">ID Booking</dt>
-                                <dd class="col-sm-8 fw-semibold">#{{ $booking['id'] }}</dd>
-
-                                <dt class="col-sm-4 text-muted">Họ tên</dt>
-                                <dd class="col-sm-8">{{ $booking['customer_name'] ?? '-' }}</dd>
-
-                                <dt class="col-sm-4 text-muted">Email</dt>
-                                <dd class="col-sm-8">{{ $booking['customer_email'] ?? '-' }}</dd>
-
-                                <dt class="col-sm-4 text-muted">Điện thoại</dt>
-                                <dd class="col-sm-8">{{ $booking['customer_phone'] ?? '-' }}</dd>
-
-                                <dt class="col-sm-4 text-muted">Ngày đặt</dt>
-                                <dd class="col-sm-8">{{ !empty($booking['booking_date']) ? date('d/m/Y', strtotime($booking['booking_date'])) : '-' }}</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card border-0 bg-light h-100">
-                        <div class="card-body">
-                            <h5 class="mb-3">
-                                <i class="bi bi-bag-check me-2 text-primary"></i> Thông tin tour
-                            </h5>
-                            <dl class="row mb-0">
-                                <dt class="col-sm-4 text-muted">Tour</dt>
-                                <dd class="col-sm-8 fw-semibold">{{ $booking['tour_name'] ?? 'N/A' }}</dd>
-
-                                <dt class="col-sm-4 text-muted">Số người</dt>
-                                <dd class="col-sm-8">{{ $booking['num_people'] ?? 0 }} người</dd>
-
-                                <dt class="col-sm-4 text-muted">Tổng tiền</dt>
-                                <dd class="col-sm-8 text-primary fw-bold fs-5">{{ !empty($booking['total_price']) ? number_format($booking['total_price'], 0, ',', '.') . ' ₫' : '0 ₫' }}</dd>
-
-                                <dt class="col-sm-4 text-muted">Trạng thái</dt>
-                                <dd class="col-sm-8">
-                                    @php
-                                        $statusInt = (int) ($booking['status'] ?? 0);
-                                        $statusMeta = match($statusInt) {
-                                            1 => ['text' => 'Đã xác nhận', 'class' => 'bg-success'],
-                                            2 => ['text' => 'Đã hủy', 'class' => 'bg-danger'],
-                                            default => ['text' => 'Chờ xác nhận', 'class' => 'bg-warning text-dark'],
-                                        };
-                                    @endphp
-                                    <span class="badge {{ $statusMeta['class'] }} fs-6 px-3 py-2">{{ $statusMeta['text'] }}</span>
-                                </dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-
-                @if(!empty($booking['note']))
-                <div class="col-md-12">
-                    <div class="card border-0 bg-light">
-                        <div class="card-body">
-                            <h5 class="mb-2">
-                                <i class="bi bi-sticky me-2 text-primary"></i> Ghi chú
-                            </h5>
-                            <div class="text-muted">{{ nl2br(e($booking['note'])) }}</div>
-                        </div>
-                    </div>
-                </div>
-                @endif
-            </div>
+            <a href="{{ route('admin/bookings/edit/' . $booking['id']) }}" class="btn btn-warning">Sửa</a>
+            <a href="{{ route('admin/bookings') }}" class="btn btn-secondary">Quay lại</a>
         </div>
     </div>
 </div>

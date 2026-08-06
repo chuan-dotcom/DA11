@@ -17,7 +17,6 @@ class User extends Model
         return $stmt->fetchAllAssociative();
     }
 
-    
     public function findById($id)
     {
         $stmt = $this->connection->createQueryBuilder();

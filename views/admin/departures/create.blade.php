@@ -10,43 +10,10 @@
         <div class="alert alert-danger">{{ $_SESSION['flash']['error'] }}</div>
         @php unset($_SESSION['flash']['error']); @endphp
     @endif
-    @if(isset($prefillFromBooking) && !empty($prefillFromBooking))
-        <div class="alert alert-primary d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
-            <span>
-                <i class="bi bi-info-square-fill me-1"></i>
-                Bạn đang <strong>tạo chuyến khởi hành mới từ Booking #{{ (int)$prefillFromBooking['id'] }}</strong> ({{ !empty($prefillFromBooking['customer_name']) ? e($prefillFromBooking['customer_name']) : 'Khách lẻ' }}
-                @if(!empty($prefillFromBooking['customer_phone'])) · {{ e($prefillFromBooking['customer_phone']) }}@endif).
-                Các trường dưới đây <strong>đã được tự điền thông tin từ booking</strong>; bạn có thể chỉnh sửa tùy ý.
-                Sau khi lưu, hệ thống sẽ <strong>tự gắn booking này vào đoàn mới tạo</strong>.
-            </span>
-            <a href="{{ route('admin/bookings/show/' . (int)$prefillFromBooking['id']) }}" class="btn btn-sm btn-outline-primary" title="Mở chi tiết booking nguồn">
-                <i class="bi bi-arrow-left me-1"></i>Xem Booking nguồn
-            </a>
-        </div>
-    @elseif(isset($preTourId) && (int)$preTourId > 0)
-        @php
-            $preTour = null;
-            $preTourIdInt = (int)$preTourId;
-            foreach ($tours as $t) {
-                if ((int)$t['id'] === $preTourIdInt) { $preTour = $t; break; }
-            }
-        @endphp
-        @if($preTour)
-            <div class="alert alert-info d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
-                <span><i class="bi bi-info-circle-fill me-1"></i>Bạn đang <strong>tạo chuyến khởi hành mới cho tour: {{ $preTour['name'] }}</strong> (chuyển hướng từ trang tạo Booking). Sau khi lưu, hãy quay lại tab Booking để gắn chuyến vừa tạo vào booking.</span>
-                <a href="{{ route('admin/bookings/create') }}?tour_id={{ $preTourIdInt }}" class="btn btn-sm btn-outline-info" title="Quay lại tab tạo booking cho tour này">
-                    <i class="bi bi-arrow-left me-1"></i>Quay lại tạo Booking
-                </a>
-            </div>
-        @endif
-    @endif
 
     <div class="card">
         <div class="card-body">
             <form action="{{ route('admin/departures/store') }}" method="POST">
-                @if(isset($sourceBookingId) && (int)$sourceBookingId > 0)
-                    <input type="hidden" name="source_booking_id" value="{{ (int)$sourceBookingId }}">
-                @endif
                 <div class="mb-3 p-3 rounded-3 bg-light border d-flex flex-column gap-2">
                     <label class="form-label fw-semibold mb-1 d-flex align-items-center gap-2">
                         <i class="bi bi-magic text-primary"></i> Tự điền từ khách hàng đã đặt tour
@@ -101,17 +68,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="group_name" class="form-label">Tên đoàn</label>
-                            @php
-                                $groupNameVal = isset($_POST['group_name']) ? $_POST['group_name'] : '';
-                                if ($groupNameVal === '' && isset($prefillFromBooking) && !empty($prefillFromBooking)) {
-                                    $parts = [];
-                                    if (!empty($prefillFromBooking['customer_name'])) { $parts[] = trim($prefillFromBooking['customer_name']); }
-                                    if (!empty($prefillFromBooking['tour_name'])) { $parts[] = trim($prefillFromBooking['tour_name']); }
-                                    if (!empty($prefillFromBooking['booking_date'])) { $parts[] = date('d/m/Y', strtotime($prefillFromBooking['booking_date'])); }
-                                    $groupNameVal = implode(' - ', array_filter($parts));
-                                }
-                            @endphp
-                            <input type="text" class="form-control" id="group_name" name="group_name" placeholder="Ví dụ: Nguyễn Anh Tài - Du lịch Cáp Nhĩ Tân" value="{{ htmlentities($groupNameVal) }}">
+                            <input type="text" class="form-control" id="group_name" name="group_name" placeholder="Ví dụ: Nguyễn Anh Tài - Du lịch Cáp Nhĩ Tân">
                             <div class="form-text">Để trống nếu bạn muốn hệ thống tự sinh tên đoàn theo tour và ngày khởi hành.</div>
                         </div>
                         <div class="mb-3">
@@ -119,59 +76,27 @@
                             <select class="form-select" id="tour_id" name="tour_id" required>
                                 <option value="">-- Chọn tour --</option>
                                 @foreach($tours as $tour)
-                                    @php
-                                        $selected = '';
-                                        if (isset($_POST['tour_id'])) {
-                                            $selected = (int)$_POST['tour_id'] === (int)$tour['id'] ? 'selected' : '';
-                                        } elseif (isset($preTourId) && (int)$preTourId > 0) {
-                                            $selected = (int)$preTourId === (int)$tour['id'] ? 'selected' : '';
-                                        }
-                                    @endphp
-                                    <option value="{{ $tour['id'] }}" {{ $selected }}>{{ $tour['name'] }} ({{ $tour['duration'] }})</option>
+                                    <option value="{{ $tour['id'] }}">{{ $tour['name'] }} ({{ $tour['duration'] }})</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="departure_date" class="form-label">Ngày khởi hành <span class="text-danger">*</span></label>
-                            @php
-                                $depDateVal = isset($_POST['departure_date']) ? $_POST['departure_date'] : '';
-                                if ($depDateVal === '' && isset($prefillFromBooking) && !empty($prefillFromBooking) && !empty($prefillFromBooking['booking_date'])) {
-                                    $depDateVal = date('Y-m-d', strtotime($prefillFromBooking['booking_date']));
-                                }
-                                if ($depDateVal === '') {
-                                    $depDateVal = date('Y-m-d', strtotime('+1 week'));
-                                }
-                            @endphp
-                            <input type="date" class="form-control" id="departure_date" name="departure_date" required value="{{ $depDateVal }}">
+                            <input type="date" class="form-control" id="departure_date" name="departure_date" required value="{{ date('Y-m-d', strtotime('+1 week')) }}">
                         </div>
                         <div class="mb-3">
                             <label for="return_date" class="form-label">Ngày trở về</label>
-                            <input type="date" class="form-control" id="return_date" name="return_date" value="{{ isset($_POST['return_date']) ? $_POST['return_date'] : '' }}">
+                            <input type="date" class="form-control" id="return_date" name="return_date">
                         </div>
                         <div class="mb-3">
                             <label for="max_participants" class="form-label">Số khách tối đa</label>
-                            @php
-                                $maxPaxVal = isset($_POST['max_participants']) && $_POST['max_participants'] !== '' ? (int)$_POST['max_participants'] : null;
-                                if ($maxPaxVal === null && isset($prefillFromBooking) && !empty($prefillFromBooking) && (int)$prefillFromBooking['num_people'] > 0) {
-                                    $maxPaxVal = max(1, (int)$prefillFromBooking['num_people']);
-                                }
-                                if ($maxPaxVal === null) {
-                                    $maxPaxVal = 20;
-                                }
-                            @endphp
-                            <input type="number" class="form-control" id="max_participants" name="max_participants" min="0" value="{{ $maxPaxVal }}">
+                            <input type="number" class="form-control" id="max_participants" name="max_participants" min="0" value="20">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="meeting_point" class="form-label">Điểm tập trung</label>
-                            @php
-                                $meetingVal = isset($_POST['meeting_point']) ? $_POST['meeting_point'] : '';
-                                if ($meetingVal === '' && isset($prefillFromBooking) && !empty($prefillFromBooking) && !empty($prefillFromBooking['pickup_address'])) {
-                                    $meetingVal = $prefillFromBooking['pickup_address'];
-                                }
-                            @endphp
-                            <input type="text" class="form-control" id="meeting_point" name="meeting_point" placeholder="Ví dụ: Sân bay Tân Sơn Nhất" value="{{ htmlentities($meetingVal) }}">
+                            <input type="text" class="form-control" id="meeting_point" name="meeting_point" placeholder="Ví dụ: Sân bay Tân Sơn Nhất">
                             <div class="form-text"><i class="bi bi-info-circle text-primary me-1"></i>Sẽ tự động gắn làm <strong>Địa chỉ đón khách hàng</strong> cho booking được thêm vào đoàn này.</div>
                         </div>
                         <div class="mb-3">

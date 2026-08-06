@@ -47,48 +47,7 @@ class DepartureController extends Controller
         $title = 'Thêm chuyến khởi hành mới';
         $tours = $this->modelTour->getAll();
         $bookingSuggestions = $this->modelBooking->getConfirmedWithTourSummary();
-        $preTourId = isset($_GET['tour_id']) ? (int)$_GET['tour_id'] : 0;
-        if ($preTourId < 0) {
-            $preTourId = 0;
-        }
-        $sourceBookingId = isset($_GET['booking_id']) ? (int)$_GET['booking_id'] : 0;
-        $prefillFromBooking = null;
-        if ($sourceBookingId > 0) {
-            try {
-                $b = $this->modelBooking->findById($sourceBookingId);
-                if ($b) {
-                    $tourName = null;
-                    foreach ($tours as $t) {
-                        if ((int)$t['id'] === (int)$b['tour_id']) {
-                            $tourName = $t['name'];
-                            break;
-                        }
-                    }
-                    if ($preTourId <= 0 && (int)$b['tour_id'] > 0) {
-                        $preTourId = (int)$b['tour_id'];
-                    }
-                    $prefillFromBooking = [
-                        'id'            => (int)$b['id'],
-                        'customer_name' => $b['customer_name'] ?? '',
-                        'customer_phone'=> $b['customer_phone'] ?? '',
-                        'num_people'    => (int)($b['num_people'] ?? 0),
-                        'booking_date'  => $b['booking_date'] ?? null,
-                        'pickup_address'=> $b['pickup_address'] ?? null,
-                        'tour_id'       => (int)$b['tour_id'],
-                        'tour_name'     => $tourName,
-                        'departure_id'  => (int)($b['departure_id'] ?? 0),
-                    ];
-                    if ((int)$prefillFromBooking['departure_id'] > 0) {
-                        $prefillFromBooking = null;
-                        $sourceBookingId = 0;
-                    }
-                }
-            } catch (\Throwable $e) {
-                $prefillFromBooking = null;
-                $sourceBookingId = 0;
-            }
-        }
-        return view('admin.departures.create', compact('title', 'tours', 'bookingSuggestions', 'preTourId', 'sourceBookingId', 'prefillFromBooking'));
+        return view('admin.departures.create', compact('title', 'tours', 'bookingSuggestions'));
     }
 
     public function store()
@@ -105,7 +64,6 @@ class DepartureController extends Controller
             'notes'           => $_POST['notes'] ?? null,
             'status'          => $_POST['status'] ?? 'scheduled',
         ];
-        $sourceBookingId = isset($_POST['source_booking_id']) ? (int)$_POST['source_booking_id'] : 0;
 
         $rules = [
             'tour_id'        => 'required|integer',
@@ -133,42 +91,8 @@ class DepartureController extends Controller
                 : null;
         }
 
-        if ($sourceBookingId > 0) {
-            $srcBooking = null;
-            try {
-                $srcBooking = $this->modelBooking->findById($sourceBookingId);
-            } catch (\Throwable $e) {
-                $srcBooking = null;
-            }
-            if (!$srcBooking) {
-                $sourceBookingId = 0;
-            } elseif ((int)($srcBooking['departure_id'] ?? 0) > 0) {
-                setFlash('warning', 'Booking #' . $sourceBookingId . ' đã thuộc đoàn #' . (int)$srcBooking['departure_id'] . ' từ trước; chỉ tạo chuyến mới, không gắn lại.');
-                $sourceBookingId = 0;
-            } elseif ((int)$srcBooking['tour_id'] !== (int)$data['tour_id']) {
-                setFlash('warning', 'Tour trong booking nguồn (#'. $sourceBookingId . ') không khớp với tour được chọn; chỉ tạo chuyến mới, không tự gắn.');
-                $sourceBookingId = 0;
-            }
-        }
-
         $this->modelDeparture->insert($data);
-        $newDepId = (int)$this->modelDeparture->getLastInsertId();
-        $msg = 'Thêm chuyến khởi hành thành công!';
-        if ($newDepId > 0 && $sourceBookingId > 0) {
-            try {
-                $this->modelBooking->assignToDeparture($sourceBookingId, $newDepId);
-                $msg .= ' (Đã tự gắn Booking #' . $sourceBookingId . ' vào đoàn mới #' . $newDepId . ')';
-            } catch (\Throwable $e) {
-                $msg .= ' (Lưu ý: không gắn được booking #' . $sourceBookingId . ' vào đoàn, vui lòng gắn thủ công)';
-            }
-        }
-        setFlash('success', $msg);
-        if ($newDepId > 0 && $sourceBookingId > 0) {
-            return redirect('admin/bookings/show/' . $sourceBookingId);
-        }
-        if ($newDepId > 0) {
-            return redirect('admin/departures/edit/' . $newDepId);
-        }
+        setFlash('success', 'Thêm chuyến khởi hành thành công!');
         return redirect('admin/departures');
     }
 
@@ -186,9 +110,8 @@ class DepartureController extends Controller
         $assignments = $this->modelAssignment->getByDepartureId($id);
         $bookingSuggestions = $this->modelBooking->getConfirmedWithTourSummary();
         $services = $this->modelService->getByDepartureId($id);
-        $bookings = $this->modelBooking->filter(null, $id, null);
 
-        return view('admin.departures.edit', compact('title', 'departure', 'tours', 'assignments', 'bookingSuggestions', 'services', 'bookings'));
+        return view('admin.departures.edit', compact('title', 'departure', 'tours', 'assignments', 'bookingSuggestions', 'services'));
     }
 
     public function update($id)

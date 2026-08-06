@@ -95,7 +95,6 @@
                         <th>Tên đoàn</th>
                         <th>Tour</th>
                         <th>Số khách</th>
-                        <th>Nhân sự/HDV</th>
                         <th>Khởi hành</th>
                         <th>Trạng thái</th>
                         <th>Thao tác</th>
@@ -104,7 +103,7 @@
                 <tbody>
                     @if(empty($guestGroups))
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">Chưa có đoàn tour nào phù hợp.</td>
+                            <td colspan="7" class="text-center text-muted py-4">Chưa có đoàn tour nào phù hợp.</td>
                         </tr>
                     @else
                         @foreach($guestGroups as $group)
@@ -117,7 +116,6 @@
                                 ];
                                 $statusInfo = $statusMap[$group['status']] ?? [$group['status'], 'bg-secondary'];
                                 $groupName = $group['group_name'] ?: ('Đoàn ' . ($group['tour_name'] ?? 'Tour #' . $group['tour_id']));
-                                $staffInfo = $assignedStaffByDeparture[(int)$group['id']] ?? ['count' => 0, 'names' => [], 'has_lead' => false];
                             @endphp
                             <tr>
                                 <td>#{{ $group['id'] }}</td>
@@ -130,37 +128,15 @@
                                         {{ (int) ($group['assigned_people'] ?? 0) }}/{{ (int) ($group['max_participants'] ?? 0) }}
                                     </span>
                                 </td>
-                                <td>
-                                    @if($staffInfo['count'] > 0)
-                                        @if($staffInfo['has_lead'])
-                                            <span class="badge bg-success text-white mini-badge me-1"><i class="bi bi-person-check-fill me-1"></i>Có HDV chính</span>
-                                        @else
-                                            <span class="badge bg-warning text-dark mini-badge me-1"><i class="bi bi-exclamation-triangle me-1"></i>Chưa có HDV chính</span>
-                                        @endif
-                                        <div class="small text-muted mt-1">{{ $staffInfo['count'] }} nhân sự
-                                            @if(!empty($staffInfo['names']))
-                                                · {{ implode(', ', array_slice($staffInfo['names'], 0, 2)) }}
-                                                @if(count($staffInfo['names']) > 2)
-                                                    +{{ count($staffInfo['names']) - 2 }}
-                                                @endif
-                                            @endif
-                                        </div>
-                                    @else
-                                        <span class="badge bg-danger text-white mini-badge"><i class="bi bi-person-x me-1"></i>Chưa phân công</span>
-                                    @endif
-                                </td>
                                 <td>{{ !empty($group['departure_date']) ? date('Y-m-d', strtotime($group['departure_date'])) : '-' }}</td>
                                 <td>
                                     <span class="badge mini-badge {{ $statusInfo[1] }}">{{ $statusInfo[0] }}</span>
                                 </td>
                                 <td class="text-nowrap">
-                                    <a href="{{ route('admin/staff-assignments/create') }}?departure_id={{ (int)$group['id'] }}" class="btn btn-sm btn-outline-info me-1" title="Phân công HDV & nhân sự cho đoàn này">
-                                        <i class="bi bi-person-plus"></i> Phân công HDV
-                                    </a>
-                                    <a href="{{ route('admin/guest-groups/print/' . $group['id']) }}" class="btn btn-sm btn-outline-secondary me-1" title="In danh sách" target="_blank">
+                                    <a href="{{ route('admin/guest-groups/print/' . $group['id']) }}" class="btn btn-sm btn-outline-secondary" title="In danh sách" target="_blank">
                                         <i class="bi bi-printer"></i>
                                     </a>
-                                    <a href="{{ route('admin/guest-groups/show/' . $group['id']) }}" class="btn btn-sm btn-primary me-1" title="Cập nhật">
+                                    <a href="{{ route('admin/guest-groups/show/' . $group['id']) }}" class="btn btn-sm btn-primary" title="Cập nhật">
                                         Cập nhật
                                     </a>
                                     <a href="{{ route('admin/departures/delete/' . $group['id']) }}"
