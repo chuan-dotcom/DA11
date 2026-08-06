@@ -23,6 +23,25 @@
     </li>
 </ul>
 
+@php
+    $assignmentBadgeClass = function (string $s): string {
+        return match($s) {
+            'confirmed' => 'bg-success',
+            'assigned'  => 'bg-primary',
+            'pending'   => 'bg-warning text-dark',
+            default     => 'bg-secondary',
+        };
+    };
+    $assignmentBadgeText = function (string $s): string {
+        return match($s) {
+            'confirmed' => 'Đã xác nhận',
+            'assigned'  => 'Đã phân bổ',
+            'pending'   => 'Chờ xác nhận',
+            default     => mb_convert_case($s, MB_CASE_TITLE, 'UTF-8'),
+        };
+    };
+@endphp
+
 @if($activeTab === 'danh-sach')
     <!-- TAB 1: DANH SÁCH TOUR (ĐÃ, ĐANG, SẼ TIẾN HÀNH) -->
     <div class="hdv-card">
@@ -63,16 +82,23 @@
                         @foreach($ongoingTours as $t)
                             <div class="col-md-6 col-lg-4">
                                 <div class="card h-100 border-success shadow-sm rounded-4 overflow-hidden">
-                                    <div class="card-header bg-success text-white fw-bold d-flex justify-content-between">
+                                    <div class="card-header bg-success text-white fw-bold d-flex justify-content-between gap-2 align-items-center">
                                         <span>#{{ $t['departure_id'] }} - {{ $t['tour_name'] }}</span>
-                                        <span class="badge bg-light text-success">Đang đi</span>
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <span class="badge bg-light text-success">Đang đi</span>
+                                            <span class="badge {{ $assignmentBadgeClass($t['assignment_status'] ?? 'assigned') }} border-0">
+                                                {{ $assignmentBadgeText($t['assignment_status'] ?? 'assigned') }}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="card-body">
+                                        <p class="card-text mb-1"><i class="bi bi-person-badge text-muted me-1"></i> <strong>Vai trò:</strong> {{ $t['hdv_role'] ? mb_convert_case($t['hdv_role'], MB_CASE_TITLE, 'UTF-8') : 'HDV' }}</p>
                                         <p class="card-text mb-1"><i class="bi bi-tags text-muted me-1"></i> <strong>Danh mục:</strong> {{ $t['category_name'] ?: 'Chưa phân loại' }}</p>
                                         <p class="card-text mb-1"><i class="bi bi-calendar3 text-muted me-1"></i> <strong>Khởi hành:</strong> {{ date('d/m/Y', strtotime($t['departure_date'])) }}</p>
+                                        <p class="card-text mb-1"><i class="bi bi-clock text-muted me-1"></i> <strong>Giờ tập trung:</strong> {{ $t['meeting_time'] ?: 'Chưa cập nhật' }}</p>
                                         <p class="card-text mb-1"><i class="bi bi-geo-alt text-muted me-1"></i> <strong>Điểm hẹn:</strong> {{ $t['meeting_point'] ?: 'Chưa cập nhật' }}</p>
                                         <p class="card-text mb-3"><i class="bi bi-truck text-muted me-1"></i> <strong>Xe:</strong> {{ $t['vehicle'] ?: 'Chưa gán' }}</p>
-                                        <a href="{{ route('hdv/dashboard?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="btn btn-sm btn-success w-100 fw-bold">
+                                        <a href="{{ route('hdv/dashboard') . '?tab=chi-tiet&departure_id=' . $t['departure_id'] }}" class="btn btn-sm btn-success w-100 fw-bold">
                                             <i class="bi bi-eye me-1"></i> Xem chi tiết
                                         </a>
                                     </div>
@@ -95,15 +121,21 @@
                         @foreach($upcomingTours as $t)
                             <div class="col-md-6 col-lg-4">
                                 <div class="card h-100 border-primary shadow-sm rounded-4 overflow-hidden">
-                                    <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between">
+                                    <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between gap-2 align-items-center">
                                         <span>#{{ $t['departure_id'] }} - {{ $t['tour_name'] }}</span>
-                                        <span class="badge bg-light text-primary">Sắp khởi hành</span>
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <span class="badge bg-light text-primary">Sắp khởi hành</span>
+                                            <span class="badge {{ $assignmentBadgeClass($t['assignment_status'] ?? 'assigned') }} border-0">
+                                                {{ $assignmentBadgeText($t['assignment_status'] ?? 'assigned') }}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="card-body">
+                                        <p class="card-text mb-1"><i class="bi bi-person-badge text-muted me-1"></i> <strong>Vai trò:</strong> {{ $t['hdv_role'] ? mb_convert_case($t['hdv_role'], MB_CASE_TITLE, 'UTF-8') : 'HDV' }}</p>
                                         <p class="card-text mb-1"><i class="bi bi-calendar3 text-muted me-1"></i> <strong>Khởi hành:</strong> {{ date('d/m/Y', strtotime($t['departure_date'])) }}</p>
                                         <p class="card-text mb-1"><i class="bi bi-clock text-muted me-1"></i> <strong>Giờ tập trung:</strong> {{ $t['meeting_time'] ?: 'Chưa cập nhật' }}</p>
                                         <p class="card-text mb-3"><i class="bi bi-geo-alt text-muted me-1"></i> <strong>Điểm hẹn:</strong> {{ $t['meeting_point'] ?: 'Chưa cập nhật' }}</p>
-                                        <a href="{{ route('hdv/dashboard?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="btn btn-sm btn-primary w-100 fw-bold">
+                                        <a href="{{ route('hdv/dashboard') . '?tab=chi-tiet&departure_id=' . $t['departure_id'] }}" class="btn btn-sm btn-primary w-100 fw-bold">
                                             <i class="bi bi-eye me-1"></i> Xem chi tiết
                                         </a>
                                     </div>
@@ -124,16 +156,27 @@
                 @else
                     <div class="row g-3">
                         @foreach($completedTours as $t)
+                            @php
+                                $isCancelled = ($t['departure_status'] ?? '') === 'cancelled';
+                            @endphp
                             <div class="col-md-6 col-lg-4">
-                                <div class="card h-100 border-secondary shadow-sm rounded-4 overflow-hidden">
-                                    <div class="card-header bg-secondary text-white fw-bold d-flex justify-content-between">
+                                <div class="card h-100 {{ $isCancelled ? 'border-danger' : 'border-secondary' }} shadow-sm rounded-4 overflow-hidden">
+                                    <div class="card-header {{ $isCancelled ? 'bg-danger' : 'bg-secondary' }} text-white fw-bold d-flex justify-content-between gap-2 align-items-center">
                                         <span>#{{ $t['departure_id'] }} - {{ $t['tour_name'] }}</span>
-                                        <span class="badge bg-light text-dark">Đã kết thúc</span>
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <span class="badge bg-light {{ $isCancelled ? 'text-danger' : 'text-dark' }}">
+                                                {{ $isCancelled ? 'Đã hủy' : 'Đã kết thúc' }}
+                                            </span>
+                                            <span class="badge {{ $assignmentBadgeClass($t['assignment_status'] ?? 'assigned') }} border-0">
+                                                {{ $assignmentBadgeText($t['assignment_status'] ?? 'assigned') }}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="card-body">
+                                        <p class="card-text mb-1"><i class="bi bi-person-badge text-muted me-1"></i> <strong>Vai trò:</strong> {{ $t['hdv_role'] ? mb_convert_case($t['hdv_role'], MB_CASE_TITLE, 'UTF-8') : 'HDV' }}</p>
                                         <p class="card-text mb-1"><i class="bi bi-calendar-check text-muted me-1"></i> <strong>Khởi hành:</strong> {{ date('d/m/Y', strtotime($t['departure_date'])) }}</p>
                                         <p class="card-text mb-3"><i class="bi bi-flag text-muted me-1"></i> <strong>Kết thúc:</strong> {{ $t['return_date'] ? date('d/m/Y', strtotime($t['return_date'])) : '-' }}</p>
-                                        <a href="{{ route('hdv/dashboard?tab=chi-tiet&departure_id=' . $t['departure_id']) }}" class="btn btn-sm btn-outline-secondary w-100 fw-bold">
+                                        <a href="{{ route('hdv/dashboard') . '?tab=chi-tiet&departure_id=' . $t['departure_id'] }}" class="btn btn-sm {{ $isCancelled ? 'btn-outline-danger' : 'btn-outline-secondary' }} w-100 fw-bold">
                                             <i class="bi bi-eye me-1"></i> Xem chi tiết
                                         </a>
                                     </div>
@@ -147,7 +190,7 @@
     </div>
 @else
     <!-- TAB 2: CHI TIẾT TOUR (MATCHING SCREENSHOT 1) -->
-    
+
     <!-- Departure selector if multiple assigned tours -->
     @if(count($assignedTours) > 1)
         <div class="card mb-3 border-0 shadow-sm rounded-4">
@@ -161,7 +204,7 @@
                         <select name="departure_id" class="form-select form-select-sm fw-semibold" onchange="this.form.submit()">
                             @foreach($assignedTours as $tour)
                                 <option value="{{ $tour['departure_id'] }}" {{ $selectedDepartureId == $tour['departure_id'] ? 'selected' : '' }}>
-                                    #{{ $tour['departure_id'] }} - {{ $tour['tour_name'] }} ({{ date('d/m/Y', strtotime($tour['departure_date'])) }})
+                                    #{{ $tour['departure_id'] }} - {{ $tour['tour_name'] }} ({{ date('d/m/Y', strtotime($tour['departure_date'])) }}) · {{ $assignmentBadgeText($tour['assignment_status'] ?? 'assigned') }}
                                 </option>
                             @endforeach
                         </select>
@@ -175,7 +218,14 @@
     <div class="hdv-card mb-4">
         <h4 class="fw-bold text-dark mb-1">Bảng Điều Khiển Hướng Dẫn Viên</h4>
         <p class="text-muted small mb-1">Quản lý thông tin tour và lịch trình hằng ngày</p>
-        <p class="text-muted small mb-3">Danh mục tour hiện tại: {{ $currentTourDetail['category_name'] ?? 'Chưa phân loại' }}</p>
+        <p class="text-muted small mb-3">
+            Danh mục tour hiện tại: {{ $currentTourDetail['category_name'] ?? 'Chưa phân loại' }}
+            @if(!empty($currentTourDetail))
+                · <span class="badge {{ $assignmentBadgeClass($currentTourDetail['assignment_status'] ?? 'assigned') }}">
+                    {{ $assignmentBadgeText($currentTourDetail['assignment_status'] ?? 'assigned') }}
+                </span>
+            @endif
+        </p>
         <div class="row g-3">
             <!-- Card 1: Số lượng khách -->
             <div class="col-md-4">
@@ -215,12 +265,60 @@
                         <div class="text-muted small">Tài xế</div>
                         <div class="fs-6 fw-bold text-dark">{{ $driverInfo['Hoten'] ?? '—' }}</div>
                         <div class="text-muted small">SĐT: {{ $driverInfo['Lienhe'] ?? '0912 345 678' }}</div>
-                        <div class="text-warning small" style="font-size: 0.8rem;">★ 4.8/5 (120 đánh giá)</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    @if(!empty($currentTourDetail))
+    <div class="hdv-card mb-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-info-circle text-primary fs-5"></i>
+            <h5 class="fw-bold mb-0">Thông tin phân bổ từ quản trị</h5>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <ul class="list-group list-group-flush border rounded-3">
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Chuyến khởi hành</span><strong>#{{ $currentTourDetail['departure_id'] }} · {{ $currentTourDetail['tour_name'] }}</strong></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Vai trò</span><strong>{{ $currentTourDetail['hdv_role'] ? mb_convert_case($currentTourDetail['hdv_role'], MB_CASE_TITLE, 'UTF-8') : 'HDV' }}</strong></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Trạng thái phân bổ</span><span class="badge {{ $assignmentBadgeClass($currentTourDetail['assignment_status'] ?? 'assigned') }}">{{ $assignmentBadgeText($currentTourDetail['assignment_status'] ?? 'assigned') }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Trạng thái chuyến đi</span><strong>{{ match($currentTourDetail['departure_status'] ?? '') {
+                        'scheduled' => 'Lên lịch',
+                        'in_progress' => 'Đang diễn ra',
+                        'completed' => 'Hoàn thành',
+                        'cancelled' => 'Đã hủy',
+                        default => '—',
+                    } }}</strong></li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-group list-group-flush border rounded-3">
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Ngày khởi hành</span><strong>{{ date('d/m/Y', strtotime($currentTourDetail['departure_date'])) }}</strong></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Ngày trở về</span><strong>{{ $currentTourDetail['return_date'] ? date('d/m/Y', strtotime($currentTourDetail['return_date'])) : '—' }}</strong></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Giờ tập trung</span><strong>{{ $currentTourDetail['meeting_time'] ?: '—' }}</strong></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Điểm hẹn</span><strong class="text-end">{{ $currentTourDetail['meeting_point'] ?: '—' }}</strong></li>
+                </ul>
+            </div>
+            @if(!empty($currentTourDetail['assignment_responsibilities']) || !empty($currentTourDetail['assignment_notes']))
+            <div class="col-md-12">
+                <div class="card border-0 bg-light">
+                    <div class="card-body">
+                        @if(!empty($currentTourDetail['assignment_responsibilities']))
+                        <h6 class="mb-2"><i class="bi bi-list-check me-1 text-primary"></i> Trách nhiệm</h6>
+                        <p class="mb-3">{{ nl2br(e($currentTourDetail['assignment_responsibilities'])) }}</p>
+                        @endif
+                        @if(!empty($currentTourDetail['assignment_notes']))
+                        <h6 class="mb-2"><i class="bi bi-sticky me-1 text-warning"></i> Ghi chú từ quản trị</h6>
+                        <p class="mb-0">{{ nl2br(e($currentTourDetail['assignment_notes'])) }}</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>
+    @endif
 
     <div class="hdv-card mb-4">
         <div class="d-flex align-items-center gap-2 mb-3">

@@ -4,11 +4,50 @@
 
 @section('content')
 
+@php
+    $assignmentBadgeClass = function (string $s): string {
+        return match($s) {
+            'confirmed' => 'bg-success',
+            'assigned'  => 'bg-primary',
+            'pending'   => 'bg-warning text-dark',
+            default     => 'bg-secondary',
+        };
+    };
+    $assignmentBadgeText = function (string $s): string {
+        return match($s) {
+            'confirmed' => 'Đã xác nhận',
+            'assigned'  => 'Đã phân bổ',
+            'pending'   => 'Chờ xác nhận',
+            default     => mb_convert_case($s, MB_CASE_TITLE, 'UTF-8'),
+        };
+    };
+    $roleBadgeClass = function (string $r): string {
+        $r = mb_strtolower($r);
+        if (str_contains($r, 'hdv') || str_contains($r, 'chính') || str_contains($r, 'hướng dẫn')) {
+            return 'bg-primary';
+        }
+        if (str_contains($r, 'lái') || str_contains($r, 'xe') || str_contains($r, 'tài')) {
+            return 'bg-warning text-dark';
+        }
+        if (str_contains($r, 'nhiếp') || str_contains($r, 'ảnh')) {
+            return 'bg-success';
+        }
+        if (str_contains($r, 'phục') || str_contains($r, 'vụ')) {
+            return 'bg-info text-dark';
+        }
+        return 'bg-secondary';
+    };
+@endphp
+
 <div class="mb-3">
     <h4 class="fw-bold text-dark mb-1">Thông tin tour đã được phân bổ</h4>
 </div>
 
+<<<<<<< HEAD
 <!-- Tour được phân công Table Card (theo định dạng Quản lý đoàn khách) -->
+=======
+<!-- Tour được phân công Table Card (đồng bộ cột theo admin staff-assignments) -->
+>>>>>>> aa059c0a460dbe3ab4b1a8320f08f6d7fe5b043c
 <div class="hdv-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-3">
         <i class="bi bi-folder-fill text-warning fs-5"></i>
@@ -19,6 +58,7 @@
         <table class="table table-hdv table-hover align-middle">
             <thead>
                 <tr>
+<<<<<<< HEAD
                     <th>ID</th>
                     <th>Tên đoàn</th>
                     <th>Tour</th>
@@ -27,14 +67,32 @@
                     <th>Điểm hẹn</th>
                     <th>Ngày khởi hành</th>
                     <th>Trạng thái</th>
+=======
+                    <th>Mã</th>
+                    <th>Tên Tour</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Khách hàng</th>
+                    <th>Điểm hẹn</th>
+                    <th>Giờ bắt đầu</th>
+                    <th>Ngày đi</th>
+                    <th>Ngày kết thúc</th>
+                    <th>Ngày phân bổ</th>
+                    <th>Ghi chú</th>
+>>>>>>> aa059c0a460dbe3ab4b1a8320f08f6d7fe5b043c
                     <th class="text-center">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 @if(empty($assignedTours))
                     <tr>
+<<<<<<< HEAD
                         <td colspan="9" class="text-center py-5 text-muted">
                             Chưa có đoàn tour nào được phân công. Vui lòng liên hệ quản trị viên để được phân công cho chuyến khởi hành.
+=======
+                        <td colspan="12" class="text-center py-5 text-muted">
+                            Chưa có tour nào được phân công.
+>>>>>>> aa059c0a460dbe3ab4b1a8320f08f6d7fe5b043c
                         </td>
                     </tr>
                 @else
@@ -63,6 +121,7 @@
                         <tr class="{{ (int)$selectedDepartureId === (int)$t['departure_id'] ? 'table-primary' : '' }}">
                             <td class="fw-bold text-dark">#{{ $t['departure_id'] }}</td>
                             <td>
+<<<<<<< HEAD
                                 <div class="fw-semibold text-dark">{{ $groupName }}</div>
                                 <div class="text-muted small mt-1">
                                     <i class="bi bi-person-badge me-1"></i>Vai trò:
@@ -70,9 +129,17 @@
                                 </div>
                                 @if(!empty($t['assignment_notes']))
                                     <div class="text-muted small mt-1"><i class="bi bi-chat-left-text me-1"></i>{{ $t['assignment_notes'] }}</div>
+=======
+                                <a href="{{ route('hdv/dashboard') . '?tab=chi-tiet&departure_id=' . $t['departure_id'] }}" class="fw-bold text-primary text-decoration-none">
+                                    {{ $t['tour_name'] }}
+                                </a>
+                                @if(!empty($t['group_name']))
+                                    <div class="text-muted small">({{ $t['group_name'] }})</div>
+>>>>>>> aa059c0a460dbe3ab4b1a8320f08f6d7fe5b043c
                                 @endif
                             </td>
                             <td>
+<<<<<<< HEAD
                                 <div class="fw-bold text-dark">{{ $t['tour_name'] }}</div>
                                 <div class="text-muted small mt-1">Danh mục: {{ $t['category_name'] ?: 'Chưa phân loại' }}</div>
                                 @if($t['total_bookings'] > 0)
@@ -105,6 +172,45 @@
                             <td class="text-center">
                                 <a href="{{ route('hdv/tour-phan-cong?departure_id=' . $t['departure_id']) }}" class="btn btn-sm btn-primary rounded-3 px-3 fw-bold me-1" title="Xem danh sách khách & check-in">
                                     <i class="bi bi-people-fill me-1"></i> Xem đoàn
+=======
+                                <span class="badge {{ $roleBadgeClass($t['hdv_role'] ?? 'HDV') }}">
+                                    {{ $t['hdv_role'] ? mb_convert_case($t['hdv_role'], MB_CASE_TITLE, 'UTF-8') : 'HDV' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {{ $assignmentBadgeClass($t['assignment_status'] ?? 'assigned') }}">
+                                    {{ $assignmentBadgeText($t['assignment_status'] ?? 'assigned') }}
+                                </span>
+                                @php
+                                    $depStatus = $t['departure_status'] ?? '';
+                                    $depBadge = match($depStatus) {
+                                        'in_progress' => ['text' => 'Đang diễn ra', 'class' => 'bg-success'],
+                                        'completed'   => ['text' => 'Hoàn thành', 'class' => 'bg-secondary'],
+                                        'cancelled'   => ['text' => 'Đã hủy', 'class' => 'bg-danger'],
+                                        default       => ['text' => 'Lên lịch', 'class' => 'bg-primary'],
+                                    };
+                                @endphp
+                                <div class="mt-1">
+                                    <span class="badge {{ $depBadge['class'] }} opacity-75">{{ $depBadge['text'] }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ $t['primary_customer_name'] ?: 'Khách đoàn' }}</div>
+                                <div class="text-muted small">{{ $t['total_guests'] }} người</div>
+                            </td>
+                            <td>{{ $t['meeting_point'] ?: '—' }}</td>
+                            <td>{{ $t['meeting_time'] ?: '—' }}</td>
+                            <td>{{ !empty($t['departure_date']) ? date('d/m/Y', strtotime($t['departure_date'])) : '—' }}</td>
+                            <td>{{ !empty($t['return_date']) ? date('d/m/Y', strtotime($t['return_date'])) : '—' }}</td>
+                            <td>{{ !empty($t['assigned_at']) ? date('d/m/Y H:i', strtotime($t['assigned_at'])) : '—' }}</td>
+                            <td>{{ $t['assignment_notes'] ?: '—' }}</td>
+                            <td class="text-center text-nowrap">
+                                <a href="{{ route('hdv/tour-phan-cong') . '?departure_id=' . $t['departure_id'] }}" class="btn btn-sm btn-primary rounded-3 px-3 fw-bold me-1">
+                                    <i class="bi bi-people me-1"></i> Khách
+                                </a>
+                                <a href="{{ route('hdv/dashboard') . '?tab=chi-tiet&departure_id=' . $t['departure_id'] }}" class="btn btn-sm btn-outline-primary rounded-3 px-3 fw-bold">
+                                    <i class="bi bi-eye me-1"></i> Chi tiết
+>>>>>>> aa059c0a460dbe3ab4b1a8320f08f6d7fe5b043c
                                 </a>
                             </td>
                         </tr>
@@ -117,6 +223,7 @@
 
 <!-- Detailed Customer List Section for Selected Tour -->
 @if($selectedTour)
+<<<<<<< HEAD
     @php
         $checkedInTotal = (int)($selectedTour['checked_in_guests'] ?? 0);
         $guestsTotal = (int)($selectedTour['total_guests'] ?? 0);
@@ -131,10 +238,15 @@
     @endphp
     <div class="hdv-card border-primary">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+=======
+    <div class="hdv-card border-primary mb-4">
+        <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-3">
+>>>>>>> aa059c0a460dbe3ab4b1a8320f08f6d7fe5b043c
             <div>
                 <h5 class="fw-bold text-primary mb-1">
                     <i class="bi bi-people-fill me-2"></i> Danh sách khách check-in: {{ $groupName }} (#{{ $selectedTour['departure_id'] }})
                 </h5>
+<<<<<<< HEAD
                 <p class="text-muted small mb-1">
                     Tour: <strong class="text-dark">{{ $selectedTour['tour_name'] }}</strong>
                     · Điểm tập kết: {{ $selectedTour['meeting_point'] ?: 'Chưa cập nhật' }}
@@ -148,6 +260,52 @@
                 </p>
             </div>
             <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill">{{ count($guests) }} khách</span>
+=======
+                <p class="text-muted small mb-0">Ngày đi: {{ date('d/m/Y', strtotime($selectedTour['departure_date'])) }} | Điểm hẹn: {{ $selectedTour['meeting_point'] ?: 'Chưa ghi chú' }} | Giờ: {{ $selectedTour['meeting_time'] ?: '—' }}</p>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+                <span class="badge {{ $roleBadgeClass($selectedTour['hdv_role'] ?? 'HDV') }}">
+                    {{ $selectedTour['hdv_role'] ? mb_convert_case($selectedTour['hdv_role'], MB_CASE_TITLE, 'UTF-8') : 'HDV' }}
+                </span>
+                <span class="badge {{ $assignmentBadgeClass($selectedTour['assignment_status'] ?? 'assigned') }}">
+                    {{ $assignmentBadgeText($selectedTour['assignment_status'] ?? 'assigned') }}
+                </span>
+                <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill">{{ count($guests) }} Khách</span>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <h6 class="small fw-bold text-muted mb-2"><i class="bi bi-info-circle me-1"></i> Thông tin phân bổ</h6>
+                        <ul class="list-unstyled mb-0 small">
+                            <li><strong>Vai trò:</strong> {{ $selectedTour['hdv_role'] ? mb_convert_case($selectedTour['hdv_role'], MB_CASE_TITLE, 'UTF-8') : 'HDV' }}</li>
+                            <li><strong>Ngày phân bổ:</strong> {{ !empty($selectedTour['assigned_at']) ? date('d/m/Y H:i', strtotime($selectedTour['assigned_at'])) : '—' }}</li>
+                            <li><strong>Cập nhật lần cuối:</strong> {{ !empty($selectedTour['updated_at']) ? date('d/m/Y H:i', strtotime($selectedTour['updated_at'])) : '—' }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <h6 class="small fw-bold text-muted mb-2"><i class="bi bi-sticky me-1 text-warning"></i> Trách nhiệm & Ghi chú từ quản trị</h6>
+                        <div class="small mb-0">
+                            @if(!empty($selectedTour['assignment_responsibilities']))
+                                <p class="mb-1"><strong>Trách nhiệm:</strong> {{ nl2br(e($selectedTour['assignment_responsibilities'])) }}</p>
+                            @endif
+                            @if(!empty($selectedTour['assignment_notes']))
+                                <p class="mb-0"><strong>Ghi chú:</strong> {{ nl2br(e($selectedTour['assignment_notes'])) }}</p>
+                            @endif
+                            @if(empty($selectedTour['assignment_responsibilities']) && empty($selectedTour['assignment_notes']))
+                                <span class="text-muted">—</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+>>>>>>> aa059c0a460dbe3ab4b1a8320f08f6d7fe5b043c
         </div>
 
         <div class="table-responsive">

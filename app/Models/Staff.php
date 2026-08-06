@@ -8,7 +8,7 @@ class Staff extends Model
 {  
     public function getAll()
     {
-        $stmt = $this->connection->createQueryBuilder();
+        $stmt = $this->connection->createQueryBuilder();     
         $stmt->select('h.*')
             ->from('hdv', 'h')
             ->orderBy('h.HDV_id', 'DESC');

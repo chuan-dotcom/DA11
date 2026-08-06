@@ -18,7 +18,6 @@ class Booking extends Model
             'departure_id' => "ALTER TABLE bookings ADD COLUMN departure_id INT NULL AFTER tour_id",
             'check_in_status' => "ALTER TABLE bookings ADD COLUMN check_in_status TINYINT(1) NOT NULL DEFAULT 0 AFTER status",
             'checked_in_at' => "ALTER TABLE bookings ADD COLUMN checked_in_at DATETIME NULL AFTER check_in_status",
-            'pickup_address' => "ALTER TABLE bookings ADD COLUMN pickup_address VARCHAR(255) NULL AFTER customer_phone",
         ];
 
         foreach ($columns as $columnName => $sql) {
@@ -50,85 +49,68 @@ class Booking extends Model
     }
 
     /**
-     * Lấy danh sách tất cả Booking
+     * Lấy danh sách tất cả Booking (hỗ trợ lọc theo tour / trạng thái / khoảng ngày)
      */
-    public function getAll()
+    public function getAll($tourId = null, $status = null, $fromDate = null, $toDate = null)
     {
         $stmt = $this->connection->createQueryBuilder();
 
         $stmt->select(
                 'b.*',
-                't.name AS tour_name',
-                't.location AS tour_location',
-                'd.group_name AS departure_group_name',
-                'd.departure_date AS departure_date_info',
-                'd.return_date AS departure_return_date',
-                'd.meeting_point AS departure_meeting_point',
-                'd.status AS departure_status'
+                't.name AS tour_name'
             )
             ->from('bookings', 'b')
-            ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id')
-            ->leftJoin('b', 'departures', 'd', 'b.departure_id = d.id')
-            ->orderBy('b.id', 'DESC');
+            ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id');
+
+        if (!empty($tourId)) {
+            $stmt->andWhere('b.tour_id = :tourId')
+                ->setParameter('tourId', (int) $tourId);
+        }
+
+        if ($status !== null && $status !== '') {
+            $stmt->andWhere('b.status = :status')
+                ->setParameter('status', (int) $status);
+        }
+
+        if (!empty($fromDate)) {
+            $stmt->andWhere('b.booking_date >= :fromDate')
+                ->setParameter('fromDate', $fromDate);
+        }
+
+        if (!empty($toDate)) {
+            $stmt->andWhere('b.booking_date <= :toDate')
+                ->setParameter('toDate', $toDate);
+        }
+
+        $stmt->orderBy('b.id', 'DESC');
 
         return $stmt->fetchAllAssociative();
     }
 
     /**
-     * Filter booking theo tour, chuyến khởi hành, trạng thái.
-     *
-     * @param int|null $tourId
-     * @param int|null $departureId
-     * @param string|int|null $status (0: chờ, 1: đã xác nhận, 2+: hủy)
+     * Thống kê số booking theo trạng thái (giống Departure::getDeparturesByStatus)
      */
-    public function filter($tourId = null, $departureId = null, $status = null)
+    public function getBookingsByStatus($tourId = null, $fromDate = null, $toDate = null)
     {
         $stmt = $this->connection->createQueryBuilder();
-
-        $stmt->select(
-                'b.*',
-                't.name AS tour_name',
-                't.location AS tour_location',
-                'd.group_name AS departure_group_name',
-                'd.departure_date AS departure_date_info',
-                'd.return_date AS departure_return_date',
-                'd.meeting_point AS departure_meeting_point',
-                'd.status AS departure_status'
-            )
+        $stmt->select('b.status', 'COUNT(b.id) as count')
             ->from('bookings', 'b')
-            ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id')
-            ->leftJoin('b', 'departures', 'd', 'b.departure_id = d.id');
+            ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id');
 
-        $hasClause = false;
-
-        if ($tourId !== null && $tourId !== '' && (int)$tourId > 0) {
-            $stmt->where('b.tour_id = :tourId')
-                ->setParameter('tourId', (int)$tourId);
-            $hasClause = true;
+        if (!empty($tourId)) {
+            $stmt->andWhere('b.tour_id = :tourId')
+                ->setParameter('tourId', (int) $tourId);
+        }
+        if (!empty($fromDate)) {
+            $stmt->andWhere('b.booking_date >= :fromDate')
+                ->setParameter('fromDate', $fromDate);
+        }
+        if (!empty($toDate)) {
+            $stmt->andWhere('b.booking_date <= :toDate')
+                ->setParameter('toDate', $toDate);
         }
 
-        if ($departureId !== null && $departureId !== '' && (int)$departureId > 0) {
-            if ($hasClause) {
-                $stmt->andWhere('b.departure_id = :departureId');
-            } else {
-                $stmt->where('b.departure_id = :departureId');
-                $hasClause = true;
-            }
-            $stmt->setParameter('departureId', (int)$departureId);
-        }
-
-        if ($status !== null && $status !== '') {
-            $clause = 'b.status = :status';
-            if ($hasClause) {
-                $stmt->andWhere($clause);
-            } else {
-                $stmt->where($clause);
-            }
-            $stmt->setParameter('status', (int)$status);
-        }
-
-        $stmt->orderBy('b.id', 'DESC');
-
+        $stmt->groupBy('b.status');
         return $stmt->fetchAllAssociative();
     }
 
@@ -142,18 +124,10 @@ class Booking extends Model
         $stmt->select(
                 'b.*',
                 't.name AS tour_name',
-                't.location AS tour_location',
-                't.price',
-                't.duration AS tour_duration',
-                'd.group_name AS departure_group_name',
-                'd.departure_date AS departure_date_info',
-                'd.return_date AS departure_return_date',
-                'd.meeting_point AS departure_meeting_point',
-                'd.status AS departure_status'
+                't.price'
             )
             ->from('bookings', 'b')
             ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id')
-            ->leftJoin('b', 'departures', 'd', 'b.departure_id = d.id')
             ->where('b.id = :id')
             ->setParameter('id', $id);
 
@@ -191,8 +165,6 @@ class Booking extends Model
 
             'customer_phone'   => $data['customer_phone'],
 
-            'pickup_address'   => $data['pickup_address'] ?? null,
-
             'num_people'       => $data['num_people'],
 
             'total_price'      => $data['total_price'],
@@ -220,8 +192,6 @@ class Booking extends Model
             'customer_email'   => $data['customer_email'],
 
             'customer_phone'   => $data['customer_phone'],
-
-            'pickup_address'   => $data['pickup_address'] ?? null,
 
             'num_people'       => $data['num_people'],
 
@@ -440,13 +410,10 @@ class Booking extends Model
 
         $stmt->select(
                 'b.*',
-                't.name AS tour_name',
-                't.location AS tour_location',
-                'd.meeting_point AS departure_meeting_point'
+                't.name AS tour_name'
             )
             ->from('bookings', 'b')
             ->leftJoin('b', 'tours', 't', 'b.tour_id=t.id')
-            ->leftJoin('b', 'departures', 'd', 'b.departure_id = d.id')
             ->orderBy('b.created_at', 'DESC')
             ->setMaxResults($limit);
 
@@ -459,42 +426,6 @@ class Booking extends Model
     public function getRecentBookings($limit = 5)
     {
         return $this->getLatestBookings($limit);
-    }
-
-    /**
-     * Lấy danh sách bookings (đã xác nhận / status=1) dùng để gợi ý khi tạo/sửa chuyến khởi hành.
-     * Kèm theo tên tour, địa điểm tour, số người tham gia.
-     *
-     * @param int|null $limit giới hạn số lượng, null = lấy tất cả
-     */
-    public function getConfirmedWithTourSummary($limit = null)
-    {
-        $stmt = $this->connection->createQueryBuilder();
-
-        $stmt->select(
-                'b.id',
-                'b.tour_id',
-                'b.customer_name',
-                'b.customer_phone',
-                'b.customer_email',
-                'b.num_people',
-                'b.booking_date',
-                'b.total_price',
-                't.name AS tour_name',
-                't.location AS tour_location'
-            )
-            ->from('bookings', 'b')
-            ->innerJoin('b', 'tours', 't', 'b.tour_id = t.id')
-            ->where('b.status = :status')
-            ->setParameter('status', 1)
-            ->orderBy('b.booking_date', 'DESC')
-            ->addOrderBy('b.id', 'DESC');
-
-        if ($limit !== null) {
-            $stmt->setMaxResults((int) $limit);
-        }
-
-        return $stmt->fetchAllAssociative();
     }
 
     /**
@@ -532,13 +463,10 @@ class Booking extends Model
         $stmt = $this->connection->createQueryBuilder();
         $stmt->select(
                 'b.*',
-                't.name AS tour_name',
-                't.location AS tour_location',
-                'd.meeting_point AS departure_meeting_point'
+                't.name AS tour_name'
             )
             ->from('bookings', 'b')
             ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id')
-            ->leftJoin('b', 'departures', 'd', 'b.departure_id = d.id')
             ->where('b.tour_id = :tourId')
             ->setParameter('tourId', $tourId)
             ->orderBy('b.booking_date', 'DESC');
@@ -576,7 +504,6 @@ class Booking extends Model
         $stmt->select(
                 'b.*',
                 't.name AS tour_name',
-                't.location AS tour_location',
                 'd.departure_date',
                 'd.return_date',
                 'd.meeting_point',
@@ -604,13 +531,10 @@ class Booking extends Model
 
         $stmt->select(
                 'b.*',
-                't.name AS tour_name',
-                't.location AS tour_location',
-                'd.meeting_point AS departure_meeting_point'
+                't.name AS tour_name'
             )
             ->from('bookings', 'b')
             ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id')
-            ->leftJoin('b', 'departures', 'd', 'b.departure_id = d.id')
             ->where('b.tour_id = :tourId')
             ->andWhere('b.status = :status')
             ->andWhere('b.departure_id IS NULL')
@@ -686,33 +610,12 @@ class Booking extends Model
      */
     public function assignToDeparture($bookingId, $departureId)
     {
-        $departureId = (int) $departureId;
-        $meetingPoint = null;
-        if ($departureId > 0) {
-            try {
-                $row = $this->connection->fetchAssociative(
-                    'SELECT meeting_point FROM departures WHERE id = ? LIMIT 1',
-                    [$departureId]
-                );
-                if (!empty($row['meeting_point'])) {
-                    $meetingPoint = $row['meeting_point'];
-                }
-            } catch (\Throwable $e) {
-            }
-        }
-
-        $update = [
-            'departure_id'    => $departureId,
+        return $this->connection->update('bookings', [
+            'departure_id' => $departureId,
             'check_in_status' => 0,
-            'checked_in_at'   => null,
-        ];
-
-        if ($meetingPoint !== null) {
-            $update['pickup_address'] = $meetingPoint;
-        }
-
-        return $this->connection->update('bookings', $update, [
-            'id' => (int) $bookingId,
+            'checked_in_at' => null,
+        ], [
+            'id' => $bookingId,
         ]);
     }
 
