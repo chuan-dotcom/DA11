@@ -245,7 +245,23 @@
                                         </td>
                                         <td>{{ $guest['address'] ?: '-' }}</td>
                                         <td>
-                                            <span class="badge {{ $payment[1] }}">{{ $payment[0] }}</span>
+                                            <div class="d-flex flex-column gap-1">
+                                                <span class="badge {{ $payment[1] }} w-100 py-2">{{ $payment[0] }}</span>
+                                                @if(($guest['payment_status'] ?? 'unpaid') !== 'paid')
+                                                    <a href="{{ route('admin/guest-groups/booking-guests/payment-paid/' . $guestGroup['id'] . '/' . $guest['id']) }}"
+                                                       class="btn btn-sm btn-success w-100"
+                                                       onclick="return confirm('Đánh dấu Đã thanh toán cho TẤT CẢ khách trong cùng booking này?')">
+                                                        <i class="bi bi-check2-circle me-1"></i>Đánh giá Đã thanh toán
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('admin/guest-groups/booking-guests/payment-unpaid/' . $guestGroup['id'] . '/' . $guest['id']) }}"
+                                                       class="btn btn-sm btn-outline-warning w-100"
+                                                       onclick="return confirm('Bỏ thanh toán cho TẤT CẢ khách trong cùng booking này?')">
+                                                        <i class="bi bi-arrow-counterclockwise me-1"></i>Bỏ thanh toán
+                                                    </a>
+                                                @endif
+                                                <small class="text-muted text-center opacity-75">Đồng bộ toàn bộ booking</small>
+                                            </div>
                                         </td>
                                         <td>
                                             @if((int) ($guest['check_in_status'] ?? 0) === 1)

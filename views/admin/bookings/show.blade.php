@@ -34,6 +34,70 @@
                     <th>Khách hàng</th>
                     <td>{{ $booking['customer_name'] }}</td>
                 </tr>
+                @php
+                    $departureStatusMap = [
+                        'scheduled'   => ['Lên lịch', 'bg-primary'],
+                        'in_progress' => ['Đang diễn ra', 'bg-warning text-dark'],
+                        'completed'   => ['Hoàn thành', 'bg-success'],
+                        'cancelled'   => ['Đã hủy', 'bg-secondary'],
+                    ];
+                @endphp
+                @if(!empty($booking['departure_id']))
+                <tr>
+                    <th>Chuyến khởi hành</th>
+                    <td>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-inline-flex align-items-center flex-wrap gap-2">
+                                <i class="bi bi-calendar-week text-primary"></i>
+                                <span class="fw-semibold">
+                                    {{ !empty($booking['departure_group_name']) ? $booking['departure_group_name'] : ('Đoàn #' . (int)$booking['departure_id']) }}
+                                </span>
+                                @php
+                                    $ds = !empty($booking['departure_status']) ? $departureStatusMap[$booking['departure_status']] ?? null : null;
+                                @endphp
+                                @if($ds)
+                                    <span class="badge {{ $ds[1] }}">{{ $ds[0] }}</span>
+                                @endif
+                            </div>
+                            <div class="small text-muted">
+                                @if(!empty($booking['departure_date_info']))
+                                    <i class="bi bi-calendar me-1"></i>
+                                    Khởi hành: {{ date('d/m/Y', strtotime($booking['departure_date_info'])) }}
+                                @endif
+                                @if(!empty($booking['departure_return_date']) && (!empty($booking['departure_date_info']) && $booking['departure_return_date'] !== $booking['departure_date_info']))
+                                    <span class="mx-2">·</span>
+                                    Trở về: {{ date('d/m/Y', strtotime($booking['departure_return_date'])) }}
+                                @endif
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{{ route('admin/departures/edit/' . (int)$booking['departure_id']) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>Mở chi tiết đoàn
+                                </a>
+                                <a href="{{ route('admin/guest-groups/show/' . (int)$booking['departure_id']) }}" class="btn btn-sm btn-outline-dark">
+                                    <i class="bi bi-people me-1"></i>Danh sách khách đoàn
+                                </a>
+                                <a href="{{ route('admin/bookings/unassign-departure/' . (int)$booking['id']) }}"
+                                   class="btn btn-sm btn-outline-warning"
+                                   onclick="return confirm('Gỡ Booking này ra khỏi chuyến khởi hành hiện tại?')">
+                                    <i class="bi bi-x-circle me-1"></i>Gỡ khỏi đoàn
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                @else
+                <tr>
+                    <th>Chuyến khởi hành</th>
+                    <td>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <span class="text-muted">Chưa gắn vào đoàn nào.</span>
+                            <a href="{{ route('admin/guest-groups/show/' . (int)$booking['tour_id']) }}" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-link-45deg me-1"></i>Gắn vào đoàn cùng tour
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                @endif
                 <tr>
                     <th>Email</th>
                     <td>{{ $booking['customer_email'] }}</td>

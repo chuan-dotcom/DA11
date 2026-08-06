@@ -215,6 +215,7 @@ class GuestGroupController extends Controller
             return redirect('admin/guest-groups/booking-guests/edit/' . (int) $departureId . '/' . (int) $guestId);
         }
 
+        $paymentStatus = $_POST['payment_status'] ?? 'unpaid';
         $this->modelBookingGuest->update($guestId, [
             'full_name' => $fullName,
             'gender' => $_POST['gender'] ?? null,
@@ -223,11 +224,50 @@ class GuestGroupController extends Controller
             'email' => $_POST['email'] ?? null,
             'identity_no' => $_POST['identity_no'] ?? null,
             'address' => $_POST['address'] ?? null,
-            'payment_status' => $_POST['payment_status'] ?? 'unpaid',
+            'payment_status' => $paymentStatus,
             'note' => $_POST['note'] ?? null,
         ]);
 
-        setFlash('success', 'Đã cập nhật khách hàng.');
+        $this->modelBookingGuest->syncPaymentStatusByBookingId($bookingId, $paymentStatus);
+
+        setFlash('success', 'Đã cập nhật khách hàng (đồng bộ trạng thái thanh toán cho toàn bộ booking).');
+        return redirect('admin/guest-groups/show/' . (int) $departureId . '?booking_id=' . (int) $bookingId);
+    }
+
+    public function markGuestPaid($departureId, $guestId)
+    {
+        return $this->togglePaymentForBookingOfGuest($departureId, $guestId, 'paid');
+    }
+
+    public function markGuestUnpaid($departureId, $guestId)
+    {
+        return $this->togglePaymentForBookingOfGuest($departureId, $guestId, 'unpaid');
+    }
+
+    private function togglePaymentForBookingOfGuest($departureId, $guestId, $status)
+    {
+        $guest = $this->modelBookingGuest->findById($guestId);
+        if (!$guest || (int) ($guest['departure_id'] ?? 0) !== (int) $departureId) {
+            setFlash('error', 'Khách hàng không tồn tại trong đoàn.');
+            return $this->redirectToShow($departureId);
+        }
+
+        $bookingId = (int) ($guest['booking_id'] ?? 0);
+        if ($bookingId <= 0) {
+            setFlash('error', 'Không tìm thấy booking của khách.');
+            return $this->redirectToShow($departureId);
+        }
+
+        $this->modelBookingGuest->syncPaymentStatusByBookingId($bookingId, $status);
+
+        if ($status === 'paid') {
+            setFlash('success', 'Đã đánh dấu Đã thanh toán cho toàn bộ khách trong booking này.');
+        } elseif ($status === 'deposit') {
+            setFlash('success', 'Đã đánh dấu Đã đặt cọc cho toàn bộ khách trong booking này.');
+        } else {
+            setFlash('success', 'Đã đánh dấu Chưa thanh toán cho toàn bộ khách trong booking này.');
+        }
+
         return redirect('admin/guest-groups/show/' . (int) $departureId . '?booking_id=' . (int) $bookingId);
     }
 
