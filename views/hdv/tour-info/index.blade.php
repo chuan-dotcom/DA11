@@ -222,6 +222,29 @@
         </div>
     </div>
 
+    @if(!empty($importantAlerts))
+        <div class="hdv-card mb-4 border-warning">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>
+                <h5 class="fw-bold mb-0">Cảnh báo quan trọng</h5>
+                <span class="badge bg-warning text-dark rounded-pill">{{ count($importantAlerts) }}</span>
+            </div>
+            <div class="row g-3">
+                @foreach($importantAlerts as $alert)
+                    <div class="col-12 col-lg-6">
+                        <div class="d-flex gap-3 h-100 rounded-4 border p-3 bg-{{ $alert['type'] }}-subtle">
+                            <div class="fs-4 text-{{ $alert['type'] }}"><i class="bi {{ $alert['icon'] }}"></i></div>
+                            <div>
+                                <div class="fw-bold text-dark">{{ $alert['title'] }}</div>
+                                <div class="small text-muted mt-1">{{ $alert['message'] }}</div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="hdv-card mb-4">
         <div class="d-flex align-items-center gap-2 mb-3">
             <i class="bi bi-clock-history text-secondary fs-5"></i>

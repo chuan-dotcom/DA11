@@ -119,6 +119,7 @@ class TourInfoController extends Controller
         $guests = [];
         $driverInfo = null;
         $tourLogs = [];
+        $importantAlerts = [];
 
         if ($activeTab === 'chi-tiet' || $selectedDepartureId) {
             $activeTab = 'chi-tiet';
@@ -156,6 +157,52 @@ class TourInfoController extends Controller
 
                     // Fetch timeline activity logs for this tour departure from the DB model
                     $tourLogs = $this->modelTourLog->getByDepartureId($selectedDepartureId);
+
+                    $pendingCheckIn = count(array_filter($guests, function ($guest) {
+                        return (int) ($guest['check_in_status'] ?? 0) !== 1;
+                    }));
+                    if ($pendingCheckIn > 0) {
+                        $importantAlerts[] = [
+                            'type' => 'warning',
+                            'icon' => 'bi-person-x-fill',
+                            'title' => $pendingCheckIn . ' khách chưa check-in',
+                            'message' => 'Kiểm tra danh sách đoàn khách và thực hiện điểm danh trước khi khởi hành.',
+                        ];
+                    }
+
+                    if (!$driverInfo) {
+                        $importantAlerts[] = [
+                            'type' => 'danger',
+                            'icon' => 'bi-truck',
+                            'title' => 'Chưa phân công tài xế',
+                            'message' => 'Liên hệ quản trị viên để bổ sung tài xế cho chuyến này.',
+                        ];
+                    }
+
+                    if (empty($tourLogs)) {
+                        $importantAlerts[] = [
+                            'type' => 'info',
+                            'icon' => 'bi-clock-history',
+                            'title' => 'Chưa có hoạt động timeline',
+                            'message' => 'Thêm hoạt động đầu tiên để theo dõi tiến độ thực tế của chuyến tour.',
+                        ];
+                    }
+
+                    $pendingServices = $db->fetchAllAssociative(
+                        'SELECT service_types FROM services WHERE departure_id = :departure_id AND status = 0',
+                        ['departure_id' => $selectedDepartureId]
+                    );
+                    if (!empty($pendingServices)) {
+                        $serviceNames = array_filter(array_unique(array_column($pendingServices, 'service_types')));
+                        $importantAlerts[] = [
+                            'type' => 'warning',
+                            'icon' => 'bi-exclamation-circle-fill',
+                            'title' => count($pendingServices) . ' dịch vụ chưa xác nhận',
+                            'message' => !empty($serviceNames)
+                                ? 'Cần xác nhận: ' . implode(', ', $serviceNames) . '.'
+                                : 'Kiểm tra và xác nhận các dịch vụ đã đặt cho đoàn.',
+                        ];
+                    }
                 }
             }
         }
@@ -176,7 +223,8 @@ class TourInfoController extends Controller
             'currentTourDetail',
             'guests',
             'driverInfo',
-            'tourLogs'
+            'tourLogs',
+            'importantAlerts'
         ));
     }
 
