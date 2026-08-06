@@ -5,18 +5,21 @@ namespace App\Controllers\Admin;
 use App\Controller;
 use App\Models\Booking;
 use App\Models\Tour;
+use App\Models\BookingGuest;
 use Rakit\Validation\Validator;
 
 class BookingController extends Controller
 {
     private $modelBooking;
     private $modelTour;
+    private $modelBookingGuest;
     private $validator;
 
     public function __construct()
     {
         $this->modelBooking = new Booking();
         $this->modelTour = new Tour();
+        $this->modelBookingGuest = new BookingGuest();
         $this->validator = new Validator();
     }
 
@@ -64,6 +67,8 @@ class BookingController extends Controller
             'customer_email' => $_POST['customer_email'],
 
             'customer_phone' => $_POST['customer_phone'],
+
+            'pickup_address' => $_POST['pickup_address'] ?? null,
 
             'num_people' => $_POST['num_people'],
 
@@ -169,6 +174,8 @@ class BookingController extends Controller
             'customer_email' => $_POST['customer_email'],
 
             'customer_phone' => $_POST['customer_phone'],
+
+            'pickup_address' => $_POST['pickup_address'] ?? null,
 
             'num_people' => $_POST['num_people'],
 
@@ -284,5 +291,34 @@ class BookingController extends Controller
                 'booking'
             )
         );
+    }
+
+    /**
+     * Hiển thị danh sách người tham gia của 1 booking (dùng cho AJAX modal).
+     * Tự động seed N người theo num_people nếu bảng booking_guests chưa có dữ liệu.
+     */
+    public function guests($id)
+    {
+        $booking = $this->modelBooking->findById((int) $id);
+        if (!$booking) {
+            http_response_code(404);
+            echo '<div class="text-center text-muted py-5">Booking không tồn tại</div>';
+            exit;
+        }
+
+        try {
+            $this->modelBookingGuest->ensureGuestsForBooking($booking);
+        } catch (\Throwable $e) {
+        }
+
+        $guests = $this->modelBookingGuest->getByBookingId($booking['id']);
+        $stats  = $this->modelBookingGuest->getStatsByBookingId($booking['id']);
+
+        return view('admin.bookings.guests', [
+            'booking' => $booking,
+            'guests'  => $guests,
+            'stats'   => $stats,
+            'layout'  => false,
+        ]);
     }
 }

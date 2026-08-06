@@ -74,6 +74,7 @@
                             <th>ID</th>
                             <th>Ảnh</th>
                             <th>Tên tour</th>
+                            <th>Địa điểm</th>
                             <th>Danh mục</th>
                             <th>Giá</th>
                             <th>Thời gian</th>
@@ -84,7 +85,7 @@
                     <tbody>
                         @if(empty($tours))
                             <tr>
-                                <td colspan="8" class="text-center">Chưa có tour nào</td>
+                                <td colspan="9" class="text-center">Chưa có tour nào</td>
                             </tr>
                         @else
                             @foreach($tours as $tour)
@@ -104,6 +105,15 @@
                                         <a href="{{ route('admin/tours/show/' . $tour['id']) }}" class="tour-name-link" title="Xem mô tả tour">
                                             {{ $tour['name'] }}
                                         </a>
+                                    </td>
+                                    <td>
+                                        @if(!empty($tour['location']))
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-geo-alt me-1"></i>{{ $tour['location'] }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted small">—</span>
+                                        @endif
                                     </td>
                                     <td>{{ $tour['category_name'] }}</td>
                                     <td class="text-danger">{{ number_format($tour['price']) }} VNĐ</td>

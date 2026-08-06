@@ -132,6 +132,51 @@ class Departure extends Model
         return $this->connection->delete('departures', ['id' => $id]);
     }
 
+    /**
+     * Đồng bộ Địa chỉ đón (pickup_address) của các booking thuộc đoàn
+     * thành Điểm tập trung (meeting_point) của chuyến khởi hành.
+     *
+     * @param int  $departureId
+     * @param string|null $meetingPoint  Nếu null → tự lấy từ DB
+     * @param bool $forceOverride  true: luôn ghi đè (kể cả booking đã có pickup_address riêng). false: chỉ điền nếu booking chưa có.
+     */
+    public function syncBookingsPickupAddress($departureId, $meetingPoint = null, $forceOverride = true)
+    {
+        $departureId = (int) $departureId;
+        if ($departureId <= 0) {
+            return 0;
+        }
+
+        if ($meetingPoint === null) {
+            $row = $this->connection->fetchAssociative(
+                'SELECT meeting_point FROM departures WHERE id = ? LIMIT 1',
+                [$departureId]
+            );
+            if (!$row) {
+                return 0;
+            }
+            $meetingPoint = $row['meeting_point'];
+        }
+
+        $qb = $this->connection->createQueryBuilder();
+        $qb->update('bookings')
+            ->set('pickup_address', ':pickup')
+            ->where('departure_id = :depId')
+            ->setParameter('pickup', $meetingPoint)
+            ->setParameter('depId', $departureId);
+
+        if (!$forceOverride) {
+            $qb->andWhere('pickup_address IS NULL OR pickup_address = :empty');
+            $qb->setParameter('empty', '');
+        }
+
+        try {
+            return (int) $qb->executeStatement();
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
     public function getUpcomingDepartures($limit = 10)
     {
         $stmt = $this->connection->createQueryBuilder();

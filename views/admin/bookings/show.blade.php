@@ -15,8 +15,21 @@
                 </tr>
                 <tr>
                     <th>Tour</th>
-                    <td>{{ $booking['tour_name'] }}</td>
+                    <td>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <span>{{ $booking['tour_name'] }}</span>
+                            <a href="{{ route('admin/tours/participants/' . $booking['tour_id']) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-people me-1"></i>Xem danh sách khách tour
+                            </a>
+                        </div>
+                    </td>
                 </tr>
+                @if(!empty($booking['tour_location']))
+                <tr>
+                    <th>Địa điểm tour</th>
+                    <td><i class="bi bi-geo-alt text-secondary me-1"></i>{{ $booking['tour_location'] }}</td>
+                </tr>
+                @endif
                 <tr>
                     <th>Khách hàng</th>
                     <td>{{ $booking['customer_name'] }}</td>
@@ -29,6 +42,20 @@
                     <th>Số điện thoại</th>
                     <td>{{ $booking['customer_phone'] }}</td>
                 </tr>
+                @php
+                    $pickup = !empty($booking['pickup_address']) ? $booking['pickup_address'] : (!empty($booking['departure_meeting_point']) ? $booking['departure_meeting_point'] : null);
+                @endphp
+                @if(!empty($pickup))
+                <tr>
+                    <th>Địa chỉ đón khách hàng</th>
+                    <td>
+                        <i class="bi bi-geo text-primary me-1"></i>{{ $pickup }}
+                        @if(!empty($booking['pickup_address']) && !empty($booking['departure_meeting_point']) && $booking['pickup_address'] !== $booking['departure_meeting_point'])
+                            <div class="mt-1"><small class="text-muted">Điểm tập kết đoàn: {{ $booking['departure_meeting_point'] }}</small></div>
+                        @endif
+                    </td>
+                </tr>
+                @endif
                 <tr>
                     <th>Số người</th>
                     <td>{{ $booking['num_people'] }}</td>
@@ -59,6 +86,12 @@
                         @endphp
                     </td>
                 </tr>
+                @if(!empty($booking['departure_meeting_point']) && empty($booking['pickup_address']))
+                <tr>
+                    <th>Điểm tập kết (đoàn)</th>
+                    <td>{{ $booking['departure_meeting_point'] }}</td>
+                </tr>
+                @endif
                 <tr>
                     <th>Ghi chú</th>
                     <td>{!! !empty($booking['note']) ? nl2br(e($booking['note'])) : 'Không có ghi chú' !!}</td>

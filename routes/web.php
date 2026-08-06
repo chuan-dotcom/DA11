@@ -115,6 +115,7 @@ $router->get('tour/(\d+)', AdminTourController::class . '@qrShow');
 
 // Admin: Booking
 $router->get('admin/bookings', AdminBookingController::class . '@index');
+$router->get('admin/bookings/guests/(\d+)', AdminBookingController::class . '@guests');
 $router->get('admin/bookings/create', AdminBookingController::class . '@create');
 $router->post('admin/bookings/store', AdminBookingController::class . '@store');
 $router->get('admin/bookings/show/(\d+)', AdminBookingController::class . '@show');

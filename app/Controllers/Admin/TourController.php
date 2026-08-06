@@ -39,6 +39,7 @@ class TourController extends Controller{
             'category_id' =>$_POST['category_id'],
             'price' =>$_POST['price'],
             'duration' =>$_POST['duration'],
+            'location' =>$_POST['location'] ?? null,
             'description' =>$_POST['description'],
             'status' =>$_POST['status'],
         ];
@@ -85,6 +86,7 @@ class TourController extends Controller{
             'category_id' =>$_POST['category_id'],
             'price' =>$_POST['price'],
             'duration' =>$_POST['duration'],
+            'location' =>$_POST['location'] ?? null,
             'description' =>$_POST['description'],
             'status' =>$_POST['status'],
         ];
