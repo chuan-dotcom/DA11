@@ -14,15 +14,26 @@
 </div>
 
 <div class="hdv-card">
+    @php
+        $selectedEditDeparture = null;
+        foreach ($departures as $departure) {
+            if ((int) $departure['id'] === (int) old('departure_id', $diary['departure_id'])) {
+                $selectedEditDeparture = $departure;
+                break;
+            }
+        }
+        $editStartDate = $selectedEditDeparture['departure_date'] ?? '';
+        $editEndDate = $selectedEditDeparture['return_date'] ?? $editStartDate;
+    @endphp
     <form method="POST" action="{{ route('hdv/nhat-ky-tour/update/' . $diary['id']) }}" enctype="multipart/form-data">
         <div class="row g-3">
             <!-- Chọn chuyến khởi hành -->
             <div class="col-md-6">
                 <label class="form-label fw-bold">Chuyến khởi hành phân công <span class="text-danger">*</span></label>
-                <select name="departure_id" class="form-select" required>
+                <select name="departure_id" id="diary-departure" class="form-select" required>
                     @foreach($departures as $d)
                         @php $selId = old('departure_id', $diary['departure_id']); @endphp
-                        <option value="{{ $d['id'] }}" {{ (int) $selId === (int) $d['id'] ? 'selected' : '' }}>
+                        <option value="{{ $d['id'] }}" data-start-date="{{ $d['departure_date'] }}" data-end-date="{{ $d['return_date'] ?: $d['departure_date'] }}" {{ (int) $selId === (int) $d['id'] ? 'selected' : '' }}>
                             #{{ $d['id'] }} - {{ $d['tour_name'] }} - {{ $d['category_name'] ?? 'Chưa phân loại' }} ({{ date('d/m/Y', strtotime($d['departure_date'])) }})
                         </option>
                     @endforeach
@@ -32,7 +43,8 @@
             <!-- Ngày nhật ký -->
             <div class="col-md-6">
                 <label class="form-label fw-bold">Ngày ghi nhật ký <span class="text-danger">*</span></label>
-                <input type="date" name="diary_date" class="form-control" value="{{ old('diary_date', $diary['diary_date']) }}" required>
+                <input type="date" name="diary_date" id="diary-date" class="form-control" value="{{ old('diary_date', $diary['diary_date']) }}" min="{{ $editStartDate }}" max="{{ $editEndDate }}" required>
+                <div id="diary-date-help" class="form-text"></div>
             </div>
 
             <!-- Tiêu đề -->
@@ -90,5 +102,31 @@
         </div>
     </form>
 </div>
+
+<script>
+    (function () {
+        const departureSelect = document.getElementById('diary-departure');
+        const diaryDate = document.getElementById('diary-date');
+        const dateHelp = document.getElementById('diary-date-help');
+
+        function updateDiaryDateRange(resetDate) {
+            const option = departureSelect.options[departureSelect.selectedIndex];
+            const startDate = option.dataset.startDate;
+            const endDate = option.dataset.endDate;
+            diaryDate.min = startDate;
+            diaryDate.max = endDate;
+            dateHelp.textContent = 'Ngày hợp lệ: ' + startDate.split('-').reverse().join('/') + ' – ' + endDate.split('-').reverse().join('/') + '.';
+
+            if (resetDate || diaryDate.value < startDate || diaryDate.value > endDate) {
+                diaryDate.value = startDate;
+            }
+        }
+
+        departureSelect.addEventListener('change', function () {
+            updateDiaryDateRange(true);
+        });
+        updateDiaryDateRange(false);
+    })();
+</script>
 
 @endsection

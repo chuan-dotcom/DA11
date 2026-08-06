@@ -170,15 +170,6 @@ class TourInfoController extends Controller
                         ];
                     }
 
-                    if (!$driverInfo) {
-                        $importantAlerts[] = [
-                            'type' => 'danger',
-                            'icon' => 'bi-truck',
-                            'title' => 'Chưa phân công tài xế',
-                            'message' => 'Liên hệ quản trị viên để bổ sung tài xế cho chuyến này.',
-                        ];
-                    }
-
                     if (empty($tourLogs)) {
                         $importantAlerts[] = [
                             'type' => 'info',

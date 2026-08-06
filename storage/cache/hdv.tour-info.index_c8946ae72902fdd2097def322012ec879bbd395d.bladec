@@ -226,6 +226,30 @@
  </div>
  </div>
 
+ <?php if(!empty($importantAlerts)): ?>
+ <div class="hdv-card mb-4 border-warning">
+ <div class="d-flex align-items-center gap-2 mb-3">
+ <i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>
+ <h5 class="fw-bold mb-0">Cảnh báo quan trọng</h5>
+ <span class="badge bg-warning text-dark rounded-pill"><?php echo \htmlentities(count($importantAlerts)??'', ENT_QUOTES, 'UTF-8', false); ?></span>
+ </div>
+ <div class="row g-3">
+ <?php $__currentLoopData = $importantAlerts; $this->addLoop($__currentLoopData);$this->getFirstLoop();
+ foreach($__currentLoopData as $alert): $loop = $this->incrementLoopIndices();  ?>
+ <div class="col-12 col-lg-6">
+ <div class="d-flex gap-3 h-100 rounded-4 border p-3 bg-<?php echo \htmlentities($alert['type']??'', ENT_QUOTES, 'UTF-8', false); ?>-subtle">
+ <div class="fs-4 text-<?php echo \htmlentities($alert['type']??'', ENT_QUOTES, 'UTF-8', false); ?>"><i class="bi <?php echo \htmlentities($alert['icon']??'', ENT_QUOTES, 'UTF-8', false); ?>"></i></div>
+ <div>
+ <div class="fw-bold text-dark"><?php echo \htmlentities($alert['title']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <div class="small text-muted mt-1"><?php echo \htmlentities($alert['message']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ </div>
+ </div>
+ <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
+ </div>
+ </div>
+ <?php endif; ?>
+
  <div class="hdv-card mb-4">
  <div class="d-flex align-items-center gap-2 mb-3">
  <i class="bi bi-clock-history text-secondary fs-5"></i>
