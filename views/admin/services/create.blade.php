@@ -22,6 +22,15 @@
 
     <div class="card">
         <div class="card-body">
+            @if(isset($returnDepartureId) && (int)$returnDepartureId > 0)
+                <div class="alert alert-info d-flex align-items-center gap-2 mb-4">
+                    <i class="bi bi-info-circle-fill fs-5"></i>
+                    <div class="small">
+                        Bạn đang <strong>tạo dịch vụ cho chuyến khởi hành #{{ (int)$returnDepartureId }}</strong>. Sau khi lưu sẽ tự động quay lại trang chi tiết đoàn.
+                        <a href="{{ route('admin/departures/edit/' . (int)$returnDepartureId) }}" class="text-decoration-none ms-2">(Quay lại ngay)</a>
+                    </div>
+                </div>
+            @endif
             <form action="{{ route('admin/services/store') }}" method="POST">
                 <div class="row g-3 mb-2">
                     <div class="col-md-6">
@@ -144,9 +153,15 @@
                     <textarea name="note" class="form-control" rows="4">{{ isset($_POST['note']) ? htmlentities($_POST['note']) : '' }}</textarea>
                 </div>
 
-                <div class="mt-4 d-flex gap-2">
+                <div class="mt-4 d-flex gap-2 flex-wrap">
                     <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Lưu dịch vụ</button>
-                    <a href="{{ route('admin/services') }}" class="btn btn-secondary">Hủy</a>
+                    @if(isset($returnDepartureId) && (int)$returnDepartureId > 0)
+                        <a href="{{ route('admin/departures/edit/' . (int)$returnDepartureId) }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Quay lại đoàn
+                        </a>
+                    @else
+                        <a href="{{ route('admin/services') }}" class="btn btn-secondary">Hủy</a>
+                    @endif
                 </div>
             </form>
         </div>

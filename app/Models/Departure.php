@@ -311,5 +311,14 @@ class Departure extends Model
 
         return $this->connection->fetchAssociative($sql, [$id]) ?: null;
     }
+
+    public function getLastInsertId()
+    {
+        try {
+            return (int) $this->connection->lastInsertId();
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
 }
 

@@ -34,70 +34,6 @@
                     <th>Khách hàng</th>
                     <td>{{ $booking['customer_name'] }}</td>
                 </tr>
-                @php
-                    $departureStatusMap = [
-                        'scheduled'   => ['Lên lịch', 'bg-primary'],
-                        'in_progress' => ['Đang diễn ra', 'bg-warning text-dark'],
-                        'completed'   => ['Hoàn thành', 'bg-success'],
-                        'cancelled'   => ['Đã hủy', 'bg-secondary'],
-                    ];
-                @endphp
-                @if(!empty($booking['departure_id']))
-                <tr>
-                    <th>Chuyến khởi hành</th>
-                    <td>
-                        <div class="d-flex flex-column gap-2">
-                            <div class="d-inline-flex align-items-center flex-wrap gap-2">
-                                <i class="bi bi-calendar-week text-primary"></i>
-                                <span class="fw-semibold">
-                                    {{ !empty($booking['departure_group_name']) ? $booking['departure_group_name'] : ('Đoàn #' . (int)$booking['departure_id']) }}
-                                </span>
-                                @php
-                                    $ds = !empty($booking['departure_status']) ? $departureStatusMap[$booking['departure_status']] ?? null : null;
-                                @endphp
-                                @if($ds)
-                                    <span class="badge {{ $ds[1] }}">{{ $ds[0] }}</span>
-                                @endif
-                            </div>
-                            <div class="small text-muted">
-                                @if(!empty($booking['departure_date_info']))
-                                    <i class="bi bi-calendar me-1"></i>
-                                    Khởi hành: {{ date('d/m/Y', strtotime($booking['departure_date_info'])) }}
-                                @endif
-                                @if(!empty($booking['departure_return_date']) && (!empty($booking['departure_date_info']) && $booking['departure_return_date'] !== $booking['departure_date_info']))
-                                    <span class="mx-2">·</span>
-                                    Trở về: {{ date('d/m/Y', strtotime($booking['departure_return_date'])) }}
-                                @endif
-                            </div>
-                            <div class="d-flex flex-wrap gap-2">
-                                <a href="{{ route('admin/departures/edit/' . (int)$booking['departure_id']) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-box-arrow-up-right me-1"></i>Mở chi tiết đoàn
-                                </a>
-                                <a href="{{ route('admin/guest-groups/show/' . (int)$booking['departure_id']) }}" class="btn btn-sm btn-outline-dark">
-                                    <i class="bi bi-people me-1"></i>Danh sách khách đoàn
-                                </a>
-                                <a href="{{ route('admin/bookings/unassign-departure/' . (int)$booking['id']) }}"
-                                   class="btn btn-sm btn-outline-warning"
-                                   onclick="return confirm('Gỡ Booking này ra khỏi chuyến khởi hành hiện tại?')">
-                                    <i class="bi bi-x-circle me-1"></i>Gỡ khỏi đoàn
-                                </a>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                @else
-                <tr>
-                    <th>Chuyến khởi hành</th>
-                    <td>
-                        <div class="d-flex flex-wrap align-items-center gap-2">
-                            <span class="text-muted">Chưa gắn vào đoàn nào.</span>
-                            <a href="{{ route('admin/guest-groups/show/' . (int)$booking['tour_id']) }}" class="btn btn-sm btn-outline-success">
-                                <i class="bi bi-link-45deg me-1"></i>Gắn vào đoàn cùng tour
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                @endif
                 <tr>
                     <th>Email</th>
                     <td>{{ $booking['customer_email'] }}</td>
@@ -106,17 +42,11 @@
                     <th>Số điện thoại</th>
                     <td>{{ $booking['customer_phone'] }}</td>
                 </tr>
-                @php
-                    $pickup = !empty($booking['pickup_address']) ? $booking['pickup_address'] : (!empty($booking['departure_meeting_point']) ? $booking['departure_meeting_point'] : null);
-                @endphp
-                @if(!empty($pickup))
+                @if(!empty($booking['pickup_address']))
                 <tr>
                     <th>Địa chỉ đón khách hàng</th>
                     <td>
-                        <i class="bi bi-geo text-primary me-1"></i>{{ $pickup }}
-                        @if(!empty($booking['pickup_address']) && !empty($booking['departure_meeting_point']) && $booking['pickup_address'] !== $booking['departure_meeting_point'])
-                            <div class="mt-1"><small class="text-muted">Điểm tập kết đoàn: {{ $booking['departure_meeting_point'] }}</small></div>
-                        @endif
+                        <i class="bi bi-geo text-primary me-1"></i>{{ $booking['pickup_address'] }}
                     </td>
                 </tr>
                 @endif
@@ -177,12 +107,6 @@
                         @endphp
                     </td>
                 </tr>
-                @if(!empty($booking['departure_meeting_point']) && empty($booking['pickup_address']))
-                <tr>
-                    <th>Điểm tập kết (đoàn)</th>
-                    <td>{{ $booking['departure_meeting_point'] }}</td>
-                </tr>
-                @endif
                 <tr>
                     <th>Ghi chú</th>
                     <td>{!! !empty($booking['note']) ? nl2br(e($booking['note'])) : 'Không có ghi chú' !!}</td>

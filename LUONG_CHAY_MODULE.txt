@@ -1,0 +1,379 @@
+
+========================================================================
+               TÀI LIỆU GIẢI THÍCH LUỒNG CHẠY CÁC MODULE
+        (Đồng bộ Booking ↔ Khởi hành ↔ Dịch vụ đoàn ↔ Phân công HDV)
+                      Cập nhật: 07/08/2026
+========================================================================
+
+❕ Lưu ý: File này là TÀI LIỆU TEXT, KHÔNG tham gia vào runtime hệ thống.
+         Không ảnh hưởng 0.001% đến logic code / DB / các file PHP khác.
+
+========================================================================
+MỤC LỤC
+========================================================================
+1. TỔNG QUAN SƠ ĐỒ LUỒNG DỮ LIỆU
+2. 7 NGUYÊN TẮC THIẾT KẾ CHUNG (Áp dụng cho TẤT CẢ module con)
+3. LUỒNG CHẠY TỪNG MODULE CHI TIẾT
+   3.1 MODULE A: QUẢN LÝ KHỞI HÀNH (Departure) - TRUNG TÂM LIÊN KẾT
+   3.2 MODULE B: QUẢN LÝ BOOKING ↔ KHỞI HÀNH
+   3.3 MODULE C: DỊCH VỤ ĐOÀN (Services) ↔ KHỞI HÀNH
+   3.4 MODULE D: PHÂN CÔNG NHÂN SỰ (StaffAssignment) ↔ KHỞI HÀNH
+4. ĐIỂM RIÊNG - LUỒNG ĐỒNG BỘ THANH TOÁN THEO BOOKING
+5. DANH SÁCH FILE LIÊN QUAN (Mã nguồn chi tiết)
+
+
+========================================================================
+1. TỔNG QUAN SƠ ĐỒ LUỒNG DỮ LIỆU
+========================================================================
+
+   +-------------------------------------------------------------+
+   |                       CSDL (DATABASE)                       |
+   |  tables: tours, departures, bookings, services,            |
+   |          staff_assignments, staffs, booking_guests, users  |
+   +-----+-----------------------------+-------------------------+
+         |                             |
+   [ADMIN Portal]                [HDV Portal]
+         |                             |
+   Quản lý Khởi hành             Đăng nhập HDV
+   (departures/index)         (Auth → Auth::redirectPath →
+         |                     'hdv/dashboard' khi role='hdv')
+         |                             |
+   +-----v---------------------+       v----------------------------------+
+   | Card: Nhân sự phân bổ     |   Lấy HDV đang đăng nhập:               |
+   | Card: Danh sách Booking   |    -> Auth::hasBoundHdv()               |
+   | Card: Dịch vụ đoàn        |    -> $_SESSION['hdv_id'] = user.hdv_id |
+   +-----+---------------------+       |    (hoặc fallback ?hdv_id switch) |
+         |                             |    AssignedTourController         |
+         |                             v----------------------------------+
+  (Mỗi Card có 2 nút)                  |
+    [1] Lọc ở trang Quản lý X           v
+    [2] Tạo X cho đoàn này     -->  Tour được phân công (hdv/tour-phan-cong)
+         |
+         v
+    Tạo X cho đoàn N → gắn departure_id / tour_id
+  → Form Lưu → redirect QUAY LẠI departures/edit/{N} ✅ (Đồng bộ)
+
+
+========================================================================
+2. 7 NGUYÊN TẮC THIẾT KẾ CHUNG (P1 → P7)
+========================================================================
+Tất cả 3 module con (Booking / Service / StaffAssignment) khi liên kết
+với Departure đều TUÂN THEO CÙNG 1 BỘ QUY TẮC:
+
+P1. ENTRY 2 NÚT Ở CARD HEADER (trong departures/edit):
+    -> Nút 1: [🔍 Lọc ở trang Quản lý X] (filter list module theo departure)
+    -> Nút 2: [➕ Thêm / Tạo / Đặt X cho đoàn này] (gọi ?departure_id để prefill)
+
+P2. CREATE NHẬN QUERY PARAMS:
+    -> Tối thiểu:  ?tour_id=X & departure_id=Y
+    -> Tùy module: ?quantity=N (Service / Booking khi từ suggestion)
+    -> ?booking_id=N (Tạo chuyến khởi hành mới từ 1 booking chưa gắn)
+
+P3. VIEW CREATE: NẾU CÓ departure_id → HIỆN ALERT-INFO:
+    -> Nội dung: "Bạn đang <b>[Tạo / Phân bổ / Đặt] X</b> cho chuyến
+       khởi hành #N. Sau khi lưu sẽ tự động quay lại trang chi tiết đoàn."
+    -> Kèm link "(Quay lại ngay)" sang departures/edit/N
+
+P4. 2 NÚT ACTION CUỐI FORM (Create & Edit):
+    -> [💾 Lưu / Cập nhật] (primary btn)
+    -> [← Quay lại đoàn] (nếu có departure)  /  [Hủy] về list (thường)
+
+P5. CONTROLLER ACTION LUÔN REDIRECT ĐÚNG NGỮ CẢNH:
+    Nếu action đó có liên quan đến departure_id (store/update/delete):
+       -> KHÔNG redirect về list filter (?departure_id=X) CŨ NỮA
+       -> MÀ LUÔN redirect về:  admin/departures/edit/{departureId}
+    (Ngoại lệ: Tạo departure từ booking → redirect về booking/show để
+     admin thấy booking đã được tự gắn departure mới ✅)
+
+P6. NÚT XÓA TRONG CARD (departures/edit):
+    Luôn có onclick="return confirm('Bạn có chắc muốn X?')"
+    -> Tránh click nhầm làm mất dữ liệu.
+
+P7. CARD FOOTER (dưới bảng list):
+    Luôn có 1 dòng small d-flex thống kê nhanh:
+       Staff: Tổng N người · HDV chính: 2 · HDV phụ: 1 · Lái xe 1
+       Booking: Tổng N booking · Tổng pax X người · Tổng giá trị Y ₫
+       Service: Tổng N dịch vụ đoàn
+
+
+========================================================================
+3. LUỒNG CHẠY TỪNG MODULE CHI TIẾT
+========================================================================
+
+3.1 MODULE A: QUẢN LÝ KHỞI HÀNH (Departure) -- TRUNG TÂM LIÊN KẾT
+========================================================================
+Đây là HUB của tất cả các module khác (xem departure/edit là trang
+"chi tiết một đoàn", có thể quản lý mọi thứ liên quan đến đoàn đó).
+
+Entry (2 cách vào):
+   A. Menu sidebar: Quản lý khởi hành → departures/index
+        -> Bộ lọc: Tour / Trạng thái / Từ ngày...
+        -> Cột Thao tác mỗi dòng:
+             [📝 Sửa]        → departures/edit/{id}     (HUB này)
+             [👥 DS Booking] → admin/bookings?departure_id={id}
+             [📋 DS Dịch vụ]→ admin/services?departure_id={id}
+             [➕ Phân công] → staff-assignments/create?departure_id={id}
+
+   B. Từ Booking chưa gắn → bấm "Tạo chuyến từ booking"
+        → admin/departures/create?tour_id=X&booking_id=N
+
+--- departures/create ---
+@Params (tùy đường vào):
+   ?tour_id=X     → prefill <select tour_id> option selected
+   ?booking_id=N  → CHẾ ĐỘ TẠO TỪ BOOKING:
+      - $prefillFromBooking = Booking::findById(N) (validate: phải tồn tại
+        + booking.departure_id phải NULL - tránh gắn 2 lần)
+      - prefill 6 field trong form:
+          group_name      = Tên KH - Tên Tour - Ngày booking
+          tour_id selected= booking.tour_id (đồng thời set preTourId)
+          departure_date  = booking.booking_date
+          max_participants= booking.num_people
+          meeting_point   = booking.pickup_address
+      - <input hidden name="source_booking_id" value=N>
+      - Alert-primary ghi rõ "Bạn đang tạo chuyến từ Booking #N
+        (Tên khách · SĐT). Sau khi lưu hệ thống tự gắn booking này vào
+        đoàn mới tạo. [Xem Booking nguồn ↗]"
+
+@Controller store (DepartureController@store):
+   1. Validate rule cũ (tour_id required / return >= departure...)
+   2. Auto-sinh group_name nếu user để trống (Đoàn <Tên Tour> <ngày>)
+   3. 3 LỚP GUARD AN TOÀN (cho source_booking_id):
+       Guard 1: Booking nguồn phải tồn tại (findById) → sai thì set = 0
+       Guard 2: booking.departure_id == 0 → khác 0 flash warning
+                "Booking #N đã thuộc đoàn cũ, chỉ tạo chuyến, k gắn lại"
+                + set = 0
+       Guard 3: booking.tour_id === departure.tour_id → khác flash
+                warning "Tour booking nguồn không khớp, chỉ tạo chuyến"
+                + set = 0
+   4. Departure::insert($data)
+   5. $newDepId = Departure::getLastInsertId()  ✅ (vừa bổ sung method)
+   6. Nếu (newDepId>0 AND source_booking_id>0):
+        Booking::assignToDeparture(srcId, newDepId)
+        (Dùng LẠI METHOD CÓ SẴN → copy meeting_point→pickup_address
+         booking + reset check_in_status = 0 100% như cũ)
+        Flash success message có thêm:
+          "(Đã tự gắn Booking #N vào đoàn mới #M)"
+   7. Redirect post action (3 nhánh, đúng P5):
+        a) source_booking_id>0 → quay về admin/bookings/show/{N}
+           (admin thấy ngay dòng "Chuyến khởi hành" đã được điền đầy đủ)
+        b) tạo thường + có newDepId → admin/departures/edit/{newDepId}
+           (vào luôn trang HUB → tiện phân bổ nhân sự / đặt dịch vụ)
+        c) lỗi getLastInsertId → admin/departures (list)
+
+--- departures/edit (TRANG HUB) ---
+4 phần (theo thứ tự ưu tiên trên trang):
+   1. Form chỉnh sửa thông tin cơ bản đoàn (tour / ngày / max / meeting
+      point / phương tiện / trạng thái / notes + suggestion KH đã đặt)
+   2. CARD 1 (border-secondary): NHÂN SỰ ĐÃ PHÂN BỔ (P1→P7)
+   3. CARD 2 (border-primary):   DANH SÁCH BOOKING THUỘC ĐOÀN
+   4. CARD 3 (border-dark):      DỊCH VỤ ĐOÀN CỦA CHUYẾN KHỞI HÀNH
+
+
+3.2 MODULE B: QUẢN LÝ BOOKING ↔ KHỞI HÀNH
+========================================================================
+Mục tiêu: Booking và Departure liên kết 2 chiều chặt chẽ, 0 gắn sai tour.
+
+Booking index:
+   -> Bộ lọc (3 select): Tour ↔ Chuyến khởi hành (lọc theo data-tour)
+                         ↔ Trạng thái
+   -> Alert "Đang xem: Tour X | Chuyến Y | Trạng thái Z" khi lọc
+   -> Cột "Chuyến khởi hành" (mới):
+      + Đã gắn: group_name + badge trạng thái + [Mở đoàn] [Gỡ]
+      + Chưa gắn: 2 nút (P2 style):
+          🔝 [➕ Tạo chuyến từ booking] (PRIMARY)
+                → departures/create?tour_id=X&booking_id=N
+                (Xem 3.1 create từ booking trên)
+          ⬇️ [🔗 Gắn vào đoàn có sẵn]
+                → departures?tour_id=X (lọc các chuyến cùng tour)
+
+Booking show (chi tiết 1 booking):
+   -> Row "Chuyến khởi hành": tương tự index, thêm nút [👥 Danh sách
+      khách đoàn] sang guest-groups/show/{departure_id} (route đúng).
+
+Booking create/edit:
+   -> Row 2 cột:  Tour ↔ Chuyến khởi hành (tùy chọn)
+      + Option departure có 4 data-*: data-tour / data-departure /
+        data-return / data-meeting (ENT_QUOTES)
+      + JS filterDepartures() onChange tour → hide options khác tour.
+      + JS applyDeparture() chọn chuyến → tự điền:
+          booking_date  = departure_date (nếu trống / = hôm nay - create)
+          pickup_address= meeting_point (nếu trống)
+      + NẾU tour có 0 chuyến → hiện alert-warning ngay dưới select,
+        kèm nút [➕ Tạo chuyến cho tour này] (target _blank, sau khi tạo
+        xong quay lại tab cũ vẫn giữ nguyên input user đã điền ✅).
+   -> Server Validate (BookingController@store / @update):
+        if (chọn departure_id):
+          Kiểm tra departure.tour_id === booking.tour_id → SAI thì
+          flash lỗi "Chuyến khởi hành không thuộc về tour đã chọn"
+          (Ngăn bypass JS filter)
+   -> Post store / update:
+      Gọi Booking::assignToDeparture($bookingId, $depId) (có sẵn)
+      Nếu swap departure (old ≠ new): removeFromDeparture(old) trước.
+      Redirect: có departure_id → admin/bookings?departure_id=X
+                (giữ filter nhìn thấy booking vừa tạo trong list đoàn)
+
+--- Route đặc biệt ---
+  GET admin/bookings/unassign-departure/{id}
+     (Gỡ 1 booking ra khỏi đoàn - giống nút [X] trong card departure
+      edit Booking list, confirm "Gỡ booking #N ra khỏi chuyến này?")
+  → gọi Booking::removeFromDeparture(id)
+  → redirect về admin/bookings?departure_id=X (giữ filter)
+
+
+3.3 MODULE C: DỊCH VỤ ĐOÀN (Service) ↔ KHỞI HÀNH
+========================================================================
+(Sau khi thống nhất P1→P7)
+
+Service index:
+   -> Bộ lọc: Tour ↔ Chuyến khởi hành (data-tour JS filter)
+              ↔ Loại dịch vụ ↔ Trạng thái
+   -> Cột "Chuyến khởi hành" (mới): link group_name + ngày +
+      [Mở đoàn] / [Gỡ]
+
+Service create (đường từ departures/edit):
+   GET admin/services/create?tour_id=X&departure_id=Y&quantity=N
+   → $preTourId, $preDepartureId, $preQty, $returnDepartureId (mới)
+   → Alert-info (P3) "Bạn đang tạo dịch vụ cho đoàn #Y..."
+   → Form tự điền departure_id selected / quantity prefill
+   → JS filterDepartures() + applyDeparture() tự điền start_time =
+      departure T06:00, end_time = return T20:00 (nếu user để trống)
+
+Service store / update / delete (P5 redirect mới):
+   Trước đây → redirect('admin/services?departure_id=X')
+   Bây giờ  → redirect('admin/departures/edit/{X}') ✅ (về lại HUB)
+   -> Giúp admin thấy ngay card Dịch vụ đoàn đã cập nhật dòng mới.
+
+Service create/edit view (P4 buttons):
+   -> [💾 Lưu dịch vụ] + [← Quay lại đoàn]   (khi có departure_id)
+   -> [💾 Cập nhật]   + [← Quay lại đoàn]   (khi có departure_id)
+   -> Fallback: [Hủy] quay về admin/services
+
+
+3.4 MODULE D: PHÂN CÔNG NHÂN SỰ (StaffAssignment) ↔ KHỞI HÀNH
+========================================================================
+(Được thống nhất sớm nhất, bây giờ hoàn toàn khớp P1→P7)
+
+Entry 2 nút Card Header (P1, vừa bổ sung nút Lọc thiếu):
+   [🔍 Lọc ở trang Phân công] → staff-assignments?departure_id=N
+   [➕ Thêm nhân sự]          → staff-assignments/create?departure_id=N
+
+Create / Edit view (P3+P4):
+   -> Alert-info "Bạn đang phân bổ cho đoàn #N...(Quay lại ngay)"
+   -> Buttons cuối: [💾 Lưu phân bổ] + [← Quay lại đoàn]
+
+Controller redirect (P5 - đã có sẵn từ yêu cầu trước):
+   store / update /delete:
+      if (departure_id>0) → departures/edit/{id}  ✅
+      else                → staff-assignments
+
+Card footer Thống kê (P7 - vừa bổ sung, trc đây thiếu):
+   "Tổng: N nhân sự phân bổ · HDV chính: 2 · HDV phụ: 1 · Lái xe: 1..."
+
+Đặc biệt (trong card staff list - cột thao tác):
+   + [↗] btn-outline-info target _blank → hdv/tour-phan-cong?hdv_id={staffId}
+     (Admin mở cổng HDV xem ngay "tour được phân công" của nhân sự đó
+      → kiểm tra đúng sơ đồ Database → 2 portal đọc cùng dữ liệu)
+
+
+========================================================================
+4. ĐIỂM RIÊNG: LUỒNG ĐỒNG BỘ THANH TOÁN THEO BOOKING
+========================================================================
+(Không liên quan đến Departure, nhưng là nghiệp vụ cross-module quan
+ trọng, đã làm ở yêu cầu trước, tóm tắt cho đầy đủ tài liệu)
+
+Mục tiêu: Khi người đại diện (1 khách trong booking) thanh toán, tất
+cả các thành viên khác cùng booking tự có payment_status giống nhau
+→ KHÔNG phải chỉnh sửa từng người 1.
+
+Điểm entry 2 kiểu (đều gọi cùng 1 method cuối):
+   Kiểu 1: Nút nhanh trên bảng guest-groups/show:
+       + Nếu unpaid → btn-success  "[$$] Đánh dấu Đã thanh toán"
+         confirm: "Đồng bộ trạng thái thanh toán cho TẤT CẢ khách trong
+                   cùng booking này?"
+       + Nếu paid  → btn-warning "[X] Bỏ thanh toán" (confirm tương tự)
+       → Route: markGuestPaid(deptId, guestId) / markGuestUnpaid(...)
+       → private togglePaymentForBookingOfGuest(deptId, guestId, status)
+           1. findById(guestId) → lấy bookingId
+           2. ✅ Gọi BookingGuest::syncPaymentStatusByBookingId(bookingId, status)
+              (QueryBuilder UPDATE ... WHERE booking_id=? + setParameter
+               - Chống SQL injection, hiệu suất bulk update tốt)
+           3. Flash message ghi rõ: "Đã đồng bộ trạng thái [Đã thanh toán]
+              cho 5/5 khách hàng trong booking #N"
+           4. Redirect về guest-groups/show/{deptId}?booking_id=N
+
+   Kiểu 2: Sửa từng khách (POST GuestGroupController@updateGuest):
+       -> Sau khi save từng guest 1 dòng → KIỂM TRA nếu payment_status
+          có thay đổi thì gọi CÙNG method syncPaymentStatusByBookingId()
+          → Nhất quán với kiểu 1.
+
+Ràng buộc KHÔNG ĐƯỢC PHÉP phá vỡ (Hard Constraints):
+   + syncPaymentStatusByBookingId CHỈ update cột payment_status
+     → KHÔNG được chạm / thay đổi check_in_status / thông tin cá nhân
+       (tên / sđt / email...) của khách.
+   + Mọi action thay đổi payment_status của 1 khách trong booking
+     → LUÔN tự apply cho TẤT CẢ booking_guests cùng booking_id đó.
+
+
+========================================================================
+5. DANH SÁCH FILE LIÊN QUAN (Mã nguồn chi tiết)
+========================================================================
+
+--- Models ---
+app/Models/Booking.php              # Booking + filter / assignTo / removeFrom / getLastInsertId
+app/Models/Departure.php            # Departure + getUpcoming / find(id) withStats + ✅ getLastInsertId() (mới bổ sung)
+app/Models/Service.php              # Service + filter by departure_id + getByDepartureId
+app/Models/StaffAssignment.php      # StaffAssignment + getAvailableStaff
+app/Models/BookingGuest.php         # ✅ syncPaymentStatusByBookingId(bookingId, status)
+
+--- Controllers Admin ---
+app/Controllers/Admin/BookingController.php        # index filter 3 trường, create từ departure, unassign route
+app/Controllers/Admin/DepartureController.php      # ✅ create từ booking, source_booking_id store redirect về booking show / edit
+app/Controllers/Admin/ServiceController.php        # ✅ store/update/delete redirect về departure.edit (P5)
+app/Controllers/Admin/StaffAssignmentController.php# ✅ create/edit truyền returnDepartureId, redirect về departure.edit
+app/Controllers/Admin/GuestGroupController.php     # ✅ markGuestPaid / Unpaid + togglePaymentForBookingOfGuest
+
+--- Controllers Hdv Portal ---
+app/Controllers/Hdv/AssignedTourController.php     # hdv/tour-phan-cong: lấy tour phân công theo HDV đăng nhập
+app/Controllers/Hdv/TourInfoController.php         # hdv/thong-tin-tour
+
+--- Views Admin: Departures HUB ---
+views/admin/departures/edit.blade.php              # 3 Cards (Nhân sự / Booking / Dịch vụ) - P1 + P7 thống nhất
+
+--- Views Admin: Bookings ---
+views/admin/bookings/index.blade.php               # Bộ lọc 3 select + Cột Chuyến khởi hành + 2 nút khi chưa gắn
+views/admin/bookings/show.blade.php                # Row Chuyến khởi hành + Mở đoàn / DS khách đoàn / Gỡ khỏi đoàn
+views/admin/bookings/create.blade.php              # 2 cột Tour + Departure + JS filter + Tạo chuyến từ tour khi 0 option
+views/admin/bookings/edit.blade.php                # Tương tự create + selected theo booking cũ
+
+--- Views Admin: Services ---
+views/admin/services/index.blade.php               # Filter tour-departure + Cột Chuyến khởi hành
+views/admin/services/create.blade.php              # ✅ Alert-info + Quay lại đoàn (giống staff)
+views/admin/services/edit.blade.php                # ✅ Alert-info + Quay lại đoàn (giống staff)
+
+--- Views Admin: StaffAssignment ---
+views/admin/staff-assignments/create.blade.php     # Alert-info + Quay lại đoàn
+views/admin/staff-assignments/edit.blade.php       # Alert-info + Quay lại đoàn
+
+--- Views: Hdv ---
+views/layouts/hdv.blade.php                        # Sidebar menu Tour được phân công + selector HDV cho admin test
+
+--- Routes ---
+routes/web.php
+    # Booking ↔ Departure
+    GET  admin/bookings/unassign-departure/(\d+)  → BookingController@unassignDeparture
+
+    # Đồng bộ thanh toán theo booking (guest)
+    GET  admin/guest-groups/booking-guests/payment-paid/(\d+)/(\d+)
+    GET  admin/guest-groups/booking-guests/payment-unpaid/(\d+)/(\d+)
+
+    # Hdv portal
+    GET  hdv/tour-phan-cong                        → AssignedTourController@index
+    GET  hdv/thong-tin-tour                        → TourInfoController@index
+
+--- Auth / Support ---
+app/Support/Auth.php                   # Auth::hasBoundHdv() + Auth::redirectPath() trả về 'hdv/dashboard' với role='hdv'
+
+
+========================================================================
+HẾT - TÀI LIỆU NÀY ĐƯỢC TẠO RIÊNG, KHÔNG ẢNH HƯỞNG RUNTIME HỆ THỐNG
+========================================================================

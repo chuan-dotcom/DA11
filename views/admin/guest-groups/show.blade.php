@@ -42,6 +42,15 @@
             <div class="text-muted">{{ $guestGroup['tour_name'] ?? '-' }}</div>
         </div>
         <div class="d-flex gap-2 flex-wrap">
+            @if(!$hasLeadGuide)
+                <a href="{{ route('admin/staff-assignments/create') }}?departure_id={{ (int)$guestGroup['id'] }}" class="btn btn-danger" title="Bước bắt buộc để HDV nhận được đoàn trên cổng HDV">
+                    <i class="bi bi-person-plus-fill"></i> Phân công HDV (bắt buộc)
+                </a>
+            @else
+                <a href="{{ route('admin/staff-assignments/create') }}?departure_id={{ (int)$guestGroup['id'] }}" class="btn btn-outline-info">
+                    <i class="bi bi-person-plus"></i> Thêm nhân sự
+                </a>
+            @endif
             <a href="{{ route('admin/guest-groups') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Danh sách đoàn
             </a>
@@ -66,6 +75,66 @@
     @if(isset($_SESSION['flash']['error']))
         <div class="alert alert-danger">{{ $_SESSION['flash']['error'] }}</div>
         @php unset($_SESSION['flash']['error']); @endphp
+
+    @if($hdvCount === 0 || !$hasLeadGuide)
+        <div class="alert alert-{{ $hdvCount === 0 ? 'danger' : 'warning' }} d-flex flex-wrap align-items-center gap-3 mb-4">
+            <div class="flex-grow-1">
+                @if($hdvCount === 0)
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Đoàn này CHƯA được phân công bất kỳ nhân sự / HDV nào.</strong><br>
+                    ⚠️ Nếu không phân công → HDV sẽ <strong>không thấy đoàn này</strong> trong phần
+                    <code>Tour được phân công</code> ở Cổng Hướng dẫn viên → không làm nhiệm vụ check-in & dẫn đoàn.
+                @else
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <strong>Đoàn này đã có {{ $hdvCount }} nhân sự được phân công, nhưng <em>chưa có HDV chính (lead_guide)</em>.</strong><br>
+                    Hãy bổ nhiệm ít nhất 1 người làm <strong>HDV chính</strong> để đoàn được quản lý tập trung.
+                @endif
+            </div>
+            <a href="{{ route('admin/staff-assignments/create') }}?departure_id={{ (int)$guestGroup['id'] }}" class="btn btn-{{ $hdvCount === 0 ? 'danger' : 'warning' }} fw-bold">
+                <i class="bi bi-person-plus me-1"></i> Phân công HDV ngay
+            </a>
+            <a href="{{ route('admin/departures/edit/' . $guestGroup['id']) }}#nhan-su-doan" class="btn btn-outline-{{ $hdvCount === 0 ? 'danger' : 'warning' }}">
+                <i class="bi bi-eye me-1"></i> Xem tại Sửa đoàn
+            </a>
+        </div>
+    @else
+        <div class="alert alert-success d-flex flex-wrap align-items-center gap-3 mb-4">
+            <div class="flex-grow-1">
+                <i class="bi bi-check2-circle me-2"></i>
+                <strong>Đoàn này đã phân công đủ:</strong> {{ $hdvCount }} nhân sự (đã có HDV chính)
+                @if(!empty($assignedStaff))
+                    <ul class="mb-0 mt-2 list-inline">
+                        @foreach($assignedStaff as $a)
+                            @php
+                                $roleMap = [
+                                    'lead_guide' => ['HDV chính', 'bg-success text-white'],
+                                    'assistant_guide' => ['HDV phụ', 'bg-info text-white'],
+                                    'driver' => ['Lái xe', 'bg-secondary text-white'],
+                                    'other' => ['Nhân sự', 'bg-light text-dark'],
+                                ];
+                                $roleInfo = $roleMap[$a['role'] ?? 'other'] ?? [$a['role'] ?? 'other', 'bg-light text-dark'];
+                                $name = trim((string)($a['staff_name'] ?? ''));
+                                if ($name === '' && !empty($a['staff_last_name']) && !empty($a['staff_first_name'])) {
+                                    $name = trim($a['staff_last_name'] . ' ' . $a['staff_first_name']);
+                                }
+                            @endphp
+                            <li class="list-inline-item mb-1">
+                                <span class="badge {{ $roleInfo[1] }} me-1">{{ $roleInfo[0] }}</span>
+                                <strong>{{ $name ?: 'Nhân sự #' . ((int)($a['staff_id'] ?? 0)) }}</strong>
+                                @if(!empty($a['responsibilities']))
+                                    <small class="text-muted ms-1"><em>{{ $a['responsibilities'] }}</em></small>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+                <div class="small mt-1 text-dark">✅ Dữ liệu đoàn, danh sách khách & check-in sẽ tự động hiển thị trên cổng Hướng dẫn viên trong mục <code>Tour được phân công</code> của từng nhân sự.</div>
+            </div>
+            <a href="{{ route('admin/staff-assignments/create') }}?departure_id={{ (int)$guestGroup['id'] }}" class="btn btn-outline-success">
+                <i class="bi bi-plus-circle me-1"></i> Thêm nhân sự
+            </a>
+        </div>
+    @endif
     @endif
 
     <div class="card group-card mb-4">

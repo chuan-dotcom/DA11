@@ -18,42 +18,19 @@
     <div class="card">
         <div class="card-body">
             <form action="{{ route('admin/bookings/store') }}" method="POST">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="mb-0">
-                            <label class="form-label">Tour du lịch <span class="text-danger">*</span></label>
-                            <select name="tour_id" id="tour_id" class="form-select" required>
-                                <option value="">-- Chọn Tour --</option>
-                                @foreach($tours as $tour)
-                                    <option value="{{ $tour['id'] }}" data-price="{{ $tour['price'] ?? 0 }}" {{ (isset($preTourId) && (int)$preTourId === (int)$tour['id']) ? 'selected' : '' }}>
-                                        {{ $tour['name'] }} ({{ number_format($tour['price']) }} VNĐ)
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-0">
-                            <label class="form-label">Chuyến khởi hành <span class="text-muted small">(tùy chọn)</span></label>
-                            <select name="departure_id" id="departure_id" class="form-select">
-                                <option value="">-- Không gắn vào đoàn --</option>
-                                @foreach($departures as $d)
-                                    <option value="{{ $d['id'] }}"
-                                            data-tour="{{ (int)($d['tour_id'] ?? 0) }}"
-                                            data-departure="{{ !empty($d['departure_date']) ? date('Y-m-d', strtotime($d['departure_date'])) : '' }}"
-                                            data-return="{{ !empty($d['return_date']) ? date('Y-m-d', strtotime($d['return_date'])) : '' }}"
-                                            data-meeting="{{ !empty($d['meeting_point']) ? htmlspecialchars($d['meeting_point'], ENT_QUOTES) : '' }}"
-                                            {{ (isset($preDepartureId) && (int)$preDepartureId === (int)$d['id']) ? 'selected' : '' }}>
-                                        #{{ $d['id'] }} - {{ $d['group_name'] ?? ('Đoàn ' . ($d['tour_name'] ?? 'Tour')) }} ({{ !empty($d['departure_date']) ? date('d/m/Y', strtotime($d['departure_date'])) : '-' }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            <div class="form-text small opacity-75">Chọn Tour ở trên sẽ tự lọc các chuyến khởi hành phù hợp. Nếu chọn chuyến → tự động gắn ngày khởi hành &amp; địa chỉ đón (nếu chưa điền).</div>
-                        </div>
-                    </div>
+                <div class="mb-3 mt-2">
+                    <label class="form-label">Tour du lịch <span class="text-danger">*</span></label>
+                    <select name="tour_id" id="tour_id" class="form-select" required>
+                        <option value="">-- Chọn Tour --</option>
+                        @foreach($tours as $tour)
+                            <option value="{{ $tour['id'] }}" data-price="{{ $tour['price'] ?? 0 }}" {{ (isset($preTourId) && (int)$preTourId === (int)$tour['id']) ? 'selected' : '' }}>
+                                {{ $tour['name'] }} ({{ number_format($tour['price']) }} VNĐ)
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
-                <div class="mb-3 mt-3">
+                <div class="mb-3">
                     <label class="form-label">Họ tên khách hàng</label>
                     <input type="text" name="customer_name" class="form-control" value="{{ 
                         isset($_POST['customer_name']) ? htmlentities($_POST['customer_name']) : '' }}" required>
@@ -125,57 +102,4 @@
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const tourSel = document.getElementById('tour_id');
-    const depSel = document.getElementById('departure_id');
-    const bookingDate = document.getElementById('booking_date');
-    const pickupAddr = document.getElementById('pickup_address');
-    if (!tourSel || !depSel) return;
-
-    const depOpts = Array.from(depSel.options).filter(o => o.value !== '');
-
-    function filterDepartures() {
-        const tourVal = tourSel.value ? parseInt(tourSel.value, 10) : 0;
-        const prev = depSel.value;
-        depSel.innerHTML = '';
-        const allOpt = document.createElement('option');
-        allOpt.value = '';
-        allOpt.textContent = '-- Không gắn vào đoàn --';
-        depSel.appendChild(allOpt);
-        depOpts.forEach(o => {
-            const t = parseInt(o.getAttribute('data-tour') || '0', 10);
-            if (!tourVal || tourVal === t) {
-                const copy = o.cloneNode(true);
-                depSel.appendChild(copy);
-            }
-        });
-        if (prev && depSel.querySelector('option[value="' + prev + '"]')) {
-            depSel.value = prev;
-        }
-    }
-
-    function applyDeparture(opt) {
-        if (!opt || !opt.dataset) return;
-        const depDate = opt.getAttribute('data-departure') || '';
-        const meet = opt.getAttribute('data-meeting') || '';
-        if (depDate && (!bookingDate.value || bookingDate.value === '{{ date('Y-m-d') }}')) {
-            bookingDate.value = depDate;
-        }
-        if (meet && !pickupAddr.value) {
-            pickupAddr.value = meet;
-        }
-    }
-
-    tourSel.addEventListener('change', filterDepartures);
-    depSel.addEventListener('change', function() {
-        const sel = this.options[this.selectedIndex];
-        if (sel && sel.value) applyDeparture(sel);
-    });
-    filterDepartures();
-    const initSel = depSel.options[depSel.selectedIndex];
-    if (initSel && initSel.value) applyDeparture(initSel);
-});
-</script>
 @endsection

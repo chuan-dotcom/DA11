@@ -5,21 +5,18 @@ namespace App\Controllers\Admin;
 use App\Controller;
 use App\Models\Booking;
 use App\Models\Tour;
-use App\Models\Departure;
 use Rakit\Validation\Validator;
 
 class BookingController extends Controller
 {
     private $modelBooking;
     private $modelTour;
-    private $modelDeparture;
     private $validator;
 
     public function __construct()
     {
         $this->modelBooking = new Booking();
         $this->modelTour = new Tour();
-        $this->modelDeparture = new Departure();
         $this->validator = new Validator();
     }
 
@@ -31,7 +28,6 @@ class BookingController extends Controller
         $title = 'Danh sách khách hàng';
 
         $tourId = isset($_GET['tour_id']) ? (int)$_GET['tour_id'] : null;
-        $departureId = isset($_GET['departure_id']) ? (int)$_GET['departure_id'] : null;
         $status = isset($_GET['status']) ? trim((string)$_GET['status']) : null;
         if ($status === '') {
             $status = null;
@@ -39,22 +35,18 @@ class BookingController extends Controller
         if ($tourId !== null && $tourId <= 0) {
             $tourId = null;
         }
-        if ($departureId !== null && $departureId <= 0) {
-            $departureId = null;
-        }
 
         $tours = $this->modelTour->getAll();
-        $departures = $this->modelDeparture->getAll();
 
-        if ($tourId === null && $departureId === null && $status === null) {
+        if ($tourId === null && $status === null) {
             $bookings = $this->modelBooking->getAll();
         } else {
-            $bookings = $this->modelBooking->filter($tourId, $departureId, $status);
+            $bookings = $this->modelBooking->filter($tourId, null, $status);
         }
 
         return view(
             'admin.bookings.index',
-            compact('title', 'bookings', 'tours', 'departures', 'tourId', 'departureId', 'status')
+            compact('title', 'bookings', 'tours', 'tourId', 'status')
         );
     }
 
@@ -66,24 +58,12 @@ class BookingController extends Controller
         $title = 'Thêm Booking';
 
         $tours = $this->modelTour->getAll();
-        $departures = $this->modelDeparture->getAll();
 
         $preTourId = isset($_GET['tour_id']) ? (int)$_GET['tour_id'] : 0;
-        $preDepartureId = isset($_GET['departure_id']) ? (int)$_GET['departure_id'] : 0;
-
-        if ($preDepartureId > 0) {
-            try {
-                $dep = $this->modelDeparture->findById($preDepartureId);
-                if ($dep && (int)$dep['tour_id'] > 0 && $preTourId <= 0) {
-                    $preTourId = (int)$dep['tour_id'];
-                }
-            } catch (\Throwable $e) {
-            }
-        }
 
         return view(
             'admin.bookings.create',
-            compact('title', 'tours', 'departures', 'preTourId', 'preDepartureId')
+            compact('title', 'tours', 'preTourId')
         );
     }
 
@@ -113,8 +93,6 @@ class BookingController extends Controller
             'note' => $_POST['note']
 
         ];
-
-        $departureId = !empty($_POST['departure_id']) ? (int)$_POST['departure_id'] : 0;
 
         $rules = [
 
@@ -153,35 +131,15 @@ class BookingController extends Controller
             return redirect('admin/bookings/create');
         }
 
-        if ($departureId > 0) {
-            $departure = $this->modelDeparture->findById($departureId);
-            if (!$departure) {
-                setFlash('error', 'Chuyến khởi hành không tồn tại');
-                return redirect('admin/bookings/create');
-            }
-            if ((int)$departure['tour_id'] !== (int)$data['tour_id']) {
-                setFlash('error', 'Chuyến khởi hành không thuộc về tour đã chọn');
-                return redirect('admin/bookings/create');
-            }
-        }
-
         $data['total_price'] = $tour['price'] * (int) $data['num_people'];
 
         $this->modelBooking->insert($data);
-        $bookingId = (int)$this->modelBooking->getLastInsertId();
-
-        if ($departureId > 0 && $bookingId > 0) {
-            $this->modelBooking->assignToDeparture($bookingId, $departureId);
-        }
 
         setFlash(
             'success',
-            'Thêm Booking thành công!' . ($departureId > 0 ? ' (Đã gắn vào chuyến khởi hành)' : '')
+            'Thêm Booking thành công!'
         );
 
-        if ($departureId > 0) {
-            return redirect('admin/bookings?departure_id=' . $departureId);
-        }
         return redirect('admin/bookings');
     }
 
@@ -205,15 +163,13 @@ class BookingController extends Controller
         }
 
         $tours = $this->modelTour->getAll();
-        $departures = $this->modelDeparture->getAll();
 
         return view(
             'admin.bookings.edit',
             compact(
                 'title',
                 'booking',
-                'tours',
-                'departures'
+                'tours'
             )
         );
     }
@@ -231,7 +187,6 @@ class BookingController extends Controller
             );
             return redirect('admin/bookings');
         }
-        $oldDepartureId = (int)($booking['departure_id'] ?? 0);
 
         $data = [
 
@@ -254,8 +209,6 @@ class BookingController extends Controller
             'note' => $_POST['note']
 
         ];
-
-        $departureId = !empty($_POST['departure_id']) ? (int)$_POST['departure_id'] : 0;
 
         $rules = [
 
@@ -296,60 +249,16 @@ class BookingController extends Controller
             return redirect('admin/bookings/edit/' . $id);
         }
 
-        if ($departureId > 0) {
-            $departure = $this->modelDeparture->findById($departureId);
-            if (!$departure) {
-                setFlash('error', 'Chuyến khởi hành không tồn tại');
-                return redirect('admin/bookings/edit/' . $id);
-            }
-            if ((int)$departure['tour_id'] !== (int)$data['tour_id']) {
-                setFlash('error', 'Chuyến khởi hành không thuộc về tour đã chọn');
-                return redirect('admin/bookings/edit/' . $id);
-            }
-        }
-
         $data['total_price'] = $tour['price'] * (int) $data['num_people'];
 
         $this->modelBooking->update($id, $data);
 
-        if ($departureId !== $oldDepartureId) {
-            if ($oldDepartureId > 0) {
-                try {
-                    $this->modelBooking->removeFromDeparture($id, $oldDepartureId);
-                } catch (\Throwable $e) {
-                }
-            }
-            if ($departureId > 0) {
-                $this->modelBooking->assignToDeparture($id, $departureId);
-            }
-        }
-
         setFlash(
             'success',
-            'Cập nhật Booking thành công!' . ($departureId > 0 ? ' (Đã cập nhật chuyến khởi hành)' : '')
+            'Cập nhật Booking thành công!'
         );
 
-        if ($departureId > 0) {
-            return redirect('admin/bookings?departure_id=' . $departureId);
-        }
         return redirect('admin/bookings');
-    }
-
-    public function unassignDeparture($id)
-    {
-        $booking = $this->modelBooking->findById($id);
-        if (!$booking) {
-            setFlash('error', 'Booking không tồn tại');
-            return redirect('admin/bookings');
-        }
-        $departureId = (int)($booking['departure_id'] ?? 0);
-        if ($departureId <= 0) {
-            setFlash('warning', 'Booking này chưa thuộc đoàn nào.');
-            return redirect('admin/bookings');
-        }
-        $this->modelBooking->removeFromDeparture($id, $departureId);
-        setFlash('success', 'Đã gỡ Booking khỏi chuyến khởi hành.');
-        return redirect('admin/bookings?departure_id=' . $departureId);
     }
 
     /**

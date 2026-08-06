@@ -149,12 +149,17 @@
  </div>
  </div>
 
- <div class="card">
+ <div class="card mt-4 border-secondary">
  <div class="card-header d-flex justify-content-between align-items-center bg-light">
- <h5 class="mb-0"><i class="bi bi-people me-2"></i>Nhân sự đã phân bổ</h5>
+ <h5 class="mb-0"><i class="bi bi-people-fill text-secondary me-2"></i>Nhân sự đã phân bổ</h5>
+ <div class="d-flex gap-2 flex-wrap">
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments')??'', ENT_QUOTES, 'UTF-8', false); ?>?departure_id=<?php echo \htmlentities($departure['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-outline-secondary">
+ <i class="bi bi-funnel me-1"></i> Lọc ở trang Phân công
+ </a>
  <a href="<?php echo \htmlentities(route('admin/staff-assignments/create')??'', ENT_QUOTES, 'UTF-8', false); ?>?departure_id=<?php echo \htmlentities($departure['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-success">
  <i class="bi bi-person-plus"></i> Thêm nhân sự
  </a>
+ </div>
  </div>
  <div class="card-body">
  <?php if(empty($assignments)): ?>
@@ -196,7 +201,13 @@
  <td><?php echo \htmlentities($a['staff_experience'] ? $a['staff_experience'] . ' năm' : '-'??'', ENT_QUOTES, 'UTF-8', false); ?></td>
  <td><?php echo \htmlentities($a['responsibilities'] ?? '-'??'', ENT_QUOTES, 'UTF-8', false); ?></td>
  <td class="text-nowrap">
- <a href="<?php echo \htmlentities(route('admin/staff-assignments/edit/' . $a['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-warning">
+ <a href="<?php echo \htmlentities(route('hdv/tour-phan-cong')??'', ENT_QUOTES, 'UTF-8', false); ?>?hdv_id=<?php echo \htmlentities((int)$a['staff_id']??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ target="_blank" rel="noopener"
+ class="btn btn-sm btn-outline-info me-1"
+ title="Mở cổng HDV xem tour được phân công của nhân sự này">
+ <i class="bi bi-box-arrow-up-right"></i>
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/edit/' . $a['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-warning me-1">
  <i class="bi bi-pencil"></i>
  </a>
  <a href="<?php echo \htmlentities(route('admin/staff-assignments/delete/' . $a['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"
@@ -209,6 +220,148 @@
  <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
  </tbody>
  </table>
+ </div>
+ <div class="mt-2 small text-muted d-flex flex-wrap gap-3 align-items-center">
+ <span><i class="bi bi-info-circle me-1"></i>Tổng: <strong><?php echo \htmlentities(count($assignments)??'', ENT_QUOTES, 'UTF-8', false); ?></strong> nhân sự phân bổ</span>
+ <?php 
+ $countRole = [];
+ foreach ($assignments as $a) {
+ $rr = $a['role'] ?? 'other';
+ if (!isset($countRole[$rr])) { $countRole[$rr] = 0; }
+ $countRole[$rr]++;
+ }
+ $roleLabel = [
+ 'lead_guide' => 'HDV chính',
+ 'assistant_guide' => 'HDV phụ',
+ 'driver' => 'Lái xe',
+ 'photographer' => 'Nhiếp ảnh',
+ 'other' => 'Khác',
+ ];
+ $roleParts = [];
+ foreach ($countRole as $rr => $c) {
+ $lbl = $roleLabel[$rr] ?? $rr;
+ $roleParts[] = $lbl . ': <strong>' . (int)$c . '</strong>';
+ }
+ ?>
+ <?php if(!empty($roleParts)): ?>
+ <span><?php echo implode(' · ', $roleParts); ?></span>
+ <?php endif; ?>
+ </div>
+ <?php endif; ?>
+ </div>
+ </div>
+
+ <div class="card mt-4 border-primary">
+ <div class="card-header bg-light d-flex flex-wrap gap-2 justify-content-between align-items-center">
+ <h5 class="mb-0 fw-semibold">
+ <i class="bi bi-journal-text text-primary me-2"></i>Danh sách booking thuộc đoàn này
+ </h5>
+ <div class="d-flex gap-2 flex-wrap">
+ <a href="<?php echo \htmlentities(route('admin/bookings')??'', ENT_QUOTES, 'UTF-8', false); ?>?departure_id=<?php echo \htmlentities($departure['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-outline-primary btn-sm">
+ <i class="bi bi-funnel me-1"></i> Lọc ở trang Quản lý booking
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/bookings/create')??'', ENT_QUOTES, 'UTF-8', false); ?>?tour_id=<?php echo \htmlentities($departure['tour_id']??'', ENT_QUOTES, 'UTF-8', false); ?>&departure_id=<?php echo \htmlentities($departure['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-primary btn-sm">
+ <i class="bi bi-plus-lg me-1"></i> Tạo booking cho đoàn này
+ </a>
+ </div>
+ </div>
+ <div class="card-body">
+ <?php if(empty($bookings)): ?>
+ <div class="text-center py-5 text-muted">
+ <i class="bi bi-journal-text fs-1 opacity-30 mb-2 d-block"></i>
+ Chuyến khởi hành này chưa có booking nào được gắn. Nhấn nút <strong class="text-primary">"Tạo booking cho đoàn này"</strong> bên trên để thêm mới, hoặc gắn booking có sẵn tại trang Quản lý booking.
+ </div>
+ <?php else: ?>
+ <div class="table-responsive">
+ <table class="table table-sm table-bordered align-middle mb-0">
+ <thead class="table-primary">
+ <tr>
+ <th>ID</th>
+ <th>Khách hàng</th>
+ <th>Liên hệ</th>
+ <th class="text-center">Số người</th>
+ <th>Ngày đặt</th>
+ <th class="text-center">Tổng tiền</th>
+ <th class="text-center">Trạng thái</th>
+ <th width="180" class="text-center">Thao tác</th>
+ </tr>
+ </thead>
+ <tbody>
+ <?php $__currentLoopData = $bookings; $this->addLoop($__currentLoopData);$this->getFirstLoop();
+ foreach($__currentLoopData as $b): $loop = $this->incrementLoopIndices();  ?>
+ <tr>
+ <td>#<?php echo \htmlentities($b['id']??'', ENT_QUOTES, 'UTF-8', false); ?></td>
+ <td class="fw-semibold"><?php echo \htmlentities($b['customer_name'] ?? '-'??'', ENT_QUOTES, 'UTF-8', false); ?></td>
+ <td class="small">
+ <?php if(!empty($b['customer_phone'])): ?>
+ <div><?php echo \htmlentities($b['customer_phone']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php endif; ?>
+ <?php if(!empty($b['customer_email'])): ?>
+ <div class="text-muted"><?php echo \htmlentities($b['customer_email']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php endif; ?>
+ <?php if(empty($b['customer_phone']) && empty($b['customer_email'])): ?>
+ <span class="text-muted">—</span>
+ <?php endif; ?>
+ </td>
+ <td class="text-center"><?php echo \htmlentities((int)$b['num_people']??'', ENT_QUOTES, 'UTF-8', false); ?></td>
+ <td class="small">
+ <?php if(!empty($b['booking_date'])): ?>
+ <?php echo \htmlentities(date('d/m/Y', strtotime($b['booking_date']))??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ <?php else: ?>
+ <span class="text-muted">—</span>
+ <?php endif; ?>
+ </td>
+ <td class="text-center">
+ <?php if(!empty($b['total_price'])): ?>
+ <?php echo \htmlentities(number_format((float)$b['total_price'], 0, ',', '.')??'', ENT_QUOTES, 'UTF-8', false); ?> ₫
+ <?php else: ?>
+ <span class="text-muted">—</span>
+ <?php endif; ?>
+ </td>
+ <td class="text-center">
+ <?php switch ($b['status']) {
+ case ('pending'): ?>
+ <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+ <?php break; ?>
+ <?php case ('confirmed'): ?>
+ <span class="badge bg-info text-white">Đã xác nhận</span>
+ <?php break; ?>
+ <?php case ('completed'): ?>
+ <span class="badge bg-success">Hoàn thành</span>
+ <?php break; ?>
+ <?php case ('cancelled'): ?>
+ <span class="badge bg-secondary">Đã hủy</span>
+ <?php break; ?>
+ <?php default: ?>
+ <span class="badge bg-light text-dark"><?php echo \htmlentities($b['status']??'', ENT_QUOTES, 'UTF-8', false); ?></span>
+ <?php } // end switch ?>
+ </td>
+ <td class="text-center">
+ <a href="<?php echo \htmlentities(route('admin/bookings/show/' . $b['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-outline-primary me-1" title="Xem chi tiết">
+ <i class="bi bi-eye"></i>
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/bookings/edit/' . $b['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-outline-warning" title="Sửa">
+ <i class="bi bi-pencil"></i>
+ </a>
+ </td>
+ </tr>
+ <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
+ </tbody>
+ </table>
+ </div>
+ <div class="mt-2 small text-muted d-flex flex-wrap gap-3 align-items-center">
+ <span><i class="bi bi-info-circle me-1"></i>Tổng: <strong><?php echo \htmlentities(count($bookings)??'', ENT_QUOTES, 'UTF-8', false); ?></strong> booking thuộc đoàn</span>
+ <?php 
+ $totalPax = 0;
+ $totalAmount = 0;
+ foreach ($bookings as $b) {
+ $totalPax += (int)($b['num_people'] ?? 0);
+ $totalAmount += (float)($b['total_price'] ?? 0);
+ }
+ ?>
+ <span><i class="bi bi-people me-1"></i>Tổng khách: <strong><?php echo \htmlentities($totalPax??'', ENT_QUOTES, 'UTF-8', false); ?></strong> người</span>
+ <span><i class="bi bi-cash-stack me-1"></i>Tổng giá trị: <strong><?php echo \htmlentities(number_format($totalAmount, 0, ',', '.')??'', ENT_QUOTES, 'UTF-8', false); ?> ₫</strong></span>
  </div>
  <?php endif; ?>
  </div>

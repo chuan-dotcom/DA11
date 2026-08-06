@@ -97,6 +97,7 @@
  <th>Tên đoàn</th>
  <th>Tour</th>
  <th>Số khách</th>
+ <th>Nhân sự/HDV</th>
  <th>Khởi hành</th>
  <th>Trạng thái</th>
  <th>Thao tác</th>
@@ -105,7 +106,7 @@
  <tbody>
  <?php if(empty($guestGroups)): ?>
  <tr>
- <td colspan="7" class="text-center text-muted py-4">Chưa có đoàn tour nào phù hợp.</td>
+ <td colspan="8" class="text-center text-muted py-4">Chưa có đoàn tour nào phù hợp.</td>
  </tr>
  <?php else: ?>
  <?php $__currentLoopData = $guestGroups; $this->addLoop($__currentLoopData);$this->getFirstLoop();
@@ -119,6 +120,7 @@
  ];
  $statusInfo = $statusMap[$group['status']] ?? [$group['status'], 'bg-secondary'];
  $groupName = $group['group_name'] ?: ('Đoàn ' . ($group['tour_name'] ?? 'Tour #' . $group['tour_id']));
+ $staffInfo = $assignedStaffByDeparture[(int)$group['id']] ?? ['count' => 0, 'names' => [], 'has_lead' => false];
  ?>
  <tr>
  <td>#<?php echo \htmlentities($group['id']??'', ENT_QUOTES, 'UTF-8', false); ?></td>
@@ -132,15 +134,39 @@
 
  </span>
  </td>
+ <td>
+ <?php if($staffInfo['count'] > 0): ?>
+ <?php if($staffInfo['has_lead']): ?>
+ <span class="badge bg-success text-white mini-badge me-1"><i class="bi bi-person-check-fill me-1"></i>Có HDV chính</span>
+ <?php else: ?>
+ <span class="badge bg-warning text-dark mini-badge me-1"><i class="bi bi-exclamation-triangle me-1"></i>Chưa có HDV chính</span>
+ <?php endif; ?>
+ <div class="small text-muted mt-1"><?php echo \htmlentities($staffInfo['count']??'', ENT_QUOTES, 'UTF-8', false); ?> nhân sự
+ <?php if(!empty($staffInfo['names'])): ?>
+ · <?php echo \htmlentities(implode(', ', array_slice($staffInfo['names'], 0, 2))??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ <?php if(count($staffInfo['names']) > 2): ?>
+ +<?php echo \htmlentities(count($staffInfo['names']) - 2??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ <?php endif; ?>
+ <?php endif; ?>
+ </div>
+ <?php else: ?>
+ <span class="badge bg-danger text-white mini-badge"><i class="bi bi-person-x me-1"></i>Chưa phân công</span>
+ <?php endif; ?>
+ </td>
  <td><?php echo \htmlentities(!empty($group['departure_date']) ? date('Y-m-d', strtotime($group['departure_date'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?></td>
  <td>
  <span class="badge mini-badge <?php echo \htmlentities($statusInfo[1]??'', ENT_QUOTES, 'UTF-8', false); ?>"><?php echo \htmlentities($statusInfo[0]??'', ENT_QUOTES, 'UTF-8', false); ?></span>
  </td>
  <td class="text-nowrap">
- <a href="<?php echo \htmlentities(route('admin/guest-groups/print/' . $group['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-outline-secondary" title="In danh sách" target="_blank">
+ <a href="<?php echo \htmlentities(route('admin/staff-assignments/create')??'', ENT_QUOTES, 'UTF-8', false); ?>?departure_id=<?php echo \htmlentities((int)$group['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-outline-info me-1" title="Phân công HDV & nhân sự cho đoàn này">
+ <i class="bi bi-person-plus"></i> Phân công HDV
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/guest-groups/print/' . $group['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-outline-secondary me-1" title="In danh sách" target="_blank">
  <i class="bi bi-printer"></i>
  </a>
- <a href="<?php echo \htmlentities(route('admin/guest-groups/show/' . $group['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-primary" title="Cập nhật">
+ <a href="<?php echo \htmlentities(route('admin/guest-groups/show/' . $group['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-primary me-1" title="Cập nhật">
  Cập nhật
  </a>
  <a href="<?php echo \htmlentities(route('admin/departures/delete/' . $group['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"

@@ -146,12 +146,17 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card mt-4 border-secondary">
         <div class="card-header d-flex justify-content-between align-items-center bg-light">
-            <h5 class="mb-0"><i class="bi bi-people me-2"></i>Nhân sự đã phân bổ</h5>
-            <a href="{{ route('admin/staff-assignments/create') }}?departure_id={{ $departure['id'] }}" class="btn btn-sm btn-success">
-                <i class="bi bi-person-plus"></i> Thêm nhân sự
-            </a>
+            <h5 class="mb-0"><i class="bi bi-people-fill text-secondary me-2"></i>Nhân sự đã phân bổ</h5>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ route('admin/staff-assignments') }}?departure_id={{ $departure['id'] }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-funnel me-1"></i> Lọc ở trang Phân công
+                </a>
+                <a href="{{ route('admin/staff-assignments/create') }}?departure_id={{ $departure['id'] }}" class="btn btn-sm btn-success">
+                    <i class="bi bi-person-plus"></i> Thêm nhân sự
+                </a>
+            </div>
         </div>
         <div class="card-body">
             @if(empty($assignments))
@@ -192,7 +197,13 @@
                                     <td>{{ $a['staff_experience'] ? $a['staff_experience'] . ' năm' : '-' }}</td>
                                     <td>{{ $a['responsibilities'] ?? '-' }}</td>
                                     <td class="text-nowrap">
-                                        <a href="{{ route('admin/staff-assignments/edit/' . $a['id']) }}" class="btn btn-sm btn-warning">
+                                        <a href="{{ route('hdv/tour-phan-cong') }}?hdv_id={{ (int)$a['staff_id'] }}"
+                                           target="_blank" rel="noopener"
+                                           class="btn btn-sm btn-outline-info me-1"
+                                           title="Mở cổng HDV xem tour được phân công của nhân sự này">
+                                            <i class="bi bi-box-arrow-up-right"></i>
+                                        </a>
+                                        <a href="{{ route('admin/staff-assignments/edit/' . $a['id']) }}" class="btn btn-sm btn-warning me-1">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         <a href="{{ route('admin/staff-assignments/delete/' . $a['id']) }}"
@@ -205,6 +216,146 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-2 small text-muted d-flex flex-wrap gap-3 align-items-center">
+                    <span><i class="bi bi-info-circle me-1"></i>Tổng: <strong>{{ count($assignments) }}</strong> nhân sự phân bổ</span>
+                    @php
+                        $countRole = [];
+                        foreach ($assignments as $a) {
+                            $rr = $a['role'] ?? 'other';
+                            if (!isset($countRole[$rr])) { $countRole[$rr] = 0; }
+                            $countRole[$rr]++;
+                        }
+                        $roleLabel = [
+                            'lead_guide' => 'HDV chính',
+                            'assistant_guide' => 'HDV phụ',
+                            'driver' => 'Lái xe',
+                            'photographer' => 'Nhiếp ảnh',
+                            'other' => 'Khác',
+                        ];
+                        $roleParts = [];
+                        foreach ($countRole as $rr => $c) {
+                            $lbl = $roleLabel[$rr] ?? $rr;
+                            $roleParts[] = $lbl . ': <strong>' . (int)$c . '</strong>';
+                        }
+                    @endphp
+                    @if(!empty($roleParts))
+                        <span>{!! implode(' · ', $roleParts) !!}</span>
+                    @endif
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <div class="card mt-4 border-primary">
+        <div class="card-header bg-light d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <h5 class="mb-0 fw-semibold">
+                <i class="bi bi-journal-text text-primary me-2"></i>Danh sách booking thuộc đoàn này
+            </h5>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ route('admin/bookings') }}?departure_id={{ $departure['id'] }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-funnel me-1"></i> Lọc ở trang Quản lý booking
+                </a>
+                <a href="{{ route('admin/bookings/create') }}?tour_id={{ $departure['tour_id'] }}&departure_id={{ $departure['id'] }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Tạo booking cho đoàn này
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            @if(empty($bookings))
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-journal-text fs-1 opacity-30 mb-2 d-block"></i>
+                    Chuyến khởi hành này chưa có booking nào được gắn. Nhấn nút <strong class="text-primary">"Tạo booking cho đoàn này"</strong> bên trên để thêm mới, hoặc gắn booking có sẵn tại trang Quản lý booking.
+                </div>
+            @else
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered align-middle mb-0">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Liên hệ</th>
+                                <th class="text-center">Số người</th>
+                                <th>Ngày đặt</th>
+                                <th class="text-center">Tổng tiền</th>
+                                <th class="text-center">Trạng thái</th>
+                                <th width="180" class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($bookings as $b)
+                                <tr>
+                                    <td>#{{ $b['id'] }}</td>
+                                    <td class="fw-semibold">{{ $b['customer_name'] ?? '-' }}</td>
+                                    <td class="small">
+                                        @if(!empty($b['customer_phone']))
+                                            <div>{{ $b['customer_phone'] }}</div>
+                                        @endif
+                                        @if(!empty($b['customer_email']))
+                                            <div class="text-muted">{{ $b['customer_email'] }}</div>
+                                        @endif
+                                        @if(empty($b['customer_phone']) && empty($b['customer_email']))
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">{{ (int)$b['num_people'] }}</td>
+                                    <td class="small">
+                                        @if(!empty($b['booking_date']))
+                                            {{ date('d/m/Y', strtotime($b['booking_date'])) }}
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if(!empty($b['total_price']))
+                                            {{ number_format((float)$b['total_price'], 0, ',', '.') }} ₫
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @switch($b['status'])
+                                            @case('pending')
+                                                <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                                @break
+                                            @case('confirmed')
+                                                <span class="badge bg-info text-white">Đã xác nhận</span>
+                                                @break
+                                            @case('completed')
+                                                <span class="badge bg-success">Hoàn thành</span>
+                                                @break
+                                            @case('cancelled')
+                                                <span class="badge bg-secondary">Đã hủy</span>
+                                                @break
+                                            @default
+                                                <span class="badge bg-light text-dark">{{ $b['status'] }}</span>
+                                        @endswitch
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ route('admin/bookings/show/' . $b['id']) }}" class="btn btn-sm btn-outline-primary me-1" title="Xem chi tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin/bookings/edit/' . $b['id']) }}" class="btn btn-sm btn-outline-warning" title="Sửa">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-2 small text-muted d-flex flex-wrap gap-3 align-items-center">
+                    <span><i class="bi bi-info-circle me-1"></i>Tổng: <strong>{{ count($bookings) }}</strong> booking thuộc đoàn</span>
+                    @php
+                        $totalPax = 0;
+                        $totalAmount = 0;
+                        foreach ($bookings as $b) {
+                            $totalPax += (int)($b['num_people'] ?? 0);
+                            $totalAmount += (float)($b['total_price'] ?? 0);
+                        }
+                    @endphp
+                    <span><i class="bi bi-people me-1"></i>Tổng khách: <strong>{{ $totalPax }}</strong> người</span>
+                    <span><i class="bi bi-cash-stack me-1"></i>Tổng giá trị: <strong>{{ number_format($totalAmount, 0, ',', '.') }} ₫</strong></span>
                 </div>
             @endif
         </div>

@@ -38,19 +38,6 @@
  </select>
  </div>
  <div>
- <label for="filter_departure_id" class="form-label small mb-1">Chuyến khởi hành</label>
- <select name="departure_id" id="filter_departure_id" class="form-select form-select-sm">
- <option value="">Tất cả</option>
- <?php $__currentLoopData = $departures; $this->addLoop($__currentLoopData);$this->getFirstLoop();
- foreach($__currentLoopData as $d): $loop = $this->incrementLoopIndices();  ?>
- <option value="<?php echo \htmlentities($d['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" data-tour="<?php echo \htmlentities((int)($d['tour_id'] ?? 0)??'', ENT_QUOTES, 'UTF-8', false); ?>" <?php echo \htmlentities((isset($departureId) && (int)$departureId === (int)$d['id']) ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>
- #<?php echo \htmlentities($d['id']??'', ENT_QUOTES, 'UTF-8', false); ?> - <?php echo \htmlentities($d['group_name'] ?? ('Đoàn ' . ($d['tour_name'] ?? 'Tour'))??'', ENT_QUOTES, 'UTF-8', false); ?> (<?php echo \htmlentities(!empty($d['departure_date']) ? date('d/m/Y', strtotime($d['departure_date'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?>)
- </option>
- <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
- </select>
- <div class="form-text small opacity-75">Chọn Tour ở trên sẽ tự lọc chuyến khởi hành phù hợp</div>
- </div>
- <div>
  <label for="filter_status" class="form-label small mb-1">Trạng thái</label>
  <select name="status" id="filter_status" class="form-select form-select-sm">
  <option value="">Tất cả</option>
@@ -62,7 +49,7 @@
  <button type="submit" class="btn btn-outline-primary btn-sm">
  <i class="bi bi-funnel me-1"></i>Lọc
  </button>
- <?php if(!empty($tourId) || !empty($departureId) || $status !== null): ?>
+ <?php if(!empty($tourId) || $status !== null): ?>
  <a href="<?php echo \htmlentities(route('admin/bookings')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-outline-secondary btn-sm">
  <i class="bi bi-x-lg me-1"></i>Xóa lọc
  </a>
@@ -70,23 +57,13 @@
  </form>
  </div>
 
- <?php if(!empty($departureId) || !empty($tourId) || $status !== null): ?>
+ <?php if(!empty($tourId) || $status !== null): ?>
  <?php 
  $filterParts = [];
  if (!empty($tourId)) {
  foreach ($tours as $t) {
  if ((int)$t['id'] === (int)$tourId) {
  $filterParts[] = 'Tour: <strong>' . htmlspecialchars($t['name']) . '</strong>';
- break;
- }
- }
- }
- if (!empty($departureId)) {
- foreach ($departures as $d) {
- if ((int)$d['id'] === (int)$departureId) {
- $name = !empty($d['group_name']) ? $d['group_name'] : ('Đoàn #' . (int)$d['id']);
- $date = !empty($d['departure_date']) ? date('d/m/Y', strtotime($d['departure_date'])) : '-';
- $filterParts[] = 'Chuyến khởi hành: <strong>' . htmlspecialchars($name) . ' (' . $date . ')</strong>';
  break;
  }
  }
@@ -112,7 +89,6 @@
  <tr>
  <th>ID</th>
  <th>Tour</th>
- <th>Chuyến khởi hành</th>
  <th>Địa chỉ tour</th>
  <th>Khách hàng</th>
  <th>Email</th>
@@ -122,76 +98,23 @@
  <th>Tổng tiền</th>
  <th>Ngày đặt</th>
  <th>Trạng thái</th>
- <th width="360">Thao tác</th>
+ <th width="320">Thao tác</th>
  </tr>
  </thead>
  <tbody>
  <?php if(empty($bookings)): ?>
  <tr>
- <td colspan="13" class="text-center">Chưa có dữ liệu</td>
+ <td colspan="12" class="text-center">Chưa có dữ liệu</td>
  </tr>
  <?php else: ?>
- <?php 
- $departureStatusMap = [
- 'scheduled'   => ['Lên lịch', 'bg-primary'],
- 'in_progress' => ['Đang diễn ra', 'bg-warning text-dark'],
- 'completed'   => ['Hoàn thành', 'bg-success'],
- 'cancelled'   => ['Đã hủy', 'bg-secondary'],
- ];
- ?>
  <?php $__currentLoopData = $bookings; $this->addLoop($__currentLoopData);$this->getFirstLoop();
  foreach($__currentLoopData as $booking): $loop = $this->incrementLoopIndices();  ?>
  <?php 
- $pickup = !empty($booking['pickup_address']) ? $booking['pickup_address'] : (!empty($booking['departure_meeting_point']) ? $booking['departure_meeting_point'] : null);
+ $pickup = !empty($booking['pickup_address']) ? $booking['pickup_address'] : null;
  ?>
  <tr>
  <td><?php echo \htmlentities($booking['id']??'', ENT_QUOTES, 'UTF-8', false); ?></td>
  <td><?php echo \htmlentities($booking['tour_name']??'', ENT_QUOTES, 'UTF-8', false); ?></td>
- <td>
- <?php if(!empty($booking['departure_id'])): ?>
- <div class="d-flex flex-column gap-1">
- <div class="d-inline-flex align-items-center gap-1">
- <i class="bi bi-calendar-week text-primary me-1"></i>
- <span class="fw-semibold text-dark">
- <?php echo \htmlentities(!empty($booking['departure_group_name']) ? $booking['departure_group_name'] : ('Đoàn #' . (int)$booking['departure_id'])??'', ENT_QUOTES, 'UTF-8', false); ?>
-
- </span>
- </div>
- <div class="small text-muted">
- <?php echo \htmlentities(!empty($booking['departure_date_info']) ? date('d/m/Y', strtotime($booking['departure_date_info'])) : '-'??'', ENT_QUOTES, 'UTF-8', false); ?>
-
- <?php if(!empty($booking['departure_return_date']) && !empty($booking['departure_date_info']) && $booking['departure_return_date'] !== $booking['departure_date_info']): ?>
- <span class="mx-1">→</span>
- <?php echo \htmlentities(date('d/m/Y', strtotime($booking['departure_return_date']))??'', ENT_QUOTES, 'UTF-8', false); ?>
-
- <?php endif; ?>
- </div>
- <?php 
- $ds = !empty($booking['departure_status']) ? $departureStatusMap[$booking['departure_status']] ?? null : null;
- ?>
- <?php if($ds): ?>
- <div><span class="badge <?php echo \htmlentities($ds[1]??'', ENT_QUOTES, 'UTF-8', false); ?>" style="width:fit-content"><?php echo \htmlentities($ds[0]??'', ENT_QUOTES, 'UTF-8', false); ?></span></div>
- <?php endif; ?>
- <div class="d-flex flex-wrap gap-1 mt-1">
- <a href="<?php echo \htmlentities(route('admin/departures/edit/' . (int)$booking['departure_id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-outline-primary">
- <i class="bi bi-box-arrow-up-right me-1"></i>Mở đoàn
- </a>
- <a href="<?php echo \htmlentities(route('admin/bookings/unassign-departure/' . (int)$booking['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"
- class="btn btn-sm btn-outline-warning"
- onclick="return confirm('Gỡ booking này ra khỏi đoàn khởi hành hiện tại?')">
- <i class="bi bi-x-circle me-1"></i>Gỡ
- </a>
- </div>
- </div>
- <?php else: ?>
- <div class="d-flex flex-column gap-1">
- <span class="text-muted small">Chưa gắn vào đoàn</span>
- <a href="<?php echo \htmlentities(route('admin/guest-groups/show/' . (int)$booking['tour_id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-sm btn-outline-success w-100">
- <i class="bi bi-link-45deg me-1"></i>Gắn vào đoàn
- </a>
- </div>
- <?php endif; ?>
- </td>
  <td>
  <?php if(!empty($booking['tour_location'])): ?>
  <span class="badge bg-secondary">
@@ -211,9 +134,6 @@
  <i class="bi bi-geo text-primary"></i>
  <span style="max-width:200px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="<?php echo \htmlentities(htmlentities($pickup)??'', ENT_QUOTES, 'UTF-8', false); ?>"><?php echo \htmlentities($pickup??'', ENT_QUOTES, 'UTF-8', false); ?></span>
  </span>
- <?php if(!empty($booking['pickup_address']) && !empty($booking['departure_meeting_point']) && $booking['pickup_address'] !== $booking['departure_meeting_point']): ?>
- <div><small class="text-muted">Điểm tập kết: <?php echo \htmlentities($booking['departure_meeting_point']??'', ENT_QUOTES, 'UTF-8', false); ?></small></div>
- <?php endif; ?>
  <?php else: ?>
  <span class="text-muted small">—</span>
  <?php endif; ?>
@@ -231,15 +151,9 @@
  <?php endif; ?>
  </td>
  <td class="text-nowrap">
- <?php if(!empty($booking['departure_id'])): ?>
  <a href="<?php echo \htmlentities(route('admin/tours/participants/' . $booking['tour_id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-outline-primary btn-sm" title="Xem danh sách khách của tour này">
  <i class="bi bi-people"></i> Khách tour
  </a>
- <?php else: ?>
- <a href="<?php echo \htmlentities(route('admin/tours/participants/' . $booking['tour_id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-outline-primary btn-sm" title="Xem danh sách khách của tour này">
- <i class="bi bi-people"></i> Khách tour
- </a>
- <?php endif; ?>
  <a href="<?php echo \htmlentities(route('admin/bookings/show/' . $booking['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-info btn-sm">Chi tiết</a>
  <a href="<?php echo \htmlentities(route('admin/bookings/edit/' . $booking['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-warning btn-sm">Sửa</a>
  <a href="<?php echo \htmlentities(route('admin/bookings/delete/' . $booking['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
@@ -253,34 +167,6 @@
  </div>
  </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
- const tourSel = document.getElementById('filter_tour_id');
- const depSel = document.getElementById('filter_departure_id');
- if (!tourSel || !depSel) return;
- const depOpts = Array.from(depSel.options).filter(o => o.value !== '');
- function filterDeps() {
- const tourVal = tourSel.value ? parseInt(tourSel.value, 10) : 0;
- const prev = depSel.value;
- depSel.innerHTML = '';
- const allOpt = document.createElement('option');
- allOpt.value = '';
- allOpt.textContent = 'Tất cả';
- depSel.appendChild(allOpt);
- depOpts.forEach(o => {
- const t = parseInt(o.getAttribute('data-tour') || '0', 10);
- if (!tourVal || tourVal === t) {
- const copy = o.cloneNode(true);
- depSel.appendChild(copy);
- }
- });
- depSel.value = prev;
- }
- tourSel.addEventListener('change', filterDeps);
- filterDeps();
-});
-</script>
 <?php $this->stopSection(); ?>
 
 <?php if (isset($_shouldextend[1])) { echo $this->runChild('layouts.admin'); } ?>

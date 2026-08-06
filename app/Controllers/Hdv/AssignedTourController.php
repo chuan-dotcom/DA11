@@ -48,7 +48,7 @@ class AssignedTourController extends Controller
 
         $db = (new \App\Model())->getConnection();
 
-        // Get detailed assignments matching mockup columns
+        // Get detailed assignments matching Quản lý đoàn khách format (theo đoàn departure, k theo booking)
         $sql = "
             SELECT 
                 sa.id AS assignment_id,
@@ -61,29 +61,36 @@ class AssignedTourController extends Controller
                 d.meeting_point,
                 d.meeting_time,
                 d.vehicle,
+                d.max_participants,
+                d.status AS departure_status,
                 t.id AS tour_id,
                 t.name AS tour_name,
                 tc.name AS category_name,
-                (
-                    SELECT b.id FROM bookings b 
-                    WHERE b.departure_id = d.id 
-                    ORDER BY b.id ASC LIMIT 1
-                ) AS primary_booking_id,
-                (
-                    SELECT b.customer_name FROM bookings b 
-                    WHERE b.departure_id = d.id 
-                    ORDER BY b.id ASC LIMIT 1
-                ) AS primary_customer_name,
+                COALESCE(
+                    (SELECT SUM(b.num_people) FROM bookings b 
+                     WHERE b.departure_id = d.id AND b.status = 1),
+                    0
+                ) AS assigned_people,
                 (
                     SELECT COUNT(g.id) FROM booking_guests g 
                     INNER JOIN bookings b ON b.id = g.booking_id 
                     WHERE b.departure_id = d.id
-                ) AS total_guests
+                ) AS total_guests,
+                (
+                    SELECT COUNT(g.id) FROM booking_guests g 
+                    INNER JOIN bookings b ON b.id = g.booking_id 
+                    WHERE b.departure_id = d.id AND g.check_in_status = 1
+                ) AS checked_in_guests,
+                (
+                    SELECT COUNT(b.id) FROM bookings b 
+                    WHERE b.departure_id = d.id
+                ) AS total_bookings
             FROM staff_assignments sa
             INNER JOIN departures d ON d.id = sa.departure_id
             INNER JOIN tours t ON t.id = d.tour_id
             LEFT JOIN tour_categories tc ON tc.id = t.category_id
             WHERE sa.staff_id = :hdv_id
+            GROUP BY sa.id, d.id, t.id, tc.id
             ORDER BY d.departure_date DESC
         ";
 

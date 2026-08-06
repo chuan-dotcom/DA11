@@ -37,13 +37,15 @@ class StaffAssignmentController extends Controller
         $departures = $this->modelDeparture->getUpcomingDepartures(50);
         $staffList = $this->modelStaff->getAll();
 
-        $departureId = $_GET['departure_id'] ?? null;
+        $departureId = isset($_GET['departure_id']) ? (int)$_GET['departure_id'] : null;
         $availableStaff = [];
         if ($departureId) {
             $availableStaff = $this->modelAssignment->getAvailableStaff($departureId);
         }
 
-        return view('admin.staff-assignments.create', compact('title', 'departures', 'staffList', 'departureId', 'availableStaff'));
+        $returnDepartureId = $departureId;
+
+        return view('admin.staff-assignments.create', compact('title', 'departures', 'staffList', 'departureId', 'availableStaff', 'returnDepartureId'));
     }
 
     public function store()
@@ -109,6 +111,10 @@ class StaffAssignmentController extends Controller
         try {
             $this->modelAssignment->insert($data);
             setFlash('success', 'Phân bổ nhân sự thành công!');
+            $redirectDepartureId = (int)$data['departure_id'];
+            if ($redirectDepartureId > 0) {
+                return redirect('admin/departures/edit/' . $redirectDepartureId);
+            }
             return redirect('admin/staff-assignments');
         } catch (\Exception $e) {
             $errorMsg = $e->getMessage();
@@ -147,8 +153,9 @@ class StaffAssignmentController extends Controller
             }
         }
         $staffList = $this->modelStaff->getAll();
+        $returnDepartureId = (int)$assignment['departure_id'];
 
-        return view('admin.staff-assignments.edit', compact('title', 'assignment', 'departures', 'staffList'));
+        return view('admin.staff-assignments.edit', compact('title', 'assignment', 'departures', 'staffList', 'returnDepartureId'));
     }
 
     public function update($id)
@@ -220,6 +227,10 @@ class StaffAssignmentController extends Controller
 
         $this->modelAssignment->update($id, $data);
         setFlash('success', 'Cập nhật phân bổ nhân sự thành công!');
+        $redirectDepartureId = (int)$data['departure_id'];
+        if ($redirectDepartureId > 0) {
+            return redirect('admin/departures/edit/' . $redirectDepartureId);
+        }
         return redirect('admin/staff-assignments');
     }
 
@@ -230,9 +241,13 @@ class StaffAssignmentController extends Controller
             setFlash('error', 'Phân bổ nhân sự không tồn tại!');
             return redirect('admin/staff-assignments');
         }
+        $redirectDepartureId = (int)$assignment['departure_id'];
 
         $this->modelAssignment->delete($id);
         setFlash('success', 'Xóa phân bổ nhân sự thành công!');
+        if ($redirectDepartureId > 0) {
+            return redirect('admin/departures/edit/' . $redirectDepartureId);
+        }
         return redirect('admin/staff-assignments');
     }
 
