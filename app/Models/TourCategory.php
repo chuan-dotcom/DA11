@@ -10,7 +10,7 @@ class TourCategory extends Model{
             ->from('tour_categories');
         
         return $stmt->fetchAllAssociative();
-    }
+    }    
 
     public function findByid($id) {
         $stmt=$this->connection->createQueryBuilder();

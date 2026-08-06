@@ -10,7 +10,7 @@ class Service extends Model
     {
         parent::__construct();
         $this->ensureTableExists();
-        $this->ensureColumnsExist();
+        $this->ensureColumnsExist();       
     }
 
     private function ensureTableExists()

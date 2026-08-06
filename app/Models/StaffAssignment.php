@@ -9,7 +9,7 @@ class StaffAssignment extends Model
     public function getAll()
     {
         $stmt = $this->connection->createQueryBuilder();
-        $stmt->select('sa.*', 'd.departure_date', 't.name as tour_name', 'h.Hoten as staff_name')
+        $stmt->select('sa.*', 'd.departure_date', 't.name as tour_name', 'h.Hoten as staff_name')      
             ->from('staff_assignments', 'sa')
             ->leftJoin('sa', 'departures', 'd', 'd.id = sa.departure_id')
             ->leftJoin('d', 'tours', 't', 't.id = d.tour_id')
