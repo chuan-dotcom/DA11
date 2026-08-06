@@ -10,6 +10,7 @@ class Service extends Model
     {
         parent::__construct();
         $this->ensureTableExists();
+        $this->ensureColumnsExist();       
     }
 
     private function ensureTableExists()
@@ -70,6 +71,24 @@ class Service extends Model
             try {
                 $this->seedSampleData();
             } catch (\Throwable $e2) {
+            }
+        }
+    }
+
+    private function ensureColumnsExist()
+    {
+        $alterSqls = [
+            'departure_id' => "ALTER TABLE services ADD COLUMN departure_id INT NULL AFTER tour_id",
+        ];
+
+        foreach ($alterSqls as $col => $sql) {
+            try {
+                $this->connection->executeQuery("SELECT `{$col}` FROM services LIMIT 1");
+            } catch (\Throwable $e) {
+                try {
+                    $this->connection->executeStatement($sql);
+                } catch (\Throwable $e2) {
+                }
             }
         }
     }
@@ -143,10 +162,14 @@ class Service extends Model
 
         $stmt->select(
                 's.*',
-                't.name AS tour_name'
+                't.name AS tour_name',
+                'd.group_name AS departure_group_name',
+                'd.departure_date AS departure_date',
+                'd.return_date AS departure_return_date'
             )
             ->from('services', 's')
             ->leftJoin('s', 'tours', 't', 's.tour_id = t.id')
+            ->leftJoin('s', 'departures', 'd', 's.departure_id = d.id')
             ->orderBy('s.id', 'DESC');
 
         return $stmt->fetchAllAssociative();
@@ -158,10 +181,14 @@ class Service extends Model
 
         $stmt->select(
                 's.*',
-                't.name AS tour_name'
+                't.name AS tour_name',
+                'd.group_name AS departure_group_name',
+                'd.departure_date AS departure_date',
+                'd.return_date AS departure_return_date'
             )
             ->from('services', 's')
             ->leftJoin('s', 'tours', 't', 's.tour_id = t.id')
+            ->leftJoin('s', 'departures', 'd', 's.departure_id = d.id')
             ->where('s.id = :id')
             ->setParameter('id', $id);
 
@@ -172,6 +199,7 @@ class Service extends Model
     {
         return $this->connection->insert('services', [
             'tour_id'       => $data['tour_id'],
+            'departure_id'  => !empty($data['departure_id']) ? (int)$data['departure_id'] : null,
             'service_types' => $data['service_types'],
             'supplier'      => $data['supplier'],
             'quantity'      => $data['quantity'],
@@ -186,6 +214,7 @@ class Service extends Model
     {
         return $this->connection->update('services', [
             'tour_id'       => $data['tour_id'],
+            'departure_id'  => !empty($data['departure_id']) ? (int)$data['departure_id'] : null,
             'service_types' => $data['service_types'],
             'supplier'      => $data['supplier'],
             'quantity'      => $data['quantity'],
@@ -218,7 +247,62 @@ class Service extends Model
         return $stmt->fetchAssociative() ?: null;
     }
 
-    public function filter($tourId = null, $serviceTypes = null, $status = null)
+    public function filter($tourId = null, $departureId = null, $serviceTypes = null, $status = null)
+    {
+        $stmt = $this->connection->createQueryBuilder();
+
+        $stmt->select(
+                's.*',
+                't.name AS tour_name',
+                'd.group_name AS departure_group_name',
+                'd.departure_date AS departure_date',
+                'd.return_date AS departure_return_date'
+            )
+            ->from('services', 's')
+            ->leftJoin('s', 'tours', 't', 's.tour_id = t.id')
+            ->leftJoin('s', 'departures', 'd', 's.departure_id = d.id');
+
+        if ($tourId) {
+            $stmt->where('s.tour_id = :tourId')
+                ->setParameter('tourId', $tourId);
+        }
+
+        if ($departureId) {
+            if ($tourId) {
+                $stmt->andWhere('s.departure_id = :departureId');
+            } else {
+                $stmt->where('s.departure_id = :departureId');
+            }
+            $stmt->setParameter('departureId', $departureId);
+        }
+
+        if ($serviceTypes) {
+            if ($tourId || $departureId) {
+                $stmt->andWhere('s.service_types LIKE :serviceTypes');
+            } else {
+                $stmt->where('s.service_types LIKE :serviceTypes');
+            }
+            $stmt->setParameter('serviceTypes', '%' . $serviceTypes . '%');
+        }
+
+        if ($status !== null && $status !== '') {
+            if ($tourId || $departureId || $serviceTypes) {
+                $stmt->andWhere('s.status = :status');
+            } else {
+                $stmt->where('s.status = :status');
+            }
+            $stmt->setParameter('status', $status);
+        }
+
+        $stmt->orderBy('s.id', 'DESC');
+
+        return $stmt->fetchAllAssociative();
+    }
+
+    /**
+     * Lấy các dịch vụ thuộc về 1 chuyến khởi hành (được gắn departure_id).
+     */
+    public function getByDepartureId($departureId)
     {
         $stmt = $this->connection->createQueryBuilder();
 
@@ -227,24 +311,10 @@ class Service extends Model
                 't.name AS tour_name'
             )
             ->from('services', 's')
-            ->leftJoin('s', 'tours', 't', 's.tour_id = t.id');
-
-        if ($tourId) {
-            $stmt->where('s.tour_id = :tourId')
-                ->setParameter('tourId', $tourId);
-        }
-
-        if ($serviceTypes) {
-            $stmt->andWhere('s.service_types LIKE :serviceTypes')
-                ->setParameter('serviceTypes', '%' . $serviceTypes . '%');
-        }
-
-        if ($status !== null && $status !== '') {
-            $stmt->andWhere('s.status = :status')
-                ->setParameter('status', $status);
-        }
-
-        $stmt->orderBy('s.id', 'DESC');
+            ->leftJoin('s', 'tours', 't', 's.tour_id = t.id')
+            ->where('s.departure_id = :departureId')
+            ->setParameter('departureId', (int)$departureId)
+            ->orderBy('s.id', 'DESC');
 
         return $stmt->fetchAllAssociative();
     }

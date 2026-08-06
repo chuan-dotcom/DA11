@@ -14,6 +14,56 @@
     <div class="card">
         <div class="card-body">
             <form action="{{ route('admin/departures/store') }}" method="POST">
+                <div class="mb-3 p-3 rounded-3 bg-light border d-flex flex-column gap-2">
+                    <label class="form-label fw-semibold mb-1 d-flex align-items-center gap-2">
+                        <i class="bi bi-magic text-primary"></i> Tự điền từ khách hàng đã đặt tour
+                    </label>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-7">
+                            <label for="booking_suggestion" class="form-label small text-muted">Chọn tên khách đại diện</label>
+                            <select class="form-select" id="booking_suggestion">
+                                <option value="">-- Chọn booking đã xác nhận --</option>
+                                @if(!empty($bookingSuggestions))
+                                    @foreach($bookingSuggestions as $b)
+                                        @php
+                                            $meta = [
+                                                'tour_id' => (int)$b['tour_id'],
+                                                'tour_name' => $b['tour_name'],
+                                                'tour_location' => $b['tour_location'] ?? '',
+                                                'num_people' => (int)$b['num_people'],
+                                                'customer_phone' => $b['customer_phone'],
+                                                'customer_email' => $b['customer_email'],
+                                                'booking_date' => $b['booking_date'],
+                                            ];
+                                        @endphp
+                                        <option value="{{ $b['id'] }}"
+                                            data-meta="{{ htmlentities(json_encode($meta, JSON_HEX_TAG|JSON_HEX_APOS), ENT_QUOTES) }}">
+                                            #{{ $b['id'] }} · {{ $b['customer_name'] }}
+                                            @if(!empty($b['customer_phone']))
+                                                ({{ $b['customer_phone'] }})
+                                            @endif
+                                            · {{ $b['tour_name'] }} · {{ $b['num_people'] }} người
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <div id="booking_summary_box" class="p-2 rounded-2 bg-white border d-none small min-h-0" style="min-height:62px">
+                                <div class="d-flex flex-column gap-1">
+                                    <div><span class="text-muted">Tour:</span> <strong id="bs_tour_name">—</strong></div>
+                                    <div class="d-flex gap-3 flex-wrap">
+                                        <div><span class="text-muted">Số khách:</span> <strong id="bs_num_people" class="text-primary">—</strong></div>
+                                        <div><span class="text-muted">Địa điểm:</span> <strong id="bs_location">—</strong></div>
+                                        <div><span class="text-muted">SĐT:</span> <strong id="bs_phone">—</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text small"><i class="bi bi-info-circle text-primary me-1"></i>Chọn một booking ở trên sẽ tự động <strong>đổi Tour</strong>, <strong>Điền Số khách tối đa</strong>, và <strong>Đưa ra tên đoàn gợi ý</strong>. Bạn có thể chỉnh sửa lại thoải mái sau khi điền tự động.</div>
+                </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -47,6 +97,7 @@
                         <div class="mb-3">
                             <label for="meeting_point" class="form-label">Điểm tập trung</label>
                             <input type="text" class="form-control" id="meeting_point" name="meeting_point" placeholder="Ví dụ: Sân bay Tân Sơn Nhất">
+                            <div class="form-text"><i class="bi bi-info-circle text-primary me-1"></i>Sẽ tự động gắn làm <strong>Địa chỉ đón khách hàng</strong> cho booking được thêm vào đoàn này.</div>
                         </div>
                         <div class="mb-3">
                             <label for="meeting_time" class="form-label">Giờ tập trung</label>
@@ -95,6 +146,63 @@ document.addEventListener('DOMContentLoaded', function() {
     const departureDate = document.getElementById('departure_date');
     const returnDate = document.getElementById('return_date');
     const tourSelect = document.getElementById('tour_id');
+    const groupName = document.getElementById('group_name');
+    const maxParticipants = document.getElementById('max_participants');
+    const bookingSuggestion = document.getElementById('booking_suggestion');
+    const summaryBox = document.getElementById('booking_summary_box');
+    const bsTourName = document.getElementById('bs_tour_name');
+    const bsNumPeople = document.getElementById('bs_num_people');
+    const bsLocation = document.getElementById('bs_location');
+    const bsPhone = document.getElementById('bs_phone');
+
+    function applyBookingSuggestion(opt) {
+        if (!opt || !opt.dataset || !opt.dataset.meta) {
+            summaryBox.classList.add('d-none');
+            return;
+        }
+        let meta = null;
+        try {
+            meta = JSON.parse(opt.dataset.meta);
+        } catch (e) {
+            meta = null;
+        }
+        if (!meta) return;
+
+        summaryBox.classList.remove('d-none');
+        bsTourName.textContent = meta.tour_name || '—';
+        bsNumPeople.textContent = (meta.num_people ?? 0) + ' người';
+        bsLocation.textContent = meta.tour_location || '—';
+        bsPhone.textContent = meta.customer_phone || '—';
+
+        if (meta.tour_id) {
+            let found = false;
+            for (let i = 0; i < tourSelect.options.length; i++) {
+                if (String(tourSelect.options[i].value) === String(meta.tour_id)) {
+                    tourSelect.selectedIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                const ev = new Event('change', { bubbles: true });
+                tourSelect.dispatchEvent(ev);
+            }
+        }
+
+        if (meta.num_people) {
+            maxParticipants.value = Math.max(1, parseInt(meta.num_people, 10) || 1);
+        }
+
+        if (meta.booking_date && !groupName.value) {
+            const customerText = opt.textContent.split('·')[1] ? opt.textContent.split('·')[1].trim() : '';
+            const loc = meta.tour_location ? ' - ' + meta.tour_location : '';
+            groupName.value = (customerText + loc + (meta.booking_date ? ' (' + meta.booking_date + ')' : '')).trim();
+        }
+    }
+
+    bookingSuggestion.addEventListener('change', function () {
+        applyBookingSuggestion(this.options[this.selectedIndex]);
+    });
 
     function validateDates() {
         if (returnDate.value && departureDate.value && returnDate.value < departureDate.value) {

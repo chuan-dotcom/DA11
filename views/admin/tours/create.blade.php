@@ -37,6 +37,10 @@
                             <label for="duration" class="form-label">Thời gian <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="duration" name="duration" placeholder="Ví dụ: 3 ngày 2 đêm" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Địa điểm tour</label>
+                            <input type="text" class="form-control" id="location" name="location" placeholder="Ví dụ: Sapa, Ninh Bình, Đà Lạt">
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">

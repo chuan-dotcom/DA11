@@ -4,39 +4,39 @@ namespace App\Support;
 
 class Auth
 {
-    public static function user(): ?array
+    public static function user(): ?array 
     {
-        return $_SESSION['auth'] ?? null;
+        return $_SESSION['auth'] ?? null; 
     }
 
-    public static function check(): bool
+    public static function check(): bool 
     {
-        return !empty($_SESSION['auth']);
+        return !empty($_SESSION['auth']);                  
     }
 
     public static function isAdmin(): bool
     {
-        return self::check() && (self::user()['role'] ?? null) === 'admin';
+        return self::check() && (self::user()['role'] ?? null) === 'admin';                 
     }
 
-    public static function isHdv(): bool
+    public static function isHdv(): bool           
     {
-        return self::check() && (self::user()['role'] ?? null) === 'hdv';
+        return self::check() && (self::user()['role'] ?? null) === 'hdv';           
     }
 
-    public static function hasBoundHdv(): bool
+    public static function hasBoundHdv(): bool              
     {
-        return self::isHdv() && !empty(self::user()['hdv_id']);
+        return self::isHdv() && !empty(self::user()['hdv_id']);             
     }
 
-    public static function canSwitchHdv(): bool
+    public static function canSwitchHdv(): bool              
     {
-        return self::isAdmin() || (self::isHdv() && !self::hasBoundHdv());
+        return self::isAdmin() || (self::isHdv() && !self::hasBoundHdv());        
     }
 
-    public static function login(array $user): void
+    public static function login(array $user): void          
     {
-        session_regenerate_id(true);
+        session_regenerate_id(true);          
 
         $_SESSION['auth'] = [
             'id' => $user['id'] ?? null,
@@ -50,19 +50,19 @@ class Auth
         ];
 
         if (($user['role'] ?? null) === 'hdv' && !empty($user['hdv_id'])) {
-            $_SESSION['hdv_id'] = (int) $user['hdv_id'];
+            $_SESSION['hdv_id'] = (int) $user['hdv_id'];           
         }
     }
 
-    public static function logout(): void
+    public static function logout(): void               
     {
-        unset($_SESSION['auth'], $_SESSION['old_input'], $_SESSION['hdv_id']);
+        unset($_SESSION['auth'], $_SESSION['old_input'], $_SESSION['hdv_id']);          
         session_regenerate_id(true);
     }
 
-    public static function redirectPath(?array $user = null): string
+    public static function redirectPath(?array $user = null): string          
     {
-        $user = $user ?? self::user();
+        $user = $user ?? self::user();         
 
         if (!$user) {
             return 'auth/login';

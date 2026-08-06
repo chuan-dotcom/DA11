@@ -9,7 +9,7 @@ $dotenv->load();
 // Show errors during development to avoid blank pages
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
+error_reporting(E_ALL); 
 
 function view($name, $data = []) {
     $blade = new \eftec\bladeone\BladeOne(

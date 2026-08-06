@@ -23,16 +23,52 @@
     <div class="card">
         <div class="card-body">
             <form action="{{ route('admin/services/update/' . $service['id']) }}" method="POST">
-                <div class="mb-3">
-                    <label class="form-label">Tour du lịch <span class="text-danger">*</span></label>
-                    <select name="tour_id" class="form-select" required>
-                        <option value="">-- Chọn Tour --</option>
-                        @foreach($tours as $tour)
-                            <option value="{{ $tour['id'] }}" {{ (isset($_POST['tour_id']) ? $_POST['tour_id'] : $service['tour_id']) == $tour['id'] ? 'selected' : '' }}>
-                                #{{ $tour['id'] }} - {{ $tour['name'] }}
-                            </option>
-                        @endforeach
-                    </select>
+                <div class="row g-3 mb-2">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Tour du lịch <span class="text-danger">*</span></label>
+                            <select name="tour_id" id="tour_id" class="form-select" required>
+                                <option value="">-- Chọn Tour --</option>
+                                @foreach($tours as $tour)
+                                    <option value="{{ $tour['id'] }}" {{ ((isset($_POST['tour_id']) ? $_POST['tour_id'] : $service['tour_id']) == $tour['id']) ? 'selected' : '' }}>
+                                        #{{ $tour['id'] }} - {{ $tour['name'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Chuyến khởi hành (tùy chọn)</label>
+                            <select name="departure_id" id="departure_id" class="form-select">
+                                <option value="">-- Không gắn vào chuyến --</option>
+                                @if(!empty($departures))
+                                    @foreach($departures as $d)
+                                        @php
+                                            $dpDate = !empty($d['departure_date']) ? date('d/m/Y', strtotime($d['departure_date'])) : '';
+                                            $rtDate = !empty($d['return_date']) ? date('d/m/Y', strtotime($d['return_date'])) : '';
+                                        @endphp
+                                        <option value="{{ $d['id'] }}"
+                                            data-tour="{{ $d['tour_id'] }}"
+                                            data-departure="{{ !empty($d['departure_date']) ? date('Y-m-d', strtotime($d['departure_date'])) : '' }}"
+                                            data-return="{{ !empty($d['return_date']) ? date('Y-m-d', strtotime($d['return_date'])) : '' }}"
+                                            {{ ((isset($_POST['departure_id']) ? $_POST['departure_id'] : $service['departure_id']) == $d['id']) ? 'selected' : '' }}>
+                                            #{{ $d['id'] }} · {{ $d['group_name'] ?: ('Chuyến '.$d['id']) }}
+                                            @if($dpDate)
+                                                ({{ $dpDate }}@if($rtDate && $rtDate !== $dpDate) → {{ $rtDate }} @endif)
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @if(!empty($service['departure_id']))
+                                <div class="form-text small text-primary">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>
+                                    Dịch vụ đang gắn vào <strong>{{ $service['departure_group_name'] ?: ('#'.$service['departure_id']) }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -93,11 +129,11 @@
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Thời gian bắt đầu</label>
-                        <input type="datetime-local" name="start_time" class="form-control" value="{{ isset($_POST['start_time']) ? htmlentities($_POST['start_time']) : ($service['start_time'] ? date('Y-m-d\TH:i', strtotime($service['start_time'])) : '') }}">
+                        <input type="datetime-local" id="start_time" name="start_time" class="form-control" value="{{ isset($_POST['start_time']) ? htmlentities($_POST['start_time']) : ($service['start_time'] ? date('Y-m-d\TH:i', strtotime($service['start_time'])) : '') }}">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Thời gian kết thúc</label>
-                        <input type="datetime-local" name="end_time" class="form-control" value="{{ isset($_POST['end_time']) ? htmlentities($_POST['end_time']) : ($service['end_time'] ? date('Y-m-d\TH:i', strtotime($service['end_time'])) : '') }}">
+                        <input type="datetime-local" id="end_time" name="end_time" class="form-control" value="{{ isset($_POST['end_time']) ? htmlentities($_POST['end_time']) : ($service['end_time'] ? date('Y-m-d\TH:i', strtotime($service['end_time'])) : '') }}">
                     </div>
                 </div>
 
@@ -123,4 +159,69 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tourSel    = document.getElementById('tour_id');
+    const depSel     = document.getElementById('departure_id');
+    const startInput = document.getElementById('start_time');
+    const endInput   = document.getElementById('end_time');
+    const depMap     = {};
+
+    Array.from(depSel.options).forEach(opt => {
+        if (opt.value === '') return;
+        depMap[opt.value] = {
+            tour:      opt.dataset.tour      || '',
+            departure: opt.dataset.departure || '',
+            return:    opt.dataset.return    || ''
+        };
+    });
+
+    function filterDepartures() {
+        const tourVal = tourSel.value;
+        for (let i = 0; i < depSel.options.length; i++) {
+            const opt = depSel.options[i];
+            if (opt.value === '') { opt.style.display = ''; continue; }
+            const t = depMap[opt.value] ? depMap[opt.value].tour : '';
+            opt.style.display = (tourVal === '' || t === '' || String(t) === String(tourVal)) ? '' : 'none';
+        }
+        if (depSel.value !== '') {
+            const cur = depMap[depSel.value];
+            if (cur && tourSel.value !== '' && String(cur.tour) !== String(tourSel.value)) {
+                depSel.value = '';
+            }
+        }
+    }
+
+    function applyDeparture() {
+        const val = depSel.value;
+        if (!val || !depMap[val]) return;
+        const cur = depMap[val];
+        if (cur.tour) {
+            for (let i = 0; i < tourSel.options.length; i++) {
+                if (String(tourSel.options[i].value) === String(cur.tour)) {
+                    tourSel.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+        if (!startInput.value && cur.departure) {
+            startInput.value = cur.departure + 'T06:00';
+        }
+        if (!endInput.value && cur.return) {
+            endInput.value = cur.return + 'T20:00';
+        } else if (!endInput.value && cur.departure) {
+            endInput.value = cur.departure + 'T20:00';
+        }
+    }
+
+    tourSel.addEventListener('change', filterDepartures);
+    depSel.addEventListener('change', function () {
+        filterDepartures();
+        applyDeparture();
+    });
+
+    filterDepartures();
+});
+</script>
 @endsection

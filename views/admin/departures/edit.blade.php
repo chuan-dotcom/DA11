@@ -18,6 +18,56 @@
     <div class="card mb-4">
         <div class="card-body">
             <form action="{{ route('admin/departures/update/' . $departure['id']) }}" method="POST">
+                <div class="mb-3 p-3 rounded-3 bg-light border d-flex flex-column gap-2">
+                    <label class="form-label fw-semibold mb-1 d-flex align-items-center gap-2">
+                        <i class="bi bi-magic text-primary"></i> Tự điền từ khách hàng đã đặt tour
+                    </label>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-7">
+                            <label for="booking_suggestion" class="form-label small text-muted">Chọn tên khách đại diện</label>
+                            <select class="form-select" id="booking_suggestion">
+                                <option value="">-- Chọn booking đã xác nhận --</option>
+                                @if(!empty($bookingSuggestions))
+                                    @foreach($bookingSuggestions as $b)
+                                        @php
+                                            $meta = [
+                                                'tour_id' => (int)$b['tour_id'],
+                                                'tour_name' => $b['tour_name'],
+                                                'tour_location' => $b['tour_location'] ?? '',
+                                                'num_people' => (int)$b['num_people'],
+                                                'customer_phone' => $b['customer_phone'],
+                                                'customer_email' => $b['customer_email'],
+                                                'booking_date' => $b['booking_date'],
+                                            ];
+                                        @endphp
+                                        <option value="{{ $b['id'] }}"
+                                            data-meta="{{ htmlentities(json_encode($meta, JSON_HEX_TAG|JSON_HEX_APOS), ENT_QUOTES) }}">
+                                            #{{ $b['id'] }} · {{ $b['customer_name'] }}
+                                            @if(!empty($b['customer_phone']))
+                                                ({{ $b['customer_phone'] }})
+                                            @endif
+                                            · {{ $b['tour_name'] }} · {{ $b['num_people'] }} người
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <div id="booking_summary_box" class="p-2 rounded-2 bg-white border d-none small min-h-0" style="min-height:62px">
+                                <div class="d-flex flex-column gap-1">
+                                    <div><span class="text-muted">Tour:</span> <strong id="bs_tour_name">—</strong></div>
+                                    <div class="d-flex gap-3 flex-wrap">
+                                        <div><span class="text-muted">Số khách:</span> <strong id="bs_num_people" class="text-primary">—</strong></div>
+                                        <div><span class="text-muted">Địa điểm:</span> <strong id="bs_location">—</strong></div>
+                                        <div><span class="text-muted">SĐT:</span> <strong id="bs_phone">—</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text small"><i class="bi bi-info-circle text-primary me-1"></i>Chọn một booking ở trên sẽ tự động <strong>đổi Tour</strong> và <strong>Điền Số khách tối đa</strong>. Bạn có thể chỉnh sửa lại sau khi điền tự động.</div>
+                </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -53,6 +103,7 @@
                         <div class="mb-3">
                             <label for="meeting_point" class="form-label">Điểm tập trung</label>
                             <input type="text" class="form-control" id="meeting_point" name="meeting_point" value="{{ $departure['meeting_point'] }}">
+                            <div class="form-text"><i class="bi bi-info-circle text-primary me-1"></i>Giá trị này sẽ được tự động gắn làm <strong>Địa chỉ đón khách hàng</strong> cho tất cả booking trong đoàn này.</div>
                         </div>
                         <div class="mb-3">
                             <label for="meeting_time" class="form-label">Giờ tập trung</label>
@@ -158,12 +209,146 @@
             @endif
         </div>
     </div>
+
+    <div class="card mt-4 border-secondary">
+        <div class="card-header bg-light d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <h5 class="mb-0 fw-semibold">
+                <i class="bi bi-list-task text-dark me-2"></i>Dịch vụ đoàn của chuyến khởi hành
+            </h5>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ route('admin/services') }}?departure_id={{ $departure['id'] }}" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-funnel me-1"></i> Lọc ở trang Quản lý dịch vụ
+                </a>
+                <a href="{{ route('admin/services/create') }}?tour_id={{ $departure['tour_id'] }}&departure_id={{ $departure['id'] }}&quantity={{ (int)($departure['max_participants'] ?? 0) }}" class="btn btn-success btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Đặt dịch vụ cho đoàn này
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            @if(empty($services))
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-list-task fs-1 opacity-30 mb-2 d-block"></i>
+                    Chuyến khởi hành này chưa có dịch vụ nào được đặt. Nhấn nút <strong class="text-success">"Đặt dịch vụ cho đoàn này"</strong> bên trên để thêm.
+                </div>
+            @else
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Loại dịch vụ</th>
+                                <th>Nhà cung cấp</th>
+                                <th class="text-center">Số lượng</th>
+                                <th>Thời gian</th>
+                                <th class="text-center">Trạng thái</th>
+                                <th width="160" class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($services as $sv)
+                                <tr>
+                                    <td>#{{ $sv['id'] }}</td>
+                                    <td class="fw-semibold">{{ $sv['service_types'] }}</td>
+                                    <td>{{ $sv['supplier'] }}</td>
+                                    <td class="text-center">{{ (int)$sv['quantity'] }}</td>
+                                    <td class="small">
+                                        @if(!empty($sv['start_time']) && !empty($sv['end_time']))
+                                            {{ date('d/m/Y H:i', strtotime($sv['start_time'])) }}
+                                            <br>→ {{ date('d/m/Y H:i', strtotime($sv['end_time'])) }}
+                                        @elseif(!empty($sv['start_time']))
+                                            {{ date('d/m/Y H:i', strtotime($sv['start_time'])) }}
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @switch($sv['status'])
+                                            @case(0)
+                                                <span class="badge bg-warning text-dark">Chờ</span>
+                                                @break
+                                            @case(1)
+                                                <span class="badge bg-info text-white">Xác nhận</span>
+                                                @break
+                                            @case(2)
+                                                <span class="badge bg-success">Hoàn tất</span>
+                                                @break
+                                            @default
+                                                <span class="badge bg-secondary">{{ (int)$sv['status'] }}</span>
+                                        @endswitch
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ route('admin/services/edit/' . $sv['id']) }}" class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-pencil"></i> Sửa
+                                        </a>
+                                        <a href="{{ route('admin/services/delete/' . $sv['id']) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc muốn xóa dịch vụ này khỏi đoàn?')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-2 small text-muted d-flex flex-wrap gap-3 align-items-center">
+                    <span><i class="bi bi-info-circle me-1"></i>Tổng: <strong>{{ count($services) }}</strong> dịch vụ đoàn</span>
+                </div>
+            @endif
+        </div>
+    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const departureDate = document.getElementById('departure_date');
     const returnDate = document.getElementById('return_date');
+    const tourSelect = document.getElementById('tour_id');
+    const groupName = document.getElementById('group_name');
+    const maxParticipants = document.getElementById('max_participants');
+    const bookingSuggestion = document.getElementById('booking_suggestion');
+    const summaryBox = document.getElementById('booking_summary_box');
+    const bsTourName = document.getElementById('bs_tour_name');
+    const bsNumPeople = document.getElementById('bs_num_people');
+    const bsLocation = document.getElementById('bs_location');
+    const bsPhone = document.getElementById('bs_phone');
+
+    function applyBookingSuggestion(opt) {
+        if (!opt || !opt.dataset || !opt.dataset.meta) {
+            summaryBox.classList.add('d-none');
+            return;
+        }
+        let meta = null;
+        try {
+            meta = JSON.parse(opt.dataset.meta);
+        } catch (e) {
+            meta = null;
+        }
+        if (!meta) return;
+
+        summaryBox.classList.remove('d-none');
+        bsTourName.textContent = meta.tour_name || '—';
+        bsNumPeople.textContent = (meta.num_people ?? 0) + ' người';
+        bsLocation.textContent = meta.tour_location || '—';
+        bsPhone.textContent = meta.customer_phone || '—';
+
+        if (meta.tour_id) {
+            let found = false;
+            for (let i = 0; i < tourSelect.options.length; i++) {
+                if (String(tourSelect.options[i].value) === String(meta.tour_id)) {
+                    tourSelect.selectedIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (meta.num_people) {
+            maxParticipants.value = Math.max(1, parseInt(meta.num_people, 10) || 1);
+        }
+    }
+
+    bookingSuggestion.addEventListener('change', function () {
+        applyBookingSuggestion(this.options[this.selectedIndex]);
+    });
 
     function validateDates() {
         if (returnDate.value && departureDate.value && returnDate.value < departureDate.value) {

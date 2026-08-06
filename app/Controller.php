@@ -1,9 +1,9 @@
-<?php
+<?php 
 namespace App;
 
 class Controller
 {
-    public function validate($validator, $data, $rules)
+    public function validate($validator, $data, $rules)        
     {
         $validation = $validator->make($data, $rules);
 

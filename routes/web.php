@@ -121,6 +121,7 @@ $router->get('admin/bookings/show/(\d+)', AdminBookingController::class . '@show
 $router->get('admin/bookings/edit/(\d+)', AdminBookingController::class . '@edit');
 $router->post('admin/bookings/update/(\d+)', AdminBookingController::class . '@update');
 $router->get('admin/bookings/delete/(\d+)', AdminBookingController::class . '@delete');
+$router->get('admin/bookings/unassign-departure/(\d+)', AdminBookingController::class . '@unassignDeparture');
 
 // Admin: Staff / HDV
 $router->get('admin/staff', AdminStaffController::class . '@index');
@@ -174,6 +175,8 @@ $router->post('admin/guest-groups/booking-guests/update/(\d+)/(\d+)', AdminGuest
 $router->get('admin/guest-groups/booking-guests/delete/(\d+)/(\d+)', AdminGuestGroupController::class . '@deleteGuest');
 $router->get('admin/guest-groups/booking-guests/check-in/(\d+)/(\d+)', AdminGuestGroupController::class . '@checkInGuest');
 $router->get('admin/guest-groups/booking-guests/check-in-cancel/(\d+)/(\d+)', AdminGuestGroupController::class . '@cancelCheckInGuest');
+$router->get('admin/guest-groups/booking-guests/payment-paid/(\d+)/(\d+)', AdminGuestGroupController::class . '@markGuestPaid');
+$router->get('admin/guest-groups/booking-guests/payment-unpaid/(\d+)/(\d+)', AdminGuestGroupController::class . '@markGuestUnpaid');
 
 // Admin: Tour Diaries
 $router->get('admin/tour-diaries', AdminTourDiaryController::class . '@index');

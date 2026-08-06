@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Model;
 
-class BookingGuest extends Model
+class BookingGuest extends Model         
 {
     public function __construct()
     {
@@ -158,6 +158,42 @@ class BookingGuest extends Model
         ], [
             'id' => (int) $id,
         ]);
+    }
+
+    public function updatePaymentStatus($id, $status)
+    {
+        $allowed = ['unpaid', 'deposit', 'paid'];
+        if (!in_array($status, $allowed, true)) {
+            return 0;
+        }
+        return $this->connection->update('booking_guests', [
+            'payment_status' => $status,
+        ], [
+            'id' => (int) $id,
+        ]);
+    }
+
+    public function syncPaymentStatusByBookingId($bookingId, $status)
+    {
+        $allowed = ['unpaid', 'deposit', 'paid'];
+        if (!in_array($status, $allowed, true)) {
+            return 0;
+        }
+        $bookingId = (int) $bookingId;
+        if ($bookingId <= 0) {
+            return 0;
+        }
+        try {
+            $stmt = $this->connection->createQueryBuilder();
+            $stmt->update('booking_guests')
+                ->set('payment_status', ':status')
+                ->where('booking_id = :bookingId')
+                ->setParameter('status', $status)
+                ->setParameter('bookingId', $bookingId);
+            return $stmt->executeStatement();
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
 
     public function getStatsByBookingId($bookingId)

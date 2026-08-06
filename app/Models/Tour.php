@@ -4,6 +4,29 @@ namespace App\Models;
 use App\Model;
   
 class Tour extends Model{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->ensureLocationColumn();
+    }
+
+    private function ensureLocationColumn()
+    {
+        try {
+            $column = $this->connection->fetchAssociative(
+                'SHOW COLUMNS FROM tours LIKE ?',
+                ['location']
+            );
+
+            if (!$column) {
+                $this->connection->executeStatement(
+                    "ALTER TABLE tours ADD COLUMN location VARCHAR(255) NULL AFTER duration"
+                );
+            }
+        } catch (\Throwable $e) {
+        }
+    }
+
     public function getAll() {
         $stmt=$this->connection->createQueryBuilder();
         $stmt->select('t.*', 'tc.name as category_name')
@@ -42,6 +65,7 @@ class Tour extends Model{
             'category_id' =>$data['category_id'],
             'price' =>$data['price'],
             'duration' =>$data['duration'],
+            'location' =>$data['location'] ?? null,
             'description' =>$data['description'],
             'image' =>$data['image'],
             'status' =>$data['status'],
@@ -54,6 +78,7 @@ class Tour extends Model{
             'category_id' =>$data['category_id'],
             'price' =>$data['price'],
             'duration' =>$data['duration'],
+            'location' =>$data['location'] ?? null,
             'description' =>$data['description'],
             'image' =>$data['image'],
             'status' =>$data['status'],

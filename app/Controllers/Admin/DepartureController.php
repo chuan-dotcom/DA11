@@ -8,6 +8,8 @@ use App\Models\Tour;
 use App\Models\TourCategory;
 use App\Models\StaffAssignment;
 use Rakit\Validation\Validator;
+use App\Models\Booking;
+use App\Models\Service;
 
 class DepartureController extends Controller
 {
@@ -15,6 +17,8 @@ class DepartureController extends Controller
     private $modelTour;
     private $modelCategory;
     private $modelAssignment;
+    private $modelBooking;
+    private $modelService;
     private $validator;
 
     public function __construct()
@@ -23,6 +27,8 @@ class DepartureController extends Controller
         $this->modelTour = new Tour();
         $this->modelCategory = new TourCategory();
         $this->modelAssignment = new StaffAssignment();
+        $this->modelBooking = new Booking();
+        $this->modelService = new Service();
         $this->validator = new Validator();
     }
 
@@ -40,7 +46,8 @@ class DepartureController extends Controller
     {
         $title = 'Thêm chuyến khởi hành mới';
         $tours = $this->modelTour->getAll();
-        return view('admin.departures.create', compact('title', 'tours'));
+        $bookingSuggestions = $this->modelBooking->getConfirmedWithTourSummary();
+        return view('admin.departures.create', compact('title', 'tours', 'bookingSuggestions'));
     }
 
     public function store()
@@ -101,8 +108,10 @@ class DepartureController extends Controller
         }
 
         $assignments = $this->modelAssignment->getByDepartureId($id);
+        $bookingSuggestions = $this->modelBooking->getConfirmedWithTourSummary();
+        $services = $this->modelService->getByDepartureId($id);
 
-        return view('admin.departures.edit', compact('title', 'departure', 'tours', 'assignments'));
+        return view('admin.departures.edit', compact('title', 'departure', 'tours', 'assignments', 'bookingSuggestions', 'services'));
     }
 
     public function update($id)
@@ -182,6 +191,9 @@ class DepartureController extends Controller
         }
 
         $this->modelDeparture->update($id, $data);
+
+        $this->modelDeparture->syncBookingsPickupAddress($id, $data['meeting_point'] ?? null, true);
+
         setFlash('success', 'Cập nhật chuyến khởi hành thành công!');
         return redirect('admin/departures');
     }
