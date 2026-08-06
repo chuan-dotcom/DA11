@@ -49,9 +49,9 @@ class Booking extends Model
     }
 
     /**
-     * Lấy danh sách tất cả Booking
+     * Lấy danh sách tất cả Booking (hỗ trợ lọc theo tour / trạng thái / khoảng ngày)
      */
-    public function getAll()
+    public function getAll($tourId = null, $status = null, $fromDate = null, $toDate = null)
     {
         $stmt = $this->connection->createQueryBuilder();
 
@@ -60,9 +60,57 @@ class Booking extends Model
                 't.name AS tour_name'
             )
             ->from('bookings', 'b')
-            ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id')
-            ->orderBy('b.id', 'DESC');
+            ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id');
 
+        if (!empty($tourId)) {
+            $stmt->andWhere('b.tour_id = :tourId')
+                ->setParameter('tourId', (int) $tourId);
+        }
+
+        if ($status !== null && $status !== '') {
+            $stmt->andWhere('b.status = :status')
+                ->setParameter('status', (int) $status);
+        }
+
+        if (!empty($fromDate)) {
+            $stmt->andWhere('b.booking_date >= :fromDate')
+                ->setParameter('fromDate', $fromDate);
+        }
+
+        if (!empty($toDate)) {
+            $stmt->andWhere('b.booking_date <= :toDate')
+                ->setParameter('toDate', $toDate);
+        }
+
+        $stmt->orderBy('b.id', 'DESC');
+
+        return $stmt->fetchAllAssociative();
+    }
+
+    /**
+     * Thống kê số booking theo trạng thái (giống Departure::getDeparturesByStatus)
+     */
+    public function getBookingsByStatus($tourId = null, $fromDate = null, $toDate = null)
+    {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('b.status', 'COUNT(b.id) as count')
+            ->from('bookings', 'b')
+            ->leftJoin('b', 'tours', 't', 'b.tour_id = t.id');
+
+        if (!empty($tourId)) {
+            $stmt->andWhere('b.tour_id = :tourId')
+                ->setParameter('tourId', (int) $tourId);
+        }
+        if (!empty($fromDate)) {
+            $stmt->andWhere('b.booking_date >= :fromDate')
+                ->setParameter('fromDate', $fromDate);
+        }
+        if (!empty($toDate)) {
+            $stmt->andWhere('b.booking_date <= :toDate')
+                ->setParameter('toDate', $toDate);
+        }
+
+        $stmt->groupBy('b.status');
         return $stmt->fetchAllAssociative();
     }
 

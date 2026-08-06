@@ -6,62 +6,31 @@ use App\Controller;
 use App\Models\TourDiary;
 use App\Models\Departure;
 use App\Models\Staff;
+use App\Models\StaffAssignment;
 use App\Support\Auth;
+use App\Support\ResolvesActiveHdv;
 use Rakit\Validation\Validator;
 
 class DiaryController extends Controller
 {
+    use ResolvesActiveHdv;
+
     private $modelDiary;
     private $modelDeparture;
-    private $modelStaff;
+    private $modelAssignment;
     private $validator;
 
     public function __construct()
     {
         $this->modelDiary = new TourDiary();
         $this->modelDeparture = new Departure();
-        $this->modelStaff = new Staff();
+        $this->modelAssignment = new StaffAssignment();
         $this->validator = new Validator();
-    }
-
-    private function getActiveHdvId()
-    {
-        if (Auth::hasBoundHdv()) {
-            $_SESSION['hdv_id'] = (int) (Auth::user()['hdv_id'] ?? 0);
-            return $_SESSION['hdv_id'];
-        }
-        if (isset($_GET['hdv_id']) && (int)$_GET['hdv_id'] > 0) {
-            $_SESSION['hdv_id'] = (int)$_GET['hdv_id'];
-        }
-        if (!isset($_SESSION['hdv_id'])) {
-            $allStaff = $this->modelStaff->getAll();
-            $_SESSION['hdv_id'] = !empty($allStaff) ? (int)$allStaff[0]['HDV_id'] : 1;
-        }
-        return $_SESSION['hdv_id'];
     }
 
     private function getAssignedDepartures($hdvId)
     {
-        $db = (new \App\Model())->getConnection();
-        $sql = "
-            SELECT 
-                d.id, 
-                d.group_name, 
-                d.departure_date, 
-                d.return_date, 
-                d.meeting_point,
-                d.meeting_time,
-                t.id AS tour_id,
-                t.name AS tour_name,
-                tc.name AS category_name
-            FROM staff_assignments sa
-            INNER JOIN departures d ON d.id = sa.departure_id
-            INNER JOIN tours t ON t.id = d.tour_id
-            LEFT JOIN tour_categories tc ON tc.id = t.category_id
-            WHERE sa.staff_id = :hdv_id
-            ORDER BY d.departure_date DESC
-        ";
-        return $db->fetchAllAssociative($sql, ['hdv_id' => $hdvId]);
+        return $this->modelAssignment->getByStaffIdWithDeparture($hdvId, true);
     }
 
     private function cleanupUploadedPhotos(array $photos): void
@@ -76,7 +45,7 @@ class DiaryController extends Controller
     private function findAssignedDepartureById(array $departures, int $departureId): ?array
     {
         foreach ($departures as $departure) {
-            if ((int) ($departure['id'] ?? 0) === $departureId) {
+            if ((int) ($departure['departure_id'] ?? 0) === $departureId) {
                 return $departure;
             }
         }
@@ -114,12 +83,12 @@ class DiaryController extends Controller
 
     public function index()
     {
-        $hdvId = $this->getActiveHdvId();
-        $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
+        $hdvId = $this->resolveActiveHdvId();
+        $activeHdv = $this->resolveActiveHdv();
+        $allHdv = $this->resolveAllViewableHdv();
 
         $departures = $this->getAssignedDepartures($hdvId);
-        $departureIds = array_column($departures, 'id');
+        $departureIds = array_column($departures, 'departure_id');
 
         $selectedDepartureId = isset($_GET['departure_id']) ? (int)$_GET['departure_id'] : null;
 
@@ -172,9 +141,9 @@ class DiaryController extends Controller
 
     public function create()
     {
-        $hdvId = $this->getActiveHdvId();
-        $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
+        $hdvId = $this->resolveActiveHdvId();
+        $activeHdv = $this->resolveActiveHdv();
+        $allHdv = $this->resolveAllViewableHdv();
 
         $departures = $this->getAssignedDepartures($hdvId);
         $selectedDepartureId = isset($_GET['departure_id']) ? (int)$_GET['departure_id'] : null;
@@ -200,7 +169,7 @@ class DiaryController extends Controller
 
     public function store()
     {
-        $hdvId = $this->getActiveHdvId();
+        $hdvId = $this->resolveActiveHdvId();
         $departures = $this->getAssignedDepartures($hdvId);
         $photos = [];
         if (isset($_FILES['photos']) && is_array($_FILES['photos']['name'])) {
@@ -276,13 +245,13 @@ class DiaryController extends Controller
 
     public function show($id)
     {
-        $hdvId = $this->getActiveHdvId();
-        $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
+        $hdvId = $this->resolveActiveHdvId();
+        $activeHdv = $this->resolveActiveHdv();
+        $allHdv = $this->resolveAllViewableHdv();
 
         $diary = $this->modelDiary->findById($id);
         $departures = $this->getAssignedDepartures($hdvId);
-        $assignedDepartureIds = array_map('intval', array_column($departures, 'id'));
+        $assignedDepartureIds = array_map('intval', array_column($departures, 'departure_id'));
 
         if (!$diary || !in_array((int) ($diary['departure_id'] ?? 0), $assignedDepartureIds, true)) {
             setFlash('error', 'Nhật ký không tồn tại!');
@@ -304,13 +273,13 @@ class DiaryController extends Controller
 
     public function edit($id)
     {
-        $hdvId = $this->getActiveHdvId();
-        $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
+        $hdvId = $this->resolveActiveHdvId();
+        $activeHdv = $this->resolveActiveHdv();
+        $allHdv = $this->resolveAllViewableHdv();
 
         $diary = $this->modelDiary->findById($id);
         $departures = $this->getAssignedDepartures($hdvId);
-        $assignedDepartureIds = array_map('intval', array_column($departures, 'id'));
+        $assignedDepartureIds = array_map('intval', array_column($departures, 'departure_id'));
 
         if (!$diary || !in_array((int) ($diary['departure_id'] ?? 0), $assignedDepartureIds, true)) {
             setFlash('error', 'Nhật ký không tồn tại!');
@@ -333,10 +302,10 @@ class DiaryController extends Controller
 
     public function update($id)
     {
-        $hdvId = $this->getActiveHdvId();
+        $hdvId = $this->resolveActiveHdvId();
         $departures = $this->getAssignedDepartures($hdvId);
         $diary = $this->modelDiary->findById($id);
-        $assignedDepartureIds = array_map('intval', array_column($departures, 'id'));
+        $assignedDepartureIds = array_map('intval', array_column($departures, 'departure_id'));
 
         if (!$diary || !in_array((int) ($diary['departure_id'] ?? 0), $assignedDepartureIds, true)) {
             setFlash('error', 'Nhật ký không tồn tại!');
@@ -412,10 +381,10 @@ class DiaryController extends Controller
 
     public function delete($id)
     {
-        $hdvId = $this->getActiveHdvId();
+        $hdvId = $this->resolveActiveHdvId();
         $diary = $this->modelDiary->findById($id);
         $departures = $this->getAssignedDepartures($hdvId);
-        $assignedDepartureIds = array_map('intval', array_column($departures, 'id'));
+        $assignedDepartureIds = array_map('intval', array_column($departures, 'departure_id'));
 
         if ($diary && in_array((int) ($diary['departure_id'] ?? 0), $assignedDepartureIds, true)) {
             $departureId = (int) ($diary['departure_id'] ?? 0);

@@ -8,86 +8,44 @@ use App\Models\Departure;
 use App\Models\BookingGuest;
 use App\Models\Staff;
 use App\Support\Auth;
+use App\Support\ResolvesActiveHdv;
 
 class AssignedTourController extends Controller
 {
+    use ResolvesActiveHdv;
+
     private $modelAssignment;
     private $modelDeparture;
     private $modelGuest;
-    private $modelStaff;
 
     public function __construct()
     {
         $this->modelAssignment = new StaffAssignment();
         $this->modelDeparture = new Departure();
         $this->modelGuest = new BookingGuest();
-        $this->modelStaff = new Staff();
-    }
-
-    private function getActiveHdvId()
-    {
-        if (Auth::hasBoundHdv()) {
-            $_SESSION['hdv_id'] = (int) (Auth::user()['hdv_id'] ?? 0);
-            return $_SESSION['hdv_id'];
-        }
-        if (isset($_GET['hdv_id']) && (int)$_GET['hdv_id'] > 0) {
-            $_SESSION['hdv_id'] = (int)$_GET['hdv_id'];
-        }
-        if (!isset($_SESSION['hdv_id'])) {
-            $allStaff = $this->modelStaff->getAll();
-            $_SESSION['hdv_id'] = !empty($allStaff) ? (int)$allStaff[0]['HDV_id'] : 1;
-        }
-        return $_SESSION['hdv_id'];
     }
 
     public function index()
     {
-        $hdvId = $this->getActiveHdvId();
-        $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
+        $hdvId = $this->resolveActiveHdvId();
+        $activeHdv = $this->resolveActiveHdv();
+        $allHdv = $this->resolveAllViewableHdv();
+
+        $assignedTours = $this->modelAssignment->getByStaffIdWithDeparture($hdvId, true);
 
         $db = (new \App\Model())->getConnection();
+        foreach ($assignedTours as $idx => $t) {
+            $depId = (int) $t['departure_id'];
 
-        // Get detailed assignments matching mockup columns
-        $sql = "
-            SELECT 
-                sa.id AS assignment_id,
-                sa.role AS hdv_role,
-                sa.notes AS assignment_notes,
-                d.id AS departure_id,
-                d.group_name,
-                d.departure_date,
-                d.return_date,
-                d.meeting_point,
-                d.meeting_time,
-                d.vehicle,
-                t.id AS tour_id,
-                t.name AS tour_name,
-                tc.name AS category_name,
-                (
-                    SELECT b.id FROM bookings b 
-                    WHERE b.departure_id = d.id 
-                    ORDER BY b.id ASC LIMIT 1
-                ) AS primary_booking_id,
-                (
-                    SELECT b.customer_name FROM bookings b 
-                    WHERE b.departure_id = d.id 
-                    ORDER BY b.id ASC LIMIT 1
-                ) AS primary_customer_name,
-                (
-                    SELECT COUNT(g.id) FROM booking_guests g 
-                    INNER JOIN bookings b ON b.id = g.booking_id 
-                    WHERE b.departure_id = d.id
-                ) AS total_guests
-            FROM staff_assignments sa
-            INNER JOIN departures d ON d.id = sa.departure_id
-            INNER JOIN tours t ON t.id = d.tour_id
-            LEFT JOIN tour_categories tc ON tc.id = t.category_id
-            WHERE sa.staff_id = :hdv_id
-            ORDER BY d.departure_date DESC
-        ";
+            $primarySql = "SELECT b.id, b.customer_name FROM bookings b WHERE b.departure_id = :depId ORDER BY b.id ASC LIMIT 1";
+            $primary = $db->fetchAssociative($primarySql, ['depId' => $depId]);
+            $assignedTours[$idx]['primary_booking_id'] = $primary['id'] ?? null;
+            $assignedTours[$idx]['primary_customer_name'] = $primary['customer_name'] ?? null;
 
-        $assignedTours = $db->fetchAllAssociative($sql, ['hdv_id' => $hdvId]);
+            $countSql = "SELECT COUNT(g.id) as c FROM booking_guests g INNER JOIN bookings b ON b.id = g.booking_id WHERE b.departure_id = :depId";
+            $countRow = $db->fetchAssociative($countSql, ['depId' => $depId]);
+            $assignedTours[$idx]['total_guests'] = (int) ($countRow['c'] ?? 0);
+        }
 
         // If specific detail requested
         $selectedDepartureId = isset($_GET['departure_id']) ? (int)$_GET['departure_id'] : null;

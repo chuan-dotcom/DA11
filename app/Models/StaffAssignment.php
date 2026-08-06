@@ -164,5 +164,56 @@ class StaffAssignment extends Model
 
         return $available;
     }
+
+    /**
+     * Lấy danh sách chuyến khởi hành đã được phân công cho 1 HDV (đồng bộ từ admin)
+     * Loại bỏ các phân bổ bị hủy / bị từ chối, giữ lại assignment role + status
+     */
+    public function getByStaffIdWithDeparture(int $staffId, bool $includeCancelledDeparture = false): array
+    {
+        $stmt = $this->connection->createQueryBuilder();
+
+        $stmt->select(
+                'sa.id AS assignment_id',
+                'sa.role AS hdv_role',
+                'sa.status AS assignment_status',
+                'sa.responsibilities AS assignment_responsibilities',
+                'sa.notes AS assignment_notes',
+                'sa.assigned_at',
+                'sa.updated_at',
+                'd.id AS departure_id',
+                'd.group_name',
+                'd.departure_date',
+                'd.return_date',
+                'd.meeting_point',
+                'd.meeting_time',
+                'd.vehicle',
+                'd.max_participants',
+                'd.status AS departure_status',
+                't.id AS tour_id',
+                't.name AS tour_name',
+                't.image AS tour_image',
+                't.duration',
+                't.price AS tour_price',
+                'tc.name AS category_name'
+            )
+            ->from('staff_assignments', 'sa')
+            ->innerJoin('sa', 'departures', 'd', 'd.id = sa.departure_id')
+            ->innerJoin('d', 'tours', 't', 't.id = d.tour_id')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->where('sa.staff_id = :staffId')
+            ->andWhere('sa.status NOT IN (:excludeStatuses)')
+            ->setParameter('staffId', $staffId)
+            ->setParameter('excludeStatuses', ['rejected', 'cancelled'], \Doctrine\DBAL\ArrayParameterType::STRING);
+
+        if (!$includeCancelledDeparture) {
+            $stmt->andWhere('d.status != :cancelled')
+                ->setParameter('cancelled', 'cancelled');
+        }
+
+        $stmt->orderBy('d.departure_date', 'DESC');
+
+        return $stmt->fetchAllAssociative();
+    }
 }
 

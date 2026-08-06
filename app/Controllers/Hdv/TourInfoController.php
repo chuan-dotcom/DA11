@@ -8,15 +8,17 @@ use App\Models\Departure;
 use App\Models\BookingGuest;
 use App\Models\Staff;
 use App\Support\Auth;
+use App\Support\ResolvesActiveHdv;
 use App\Models\Tour;
 use App\Models\TourLog;
 
 class TourInfoController extends Controller
 {
+    use ResolvesActiveHdv;
+
     private $modelAssignment;
     private $modelDeparture;
     private $modelGuest;
-    private $modelStaff;
     private $modelTour;
     private $modelTourLog;
 
@@ -25,69 +27,20 @@ class TourInfoController extends Controller
         $this->modelAssignment = new StaffAssignment();
         $this->modelDeparture = new Departure();
         $this->modelGuest = new BookingGuest();
-        $this->modelStaff = new Staff();
         $this->modelTour = new Tour();
         $this->modelTourLog = new TourLog();
     }
 
-    private function getActiveHdvId()
-    {
-        if (Auth::hasBoundHdv()) {
-            $_SESSION['hdv_id'] = (int) (Auth::user()['hdv_id'] ?? 0);
-            return $_SESSION['hdv_id'];
-        }
-
-        if (isset($_GET['hdv_id']) && (int)$_GET['hdv_id'] > 0) {
-            $_SESSION['hdv_id'] = (int)$_GET['hdv_id'];
-        }
-        
-        if (!isset($_SESSION['hdv_id'])) {
-            $allStaff = $this->modelStaff->getAll();
-            $_SESSION['hdv_id'] = !empty($allStaff) ? (int)$allStaff[0]['HDV_id'] : 1;
-        }
-
-        return $_SESSION['hdv_id'];
-    }
-
     public function index()
     {
-        $hdvId = $this->getActiveHdvId();
-        $activeHdv = $this->modelStaff->findById($hdvId);
-        $allHdv = Auth::canSwitchHdv() ? $this->modelStaff->getAll() : [$activeHdv];
+        $hdvId = $this->resolveActiveHdvId();
+        $activeHdv = $this->resolveActiveHdv();
+        $allHdv = $this->resolveAllViewableHdv();
 
         $activeTab = $_GET['tab'] ?? 'danh-sach';
         $selectedDepartureId = isset($_GET['departure_id']) ? (int)$_GET['departure_id'] : null;
 
-        // Query assigned departures for this HDV
-        $db = (new \App\Model())->getConnection();
-        
-        $sql = "
-            SELECT 
-                sa.id AS assignment_id,
-                sa.role AS hdv_role,
-                sa.status AS assignment_status,
-                d.id AS departure_id,
-                d.group_name,
-                d.departure_date,
-                d.return_date,
-                d.meeting_point,
-                d.meeting_time,
-                d.vehicle,
-                d.status AS departure_status,
-                t.id AS tour_id,
-                t.name AS tour_name,
-                t.image AS tour_image,
-                t.duration,
-                tc.name AS category_name
-            FROM staff_assignments sa
-            INNER JOIN departures d ON d.id = sa.departure_id
-            INNER JOIN tours t ON t.id = d.tour_id
-            LEFT JOIN tour_categories tc ON tc.id = t.category_id
-            WHERE sa.staff_id = :hdv_id
-            ORDER BY d.departure_date DESC
-        ";
-        
-        $assignedTours = $db->fetchAllAssociative($sql, ['hdv_id' => $hdvId]);
+        $assignedTours = $this->modelAssignment->getByStaffIdWithDeparture($hdvId, true);
 
         // Categorize into Ongoing (Đang), Upcoming (Sẽ), Completed (Đã)
         $todayTimestamp = strtotime(date('Y-m-d'));
@@ -98,8 +51,18 @@ class TourInfoController extends Controller
         foreach ($assignedTours as $item) {
             $startTimestamp = strtotime($item['departure_date']);
             $endTimestamp = strtotime($item['return_date'] ?: $item['departure_date']);
+            $depStatus = $item['departure_status'] ?? null;
 
-            if ($endTimestamp < $todayTimestamp) {
+            if ($depStatus === 'completed') {
+                $item['progress_status'] = 'da_tien_hanh';
+                $completedTours[] = $item;
+            } elseif ($depStatus === 'in_progress') {
+                $item['progress_status'] = 'dang_tien_hanh';
+                $ongoingTours[] = $item;
+            } elseif ($depStatus === 'cancelled') {
+                $item['progress_status'] = 'da_tien_hanh';
+                $completedTours[] = $item;
+            } elseif ($endTimestamp < $todayTimestamp) {
                 $item['progress_status'] = 'da_tien_hanh';
                 $completedTours[] = $item;
             } elseif ($startTimestamp <= $todayTimestamp && $endTimestamp >= $todayTimestamp) {
@@ -146,9 +109,10 @@ class TourInfoController extends Controller
                         SELECT h.*, sa.role 
                         FROM staff_assignments sa
                         INNER JOIN hdv h ON h.HDV_id = sa.staff_id
-                        WHERE sa.departure_id = :departure_id AND sa.role = 'driver'
+                        WHERE sa.departure_id = :departure_id AND sa.role = 'driver' AND sa.status NOT IN ('rejected','cancelled')
                         LIMIT 1
                     ";
+                    $db = (new \App\Model())->getConnection();
                     $driverInfo = $db->fetchAssociative($driverSql, ['departure_id' => $selectedDepartureId]);
 
                     // Fetch timeline activity logs for this tour departure from the DB model
