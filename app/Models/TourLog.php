@@ -34,4 +34,36 @@ class TourLog extends Model
 
         return $stmt->fetchAssociative();
     }
+
+    public function create(array $data)
+    {
+        return $this->connection->insert('tour_logs', [
+            'departure_id' => (int) $data['departure_id'],
+            'title'        => $data['title'],
+            'content'      => $data['content'],
+            'log_date'     => $data['log_date'],
+            'location'     => $data['location'] ?: null,
+            'weather'      => $data['weather'] ?: null,
+            'mood'         => $data['mood'] ?: null,
+            'author_id'    => !empty($data['author_id']) ? (int) $data['author_id'] : null,
+            'status'       => 'published',
+        ]);
+    }
+
+    public function updateLog($id, array $data)
+    {
+        return $this->connection->update('tour_logs', [
+            'title'    => $data['title'],
+            'content'  => $data['content'],
+            'log_date' => $data['log_date'],
+            'location' => $data['location'] ?: null,
+            'weather'  => $data['weather'] ?: null,
+            'mood'     => $data['mood'] ?: null,
+        ], ['id' => (int) $id]);
+    }
+
+    public function deleteLog($id)
+    {
+        return $this->connection->delete('tour_logs', ['id' => (int) $id]);
+    }
 }

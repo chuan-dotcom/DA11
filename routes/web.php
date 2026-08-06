@@ -195,6 +195,9 @@ $router->get('admin/tour-diaries/delete/(\d+)', AdminTourDiaryController::class 
 $router->get('hdv', HdvTourInfoController::class . '@index');
 $router->get('hdv/dashboard', HdvTourInfoController::class . '@index');
 $router->get('hdv/thong-tin-tour', HdvTourInfoController::class . '@index');
+$router->post('hdv/tour-logs/store', HdvTourInfoController::class . '@storeTourLog');
+$router->post('hdv/tour-logs/update/(\d+)', HdvTourInfoController::class . '@updateTourLog');
+$router->post('hdv/tour-logs/delete/(\d+)', HdvTourInfoController::class . '@deleteTourLog');
 
 $router->get('hdv/tour-phan-cong', HdvAssignedTourController::class . '@index');
 $router->post('hdv/guest/check-in', HdvAssignedTourController::class . '@toggleCheckIn');

@@ -10,6 +10,7 @@ use App\Models\Staff;
 use App\Support\Auth;
 use App\Models\Tour;
 use App\Models\TourLog;
+use Rakit\Validation\Validator;
 
 class TourInfoController extends Controller
 {
@@ -19,6 +20,7 @@ class TourInfoController extends Controller
     private $modelStaff;
     private $modelTour;
     private $modelTourLog;
+    private $validator;
 
     public function __construct()
     {
@@ -28,6 +30,7 @@ class TourInfoController extends Controller
         $this->modelStaff = new Staff();
         $this->modelTour = new Tour();
         $this->modelTourLog = new TourLog();
+        $this->validator = new Validator();
     }
 
     private function getActiveHdvId()
@@ -175,5 +178,129 @@ class TourInfoController extends Controller
             'driverInfo',
             'tourLogs'
         ));
+    }
+
+    public function storeTourLog()
+    {
+        $hdvId = $this->getActiveHdvId();
+        $data = $this->tourLogData();
+        $departure = $this->assignedDeparture($hdvId, (int) $data['departure_id']);
+
+        if (!$departure) {
+            setFlash('error', 'Bạn chỉ có thể cập nhật lịch trình của chuyến được phân công.');
+            return redirect('hdv/dashboard?tab=chi-tiet');
+        }
+
+        $errors = $this->validate($this->validator, $data, $this->tourLogRules());
+        if (!empty($errors)) {
+            setFlash('error', reset($errors));
+            return redirect('hdv/dashboard?tab=chi-tiet&departure_id=' . (int) $data['departure_id']);
+        }
+
+        $dateError = $this->validateLogDate($departure, $data['log_date']);
+        if ($dateError) {
+            setFlash('error', $dateError);
+            return redirect('hdv/dashboard?tab=chi-tiet&departure_id=' . (int) $data['departure_id']);
+        }
+
+        $data['author_id'] = $hdvId;
+        $this->modelTourLog->create($data);
+        setFlash('success', 'Đã thêm hoạt động vào lịch trình tour.');
+        return redirect('hdv/dashboard?tab=chi-tiet&departure_id=' . (int) $data['departure_id']);
+    }
+
+    public function updateTourLog($id)
+    {
+        $hdvId = $this->getActiveHdvId();
+        $log = $this->modelTourLog->findById($id);
+        $data = $this->tourLogData();
+        $departureId = (int) ($log['departure_id'] ?? 0);
+        $departure = $this->assignedDeparture($hdvId, $departureId);
+
+        if (!$log || !$departure) {
+            setFlash('error', 'Hoạt động không tồn tại hoặc bạn không có quyền cập nhật.');
+            return redirect('hdv/dashboard?tab=chi-tiet');
+        }
+
+        $data['departure_id'] = $departureId;
+        $errors = $this->validate($this->validator, $data, $this->tourLogRules());
+        if (!empty($errors)) {
+            setFlash('error', reset($errors));
+            return redirect('hdv/dashboard?tab=chi-tiet&departure_id=' . $departureId);
+        }
+
+        $dateError = $this->validateLogDate($departure, $data['log_date']);
+        if ($dateError) {
+            setFlash('error', $dateError);
+            return redirect('hdv/dashboard?tab=chi-tiet&departure_id=' . $departureId);
+        }
+
+        $this->modelTourLog->updateLog($id, $data);
+        setFlash('success', 'Đã cập nhật hoạt động tour.');
+        return redirect('hdv/dashboard?tab=chi-tiet&departure_id=' . $departureId);
+    }
+
+    public function deleteTourLog($id)
+    {
+        $hdvId = $this->getActiveHdvId();
+        $log = $this->modelTourLog->findById($id);
+        $departureId = (int) ($log['departure_id'] ?? 0);
+
+        if (!$log || !$this->assignedDeparture($hdvId, $departureId)) {
+            setFlash('error', 'Hoạt động không tồn tại hoặc bạn không có quyền xóa.');
+            return redirect('hdv/dashboard?tab=chi-tiet');
+        }
+
+        $this->modelTourLog->deleteLog($id);
+        setFlash('success', 'Đã xóa hoạt động khỏi lịch trình tour.');
+        return redirect('hdv/dashboard?tab=chi-tiet&departure_id=' . $departureId);
+    }
+
+    private function tourLogData()
+    {
+        return [
+            'departure_id' => (int) ($_POST['departure_id'] ?? 0),
+            'title'        => trim($_POST['title'] ?? ''),
+            'content'      => trim($_POST['content'] ?? ''),
+            'log_date'     => trim($_POST['log_date'] ?? ''),
+            'location'     => trim($_POST['location'] ?? ''),
+            'weather'      => trim($_POST['weather'] ?? ''),
+            'mood'         => trim($_POST['mood'] ?? ''),
+        ];
+    }
+
+    private function tourLogRules()
+    {
+        return [
+            'departure_id' => 'required|integer',
+            'title'        => 'required|max:255',
+            'content'      => 'required',
+            'log_date'     => 'required',
+            'location'     => 'max:255',
+            'weather'      => 'max:100',
+            'mood'         => 'max:50',
+        ];
+    }
+
+    private function assignedDeparture($hdvId, $departureId)
+    {
+        $sql = 'SELECT d.* FROM staff_assignments sa INNER JOIN departures d ON d.id = sa.departure_id WHERE sa.staff_id = :hdv_id AND d.id = :departure_id LIMIT 1';
+        return (new \App\Model())->getConnection()->fetchAssociative($sql, [
+            'hdv_id' => (int) $hdvId,
+            'departure_id' => (int) $departureId,
+        ]);
+    }
+
+    private function validateLogDate(array $departure, $logDate)
+    {
+        $timestamp = strtotime($logDate);
+        $start = strtotime($departure['departure_date'] . ' 00:00:00');
+        $end = strtotime(($departure['return_date'] ?: $departure['departure_date']) . ' 23:59:59');
+
+        if (!$timestamp || $timestamp < $start || $timestamp > $end) {
+            return 'Thời gian hoạt động phải nằm trong thời gian diễn ra chuyến tour.';
+        }
+
+        return null;
     }
 }
