@@ -9,6 +9,7 @@ use App\Models\TourCategory;
 use App\Models\StaffAssignment;
 use Rakit\Validation\Validator;
 use App\Models\Booking;
+use App\Models\Service;
 
 class DepartureController extends Controller
 {
@@ -17,6 +18,7 @@ class DepartureController extends Controller
     private $modelCategory;
     private $modelAssignment;
     private $modelBooking;
+    private $modelService;
     private $validator;
 
     public function __construct()
@@ -26,6 +28,7 @@ class DepartureController extends Controller
         $this->modelCategory = new TourCategory();
         $this->modelAssignment = new StaffAssignment();
         $this->modelBooking = new Booking();
+        $this->modelService = new Service();
         $this->validator = new Validator();
     }
 
@@ -106,8 +109,9 @@ class DepartureController extends Controller
 
         $assignments = $this->modelAssignment->getByDepartureId($id);
         $bookingSuggestions = $this->modelBooking->getConfirmedWithTourSummary();
+        $services = $this->modelService->getByDepartureId($id);
 
-        return view('admin.departures.edit', compact('title', 'departure', 'tours', 'assignments', 'bookingSuggestions'));
+        return view('admin.departures.edit', compact('title', 'departure', 'tours', 'assignments', 'bookingSuggestions', 'services'));
     }
 
     public function update($id)

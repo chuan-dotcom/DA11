@@ -177,6 +177,9 @@
                                         </span>
                                     </td>
                                     <td class="text-nowrap">
+                                        <a href="{{ route('admin/services') }}?departure_id={{ $d['id'] }}" class="btn btn-sm btn-outline-dark" title="Dịch vụ đoàn">
+                                            <i class="bi bi-list-task"></i>
+                                        </a>
                                         <a href="{{ route('admin/departures/show/' . $d['id']) }}" class="btn btn-sm btn-info text-white">
                                             <i class="bi bi-eye"></i>
                                         </a>

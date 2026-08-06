@@ -27,9 +27,9 @@
     <div class="card mb-3">
         <div class="card-body py-3">
             <form action="{{ route('admin/services') }}" method="GET" class="row g-3 align-items-end">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label visually-hidden">Tour</label>
-                    <select name="tour_id" class="form-select form-select-lg">
+                    <select name="tour_id" id="filter_tour_id" class="form-select form-select-lg">
                         <option value="">Tất cả Tour</option>
                         @foreach($tours as $tour)
                             <option value="{{ $tour['id'] }}" {{ ($tourId ?? '') == $tour['id'] ? 'selected' : '' }}>
@@ -39,6 +39,23 @@
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label visually-hidden">Chuyến khởi hành</label>
+                    <select name="departure_id" id="filter_departure_id" class="form-select form-select-lg">
+                        <option value="">Tất cả chuyến</option>
+                        @if(!empty($departures))
+                            @foreach($departures as $d)
+                                <option value="{{ $d['id'] }}" data-tour="{{ $d['tour_id'] }}" {{ ($departureId ?? '') == $d['id'] ? 'selected' : '' }}>
+                                    #{{ $d['id'] }} · {{ $d['group_name'] ?: 'Chuyến ' . $d['id'] }}
+                                    @if(!empty($d['departure_date']))
+                                        ({{ date('d/m/Y', strtotime($d['departure_date'])) }})
+                                    @endif
+                                </option>
+                            @endforeach
+                        @endif
+                    </select>
+                    <div class="form-text small">Chọn Tour ở trên sẽ tự lọc các chuyến khởi hành phù hợp.</div>
+                </div>
+                <div class="col-md-2">
                     <label class="form-label visually-hidden">Loại dịch vụ</label>
                     <select name="service_types" class="form-select form-select-lg">
                         <option value="">Tất cả loại</option>
@@ -49,7 +66,7 @@
                         <option value="Xe" {{ ($serviceTypes ?? '') == 'Xe' ? 'selected' : '' }}>Xe</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label visually-hidden">Trạng thái</label>
                     <select name="status" class="form-select form-select-lg">
                         <option value="">Tất cả trạng thái</option>
@@ -73,6 +90,7 @@
                     <thead style="background: #f8fafc;">
                         <tr>
                             <th>ID</th>
+                            <th>Chuyến khởi hành</th>
                             <th>Tour</th>
                             <th>Loại dịch vụ</th>
                             <th>Nhà cung cấp</th>
@@ -86,12 +104,40 @@
                     <tbody>
                         @if(empty($services))
                             <tr>
-                                <td colspan="9" class="text-center py-5 text-muted">Chưa có dữ liệu</td>
+                                <td colspan="10" class="text-center py-5 text-muted">Chưa có dữ liệu</td>
                             </tr>
                         @else
                             @foreach($services as $service)
                                 <tr style="border-bottom: 1px solid #eef2f7;">
                                     <td>{{ $service['id'] }}</td>
+                                    <td>
+                                        @if(!empty($service['departure_id']))
+                                            <span class="fw-semibold text-primary">
+                                                <i class="bi bi-calendar-week me-1"></i>
+                                                {{ $service['departure_group_name'] ?: ('#'.$service['departure_id']) }}
+                                            </span>
+                                            @if(!empty($service['departure_date']))
+                                                <div class="small text-muted">
+                                                    {{ date('d/m/Y', strtotime($service['departure_date'])) }}
+                                                    @if(!empty($service['departure_return_date']))
+                                                        → {{ date('d/m/Y', strtotime($service['departure_return_date'])) }}
+                                                    @endif
+                                                </div>
+                                            @endif
+                                            <div class="small mt-1">
+                                                <a href="{{ route('admin/departures/edit/' . $service['departure_id']) }}" class="text-decoration-none">
+                                                    <i class="bi bi-box-arrow-up-right"></i> Mở chuyến khởi hành
+                                                </a>
+                                            </div>
+                                        @else
+                                            <span class="text-muted small"><i class="bi bi-dash-circle me-1"></i>Chưa gắn chuyến</span>
+                                            <div class="small mt-1">
+                                                <a href="{{ route('admin/services/edit/' . $service['id']) }}" class="text-decoration-none">
+                                                    <i class="bi bi-link-45deg"></i> Gắn vào chuyến
+                                                </a>
+                                            </div>
+                                        @endif
+                                    </td>
                                     <td class="fw-semibold">
                                         #{{ $service['tour_id'] }} - {{ $service['tour_name'] }}
                                     </td>
@@ -109,10 +155,10 @@
                                     </td>
                                     <td style="white-space: normal;">
                                         @if($service['start_time'] && $service['end_time'])
-                                            {{ date('Y-m-d H:i:s', strtotime($service['start_time'])) }} -<br>
-                                            {{ date('Y-m-d H:i:s', strtotime($service['end_time'])) }}
+                                            {{ date('Y-m-d H:i', strtotime($service['start_time'])) }} -<br>
+                                            {{ date('Y-m-d H:i', strtotime($service['end_time'])) }}
                                         @elseif($service['start_time'])
-                                            {{ date('Y-m-d H:i:s', strtotime($service['start_time'])) }}
+                                            {{ date('Y-m-d H:i', strtotime($service['start_time'])) }}
                                         @else
                                             -
                                         @endif
@@ -137,4 +183,31 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tourSel  = document.getElementById('filter_tour_id');
+    const depSel   = document.getElementById('filter_departure_id');
+    const depMap   = {};
+    let prevDep    = depSel.value;
+    Array.from(depSel.options).forEach(opt => { if (opt.value !== '') depMap[opt.value] = opt.dataset.tour || ''; });
+
+    function refreshDepOptions() {
+        const tourVal = tourSel.value;
+        for (let i = 0; i < depSel.options.length; i++) {
+            const opt = depSel.options[i];
+            if (opt.value === '') { opt.style.display = ''; continue; }
+            const t = depMap[opt.value] || '';
+            opt.style.display = (tourVal === '' || t === '' || String(t) === String(tourVal)) ? '' : 'none';
+        }
+        if (prevDep && depSel.options.namedItem) {
+            const stillExists = Array.from(depSel.options).some(o => o.value === prevDep && o.style.display !== 'none');
+            if (!stillExists) depSel.value = '';
+        }
+    }
+
+    tourSel.addEventListener('change', refreshDepOptions);
+    refreshDepOptions();
+});
+</script>
 @endsection
