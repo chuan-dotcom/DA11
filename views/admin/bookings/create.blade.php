@@ -17,7 +17,7 @@
 
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin/bookings/store') }}" method="POST">
+            <form action="{{ route('admin/bookings/store') }}" method="POST">                         
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="mb-0">
