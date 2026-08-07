@@ -35,6 +35,7 @@ class TourDiary extends Model
                         weather VARCHAR(100) NULL,
                         mood VARCHAR(100) NULL,
                         photos TEXT NULL,
+                        actual_cost BIGINT DEFAULT 0,
                         expense_amount BIGINT DEFAULT 0,
                         expense_category VARCHAR(100) NULL,
                         receipt_photo VARCHAR(255) NULL,
@@ -99,9 +100,13 @@ class TourDiary extends Model
     private function ensureExpenseColumns()
     {
         try {
+            $col0 = $this->connection->fetchAssociative("SHOW COLUMNS FROM tour_diaries LIKE 'actual_cost'");
+            if (!$col0) {
+                $this->connection->executeStatement("ALTER TABLE tour_diaries ADD COLUMN actual_cost BIGINT DEFAULT 0 AFTER photos");
+            }
             $col1 = $this->connection->fetchAssociative("SHOW COLUMNS FROM tour_diaries LIKE 'expense_amount'");
             if (!$col1) {
-                $this->connection->executeStatement("ALTER TABLE tour_diaries ADD COLUMN expense_amount BIGINT DEFAULT 0 AFTER photos");
+                $this->connection->executeStatement("ALTER TABLE tour_diaries ADD COLUMN expense_amount BIGINT DEFAULT 0 AFTER actual_cost");
             }
             $col2 = $this->connection->fetchAssociative("SHOW COLUMNS FROM tour_diaries LIKE 'expense_category'");
             if (!$col2) {
@@ -210,6 +215,7 @@ class TourDiary extends Model
             ? implode(',', $data['photos'])
             : ($data['photos'] ?? null);
 
+        $actualCost = !empty($data['actual_cost']) ? (int) preg_replace('/[^\d]/', '', $data['actual_cost']) : 0;
         $expenseAmount = !empty($data['expense_amount']) ? (int) preg_replace('/[^\d]/', '', $data['expense_amount']) : 0;
 
         return $this->connection->insert('tour_diaries', [
@@ -222,6 +228,7 @@ class TourDiary extends Model
             'weather'           => !empty($data['weather']) ? $data['weather'] : null,
             'mood'              => !empty($data['mood']) ? $data['mood'] : null,
             'photos'            => $photos,
+            'actual_cost'       => $actualCost,
             'expense_amount'    => $expenseAmount,
             'expense_category'  => !empty($data['expense_category']) ? $data['expense_category'] : null,
             'receipt_photo'     => !empty($data['receipt_photo']) ? $data['receipt_photo'] : null,
@@ -257,6 +264,7 @@ class TourDiary extends Model
             $photosString = !empty($allPhotos) ? implode(',', $allPhotos) : null;
         }
 
+        $actualCost = isset($data['actual_cost']) ? (int) preg_replace('/[^\d]/', '', $data['actual_cost']) : (int)($current['actual_cost'] ?? 0);
         $expenseAmount = isset($data['expense_amount']) ? (int) preg_replace('/[^\d]/', '', $data['expense_amount']) : (int)($current['expense_amount'] ?? 0);
 
         $updateData = [
@@ -268,6 +276,7 @@ class TourDiary extends Model
             'weather'          => !empty($data['weather']) ? $data['weather'] : null,
             'mood'             => !empty($data['mood']) ? $data['mood'] : null,
             'photos'           => $photosString,
+            'actual_cost'      => $actualCost,
             'expense_amount'   => $expenseAmount,
             'expense_category' => isset($data['expense_category']) ? $data['expense_category'] : ($current['expense_category'] ?? null),
             'receipt_photo'    => isset($data['receipt_photo']) ? $data['receipt_photo'] : ($current['receipt_photo'] ?? null),

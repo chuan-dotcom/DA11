@@ -190,7 +190,9 @@ class DiaryController extends Controller
             $depId = (int) $dep['id'];
             $childDiaries = array_values(array_filter($allDiaries, fn($item) => (int)$item['departure_id'] === $depId));
             $estimatedCost = $this->modelDeparture->getEstimatedCostForDeparture($depId);
+            $actualCostSum = array_sum(array_map('floatval', array_column($childDiaries, 'actual_cost')));
             $diariesExpenseSum = array_sum(array_map('floatval', array_column($childDiaries, 'expense_amount')));
+            $actualCost = $actualCostSum;
             $incurredCost = $diariesExpenseSum > 0 ? $diariesExpenseSum : (float) ($dep['incurred_cost'] ?? 0);
             $incurredCostNote = $dep['incurred_cost_note'] ?? '';
 
@@ -203,6 +205,7 @@ class DiaryController extends Controller
                 'departure_date'     => $dep['departure_date'] ?? null,
                 'return_date'        => $dep['return_date'] ?? null,
                 'estimated_cost'     => $estimatedCost,
+                'actual_cost'        => $actualCost,
                 'incurred_cost'      => $incurredCost,
                 'incurred_cost_note' => $incurredCostNote,
                 'diaries'            => $childDiaries,

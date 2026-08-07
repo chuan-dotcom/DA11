@@ -49,7 +49,9 @@ class TourDiaryController extends Controller
             if (!empty($childDiaries) || $departureId === $depId) {
                 $depDetail = $this->modelDeparture->findById($depId);
                 $estimatedCost = $this->modelDeparture->getEstimatedCostForDeparture($depId);
+                $actualCostSum = array_sum(array_map('floatval', array_column($childDiaries, 'actual_cost')));
                 $diariesExpenseSum = array_sum(array_map('floatval', array_column($childDiaries, 'expense_amount')));
+                $actualCost = $actualCostSum;
                 $incurredCost = $diariesExpenseSum > 0 ? $diariesExpenseSum : (float) ($depDetail['incurred_cost'] ?? 0);
                 $incurredCostNote = $depDetail['incurred_cost_note'] ?? '';
 
@@ -60,6 +62,7 @@ class TourDiaryController extends Controller
                     'departure_date'     => $dep['departure_date'] ?? null,
                     'return_date'        => $dep['return_date'] ?? null,
                     'estimated_cost'     => $estimatedCost,
+                    'actual_cost'        => $actualCost,
                     'incurred_cost'      => $incurredCost,
                     'incurred_cost_note' => $incurredCostNote,
                     'diaries'            => $childDiaries,

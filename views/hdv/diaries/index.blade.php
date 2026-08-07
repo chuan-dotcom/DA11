@@ -92,14 +92,14 @@
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <div class="stat-box shadow-sm">
-            <div class="small opacity-75 mb-1">Tổng số Chuyến đi chính</div>
+            <div class="small opacity-75 mb-1">Tổng số Chuyến đi công tác</div>
             <div class="fs-2 fw-bold">{{ $totalJournals ?? count($groupedJournals) }} chuyến</div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="stat-box shadow-sm">
-            <div class="small opacity-75 mb-1">Tổng số Bài viết nhật ký nhỏ</div>
-            <div class="fs-2 fw-bold">{{ $totalDiaries ?? 0 }} bài</div>
+            <div class="small opacity-75 mb-1">Bài viết nhật ký chính</div>
+            <div class="fs-2 fw-bold">{{ $totalJournals ?? count($groupedJournals) }} bài chính</div>
         </div>
     </div>
     <div class="col-md-4">
@@ -188,26 +188,27 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-4">
+                        <div class="cost-card estimated shadow-sm" style="border-left: 4px solid #0d6efd;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small fw-semibold text-muted"><i class="bi bi-cash-coin me-1 text-primary"></i> Chi phí thực tế</span>
+                                <span class="badge bg-primary-subtle text-primary-emphasis px-2 py-0.5" style="font-size:10px;">Tự động tính từ nhật ký</span>
+                            </div>
+                            <div class="fs-5 fw-bold text-primary">
+                                {{ number_format($journal['actual_cost'], 0, ',', '.') }} VNĐ
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="cost-card incurred shadow-sm">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="small fw-semibold text-muted"><i class="bi bi-cash-coin me-1 text-warning"></i> Chi phí phát sinh</span>
-                                <span class="badge bg-warning-subtle text-warning-emphasis px-2 py-0.5" style="font-size:10px;">Tự động tính từ nhật ký</span>
+                                <span class="small fw-semibold text-muted"><i class="bi bi-lightning-charge me-1 text-warning"></i> Chi phí phát sinh</span>
+                                <span class="badge bg-warning-subtle text-warning-emphasis px-2 py-0.5" style="font-size:10px;">HDV cập nhật</span>
                             </div>
                             <div class="fs-5 fw-bold text-warning-emphasis">
                                 {{ number_format($journal['incurred_cost'], 0, ',', '.') }} VNĐ
                             </div>
-                            @if(!empty($journal['incurred_cost_note']))
-                                <div class="small text-muted text-truncate mt-1" title="{{ $journal['incurred_cost_note'] }}">
-                                    <i class="bi bi-info-circle me-1"></i> Ghi chú: {{ $journal['incurred_cost_note'] }}
-                                </div>
-                            @endif
                         </div>
-                    </div>
-                    <div class="col-md-3 text-md-end">
-                        <button type="button" class="btn btn-sm btn-outline-warning text-dark rounded-pill px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#costModal{{ $journal['departure_id'] }}">
-                            <i class="bi bi-pencil-square me-1"></i> Cập nhật phát sinh
-                        </button>
                     </div>
                 </div>
             </div>
@@ -236,6 +237,7 @@
                                         <th style="width: 50px;">ID</th>
                                         <th style="width: 80px;">Hình ảnh</th>
                                         <th>Tiêu đề bài viết nhỏ</th>
+                                        <th style="width: 140px;">Chi phí thực tế</th>
                                         <th style="width: 140px;">Chi phí phát sinh</th>
                                         <th>Ngày viết</th>
                                         <th>Thời tiết / Cảm xúc</th>
@@ -273,20 +275,29 @@
                                                 <a href="{{ route('hdv/nhat-ky-tour/show/' . $diary['id']) }}" class="diary-title-link">
                                                     {{ $diary['title'] }}
                                                 </a>
-                                                <div class="text-muted small text-truncate" style="max-width: 340px;">
+                                                <div class="text-muted small text-truncate" style="max-width: 280px;">
                                                     {{ mb_strimwidth(strip_tags($diary['content']), 0, 90, '...') }}
                                                 </div>
                                             </td>
                                             <td>
-                                                @if(!empty($diary['expense_amount']) && (float)$diary['expense_amount'] > 0)
-                                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-bold">
-                                                        <i class="bi bi-cash-stack me-1"></i>+{{ number_format($diary['expense_amount'], 0, ',', '.') }}đ
+                                                @if(!empty($diary['actual_cost']) && (float)$diary['actual_cost'] > 0)
+                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold">
+                                                        <i class="bi bi-cash-coin me-1"></i>{{ number_format($diary['actual_cost'], 0, ',', '.') }}đ
                                                     </span>
                                                     @if(!empty($diary['expense_category']))
                                                         <div class="small text-muted mt-1" style="font-size:11px;">
                                                             <i class="bi bi-tag me-1"></i>{{ $diary['expense_category'] }}
                                                         </div>
                                                     @endif
+                                                @else
+                                                    <span class="text-muted small">—</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if(!empty($diary['expense_amount']) && (float)$diary['expense_amount'] > 0)
+                                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-bold">
+                                                        <i class="bi bi-lightning me-1"></i>+{{ number_format($diary['expense_amount'], 0, ',', '.') }}đ
+                                                    </span>
                                                 @else
                                                     <span class="text-muted small">—</span>
                                                 @endif

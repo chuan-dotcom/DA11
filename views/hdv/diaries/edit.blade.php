@@ -47,6 +47,7 @@
                 <div id="diary-date-help" class="form-text"></div>
             </div>
 
+            <!-- Liên kết mốc hoạt động -->
             <div class="col-12">
                 <label class="form-label fw-bold">Liên kết mốc hoạt động <span class="text-muted fw-normal">(không bắt buộc)</span></label>
                 <select name="tour_log_id" id="diary-tour-log" class="form-select">
@@ -58,42 +59,6 @@
                     @endforeach
                 </select>
             </div>
-
-            <!-- Tiêu đề -->
-            <div class="col-12">
-                <label class="form-label fw-bold">Tiêu đề bài viết <span class="text-danger">*</span></label>
-                <input type="text" name="title" class="form-control" value="{{ old('title', $diary['title']) }}" required>
-            </div>
-
-            <!-- Thời tiết & Tâm trạng -->
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Thời tiết trong ngày</label>
-                <input type="text" name="weather" class="form-control" value="{{ old('weather', $diary['weather']) }}">
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Tâm trạng / Không khí đoàn</label>
-                <input type="text" name="mood" class="form-control" value="{{ old('mood', $diary['mood']) }}">
-            </div>
-
-            <!-- Nội dung chi tiết -->
-            <div class="col-12">
-                <label class="form-label fw-bold">Nội dung nhật ký chi tiết <span class="text-danger">*</span></label>
-                <textarea name="content" class="form-control" rows="6" required>{{ old('content', $diary['content']) }}</textarea>
-            </div>
-
-            <!-- Hình ảnh đã có -->
-            @if(!empty($photos))
-                <div class="col-12">
-                    <label class="form-label fw-bold">Hình ảnh hiện tại (Tích vào ảnh nếu muốn xóa):</label>
-                    <div class="d-flex flex-wrap gap-3">
-                        @foreach($photos as $p)
-                            <div class="card p-2 text-center shadow-sm">
-                                <img src="{{ file_url($p) }}" style="width: 120px; height: 90px; object-fit: cover;" class="rounded mb-2">
-                                <div class="form-check text-start">
-                                    <input class="form-check-input" type="checkbox" name="delete_photos[]" value="{{ $p }}" id="del_{{ md5($p) }}">
-                                    <label class="form-check-label text-danger small fw-bold" for="del_{{ md5($p) }}">Xóa ảnh</label>
-                                </div>
 
             <!-- Tiêu đề -->
             <div class="col-12">
@@ -142,23 +107,31 @@
                 <input type="file" name="photos[]" class="form-control" multiple accept="image/*">
             </div>
 
-            <!-- Chi phí phát sinh nếu có -->
-            <div class="col-md-6">
+            <!-- Chi phí thực tế & Chi phí phát sinh -->
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Chi phí thực tế tại mốc (VNĐ)</label>
+                <div class="input-group">
+                    <input type="number" name="actual_cost" class="form-control" value="{{ old('actual_cost', $diary['actual_cost'] ?? 0) }}" placeholder="Ví dụ: 4500000" min="0" step="1000">
+                    <span class="input-group-text">VNĐ</span>
+                </div>
+            </div>
+            <div class="col-md-4">
                 <label class="form-label fw-bold">Chi phí phát sinh (nếu có)</label>
                 <div class="input-group">
                     <input type="number" name="expense_amount" class="form-control" value="{{ old('expense_amount', $diary['expense_amount'] ?? 0) }}" placeholder="Ví dụ: 500000" min="0" step="1000">
                     <span class="input-group-text">VNĐ</span>
                 </div>
             </div>
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Loại chi phí phát sinh</label>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Loại chi phí</label>
                 <select name="expense_category" class="form-select">
                     <option value="">-- Không có chi phí --</option>
+                    <option value="Vé máy bay / Phương tiện" {{ old('expense_category', $diary['expense_category'] ?? '') === 'Vé máy bay / Phương tiện' ? 'selected' : '' }}>✈️ Vé máy bay / Đò / Tàu hỏa</option>
+                    <option value="Lưu trú / Khách sạn" {{ old('expense_category', $diary['expense_category'] ?? '') === 'Lưu trú / Khách sạn' ? 'selected' : '' }}>🏨 Lưu trú / Khách sạn</option>
+                    <option value="Di chuyển / Cầu đường" {{ old('expense_category', $diary['expense_category'] ?? '') === 'Di chuyển / Cầu đường' ? 'selected' : '' }}>🚗 Di chuyển / Cầu đường / Xăng xe</option>
                     <option value="Ăn uống" {{ old('expense_category', $diary['expense_category'] ?? '') === 'Ăn uống' ? 'selected' : '' }}>🍲 Ăn uống</option>
                     <option value="Vé tham quan" {{ old('expense_category', $diary['expense_category'] ?? '') === 'Vé tham quan' ? 'selected' : '' }}>🎟️ Vé tham quan</option>
-                    <option value="Di chuyển / Cầu đường" {{ old('expense_category', $diary['expense_category'] ?? '') === 'Di chuyển / Cầu đường' ? 'selected' : '' }}>🚗 Di chuyển / Cầu đường / Xăng xe</option>
-                    <option value="Lưu trú / Khách sạn" {{ old('expense_category', $diary['expense_category'] ?? '') === 'Lưu trú / Khách sạn' ? 'selected' : '' }}>🏨 Lưu trú / Khách sạn</option>
-                    <option value="Khác" {{ old('expense_category', $diary['expense_category'] ?? '') === 'Khác' ? 'selected' : '' }}>⭐ Phát sinh khác</option>
+                    <option value="Khác" {{ old('expense_category', $diary['expense_category'] ?? '') === 'Khác' ? 'selected' : '' }}>⭐ Khác</option>
                 </select>
             </div>
 
