@@ -182,6 +182,8 @@ CREATE TABLE `departures` (
   `meeting_time` time DEFAULT NULL,
   `vehicle` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `incurred_cost` bigint NOT NULL DEFAULT '0',
+  `incurred_cost_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` enum('scheduled','in_progress','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'scheduled',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
@@ -191,14 +193,14 @@ CREATE TABLE `departures` (
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table `departures`
-INSERT INTO `departures` (`id`, `tour_id`, `group_name`, `departure_date`, `return_date`, `max_participants`, `meeting_point`, `meeting_time`, `vehicle`, `notes`, `status`, `created_at`, `updated_at`) VALUES
-('8', '6', 'Chuẩn  (0349422856) - Cà mau (2026-08-07)', '2026-08-08', '2026-08-10', '5', '8B nghách 46 ngõ 1 Bùi Xương Trạch', '06:00:00', 'Xe khách', '', 'scheduled', '2026-08-06 19:55:42', '2026-08-06 20:10:49'),
-('9', '5', 'Thanh Huệ  (0865144307) - Quảng Ninh (2026-08-08)', '2026-08-13', '2026-08-15', '5', '8B nghách 46 ngõ 1 Bùi Xương Trạch', '06:00:00', 'Xe khách', '', 'scheduled', '2026-08-06 20:17:41', '2026-08-06 20:17:58'),
-('10', '7', 'Đoàn Sapa Fansipan (20/08 - 22/08/2026)', '2026-08-20', '2026-08-22', '15', 'Công viên Thống Nhất, Hà Nội', '06:00:00', 'Xe giường nằm cao cấp', 'Mang theo áo ấm, giày thể thao và giấy tờ tùy thân', 'scheduled', '2026-08-07 09:48:12', NULL),
-('11', '8', 'Đoàn Đà Nẵng - Hội An (25/08 - 27/08/2026)', '2026-08-25', '2026-08-27', '20', 'Sân bay Đà Nẵng / Ga Đà Nẵng', '07:30:00', 'Xe du lịch 29 chỗ đời mới', 'Nên mang theo kem chống nắng, đồ bơi', 'scheduled', '2026-08-07 09:48:12', NULL),
-('12', '9', 'Đoàn Đà Lạt Ngàn Hoa (28/08 - 30/08/2026)', '2026-08-28', '2026-08-30', '18', 'Sân bay Liên Khương / Bến xe Đà Lạt', '07:00:00', 'Xe du lịch 16 chỗ Hyundai Solati', 'Chuẩn bị trang phục chụp ảnh đẹp, áo khoác nhẹ', 'scheduled', '2026-08-07 09:48:12', NULL),
-('13', '10', 'Đoàn Ninh Bình Tràng An (01/09 - 02/09/2026)', '2026-09-01', '2026-09-02', '12', 'Nhà hát Lớn Hà Nội', '07:00:00', 'Xe Limousine 19 chỗ', 'Trang phục lịch sự khi đi chùa Bái Đính', 'scheduled', '2026-08-07 09:48:12', NULL),
-('14', '11', 'Đoàn Huế Cố Đô Di Sản (01/08 - 03/08/2026)', '2026-08-01', '2026-08-03', '20', 'Ga Huế / Sân bay Phú Bài, Thừa Thiên Huế', '07:00:00', 'Xe du lịch 29 chỗ Universe', 'Chuyến đi đã hoàn thành xuất sắc, 100% khách hài lòng.', 'completed', '2026-08-07 10:05:53', '2026-08-07 10:05:53');
+INSERT INTO `departures` (`id`, `tour_id`, `group_name`, `departure_date`, `return_date`, `max_participants`, `meeting_point`, `meeting_time`, `vehicle`, `notes`, `incurred_cost`, `incurred_cost_note`, `status`, `created_at`, `updated_at`) VALUES
+('8', '6', 'Chuẩn  (0349422856) - Cà mau (2026-08-07)', '2026-08-08', '2026-08-10', '5', '8B nghách 46 ngõ 1 Bùi Xương Trạch', '06:00:00', 'Xe khách', '', 0, NULL, 'scheduled', '2026-08-06 19:55:42', '2026-08-06 20:10:49'),
+('9', '5', 'Thanh Huệ  (0865144307) - Quảng Ninh (2026-08-08)', '2026-08-13', '2026-08-15', '5', '8B nghách 46 ngõ 1 Bùi Xương Trạch', '06:00:00', 'Xe khách', '', 0, NULL, 'scheduled', '2026-08-06 20:17:41', '2026-08-06 20:17:58'),
+('10', '7', 'Đoàn Sapa Fansipan (20/08 - 22/08/2026)', '2026-08-20', '2026-08-22', '15', 'Công viên Thống Nhất, Hà Nội', '06:00:00', 'Xe giường nằm cao cấp', 'Mang theo áo ấm, giày thể thao và giấy tờ tùy thân', 0, NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
+('11', '8', 'Đoàn Đà Nẵng - Hội An (25/08 - 27/08/2026)', '2026-08-25', '2026-08-27', '20', 'Sân bay Đà Nẵng / Ga Đà Nẵng', '07:30:00', 'Xe du lịch 29 chỗ đời mới', 'Nên mang theo kem chống nắng, đồ bơi', 0, NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
+('12', '9', 'Đoàn Đà Lạt Ngàn Hoa (28/08 - 30/08/2026)', '2026-08-28', '2026-08-30', '18', 'Sân bay Liên Khương / Bến xe Đà Lạt', '07:00:00', 'Xe du lịch 16 chỗ Hyundai Solati', 'Chuẩn bị trang phục chụp ảnh đẹp, áo khoác nhẹ', 0, NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
+('13', '10', 'Đoàn Ninh Bình Tràng An (01/09 - 02/09/2026)', '2026-09-01', '2026-09-02', '12', 'Nhà hát Lớn Hà Nội', '07:00:00', 'Xe Limousine 19 chỗ', 'Trang phục lịch sự khi đi chùa Bái Đính', 0, NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
+('14', '11', 'Đoàn Huế Cố Đô Di Sản (01/08 - 03/08/2026)', '2026-08-01', '2026-08-03', '20', 'Ga Huế / Sân bay Phú Bài, Thừa Thiên Huế', '07:00:00', 'Xe du lịch 29 chỗ Universe', 'Chuyến đi đã hoàn thành xuất sắc, 100% khách hài lòng.', 87500000, 'Ví dụ: Mua thêm nước uống cho đoàn', 'completed', '2026-08-07 10:05:53', '2026-08-07 10:05:53');
 
 -- --------------------------------------------------------
 -- Table structure for table `bookings`
