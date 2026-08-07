@@ -41,13 +41,25 @@ if (!function_exists('redirect404')) {
 if (!function_exists('file_url')) {
     function file_url(?string $path): ?string
     {
-        if (!$path) {
-            return null;
+        if (empty($path)) {
+            return 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80';
         }
 
-        $base = $_ENV['APP_URL'] ?: '';
+        $cleanPath = str_replace('\\', '/', trim($path));
 
-        return rtrim($base, '/') . '/' . ltrim($path, '/');
+        if (preg_match('#^(https?://|data:image/)#i', $cleanPath)) {
+            return $cleanPath;
+        }
+
+        $cleanPath = ltrim($cleanPath, '/');
+        $fullPath = __DIR__ . '/' . $cleanPath;
+
+        if (!file_exists($fullPath)) {
+            return 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80';
+        }
+
+        $base = $_ENV['APP_URL'] ?? '';
+        return rtrim($base, '/') . '/' . $cleanPath;
     }
 }
 

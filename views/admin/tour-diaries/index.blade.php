@@ -123,14 +123,23 @@
                                         @php
                                             $firstPhoto = null;
                                             if (!empty($diary['photos'])) {
-                                                $photos = explode(',', $diary['photos']);
-                                                $firstPhoto = $photos[0] ?? null;
+                                                $rawP = trim($diary['photos']);
+                                                if (str_starts_with($rawP, '[') && str_ends_with($rawP, ']')) {
+                                                    $decoded = json_decode($rawP, true);
+                                                    if (is_array($decoded) && !empty($decoded)) {
+                                                        $firstPhoto = $decoded[0];
+                                                    }
+                                                }
+                                                if (!$firstPhoto) {
+                                                    $photos = explode(',', $rawP);
+                                                    $firstPhoto = trim($photos[0] ?? '', "[] \"'\t\n\r");
+                                                }
                                             }
                                         @endphp
                                         @if($firstPhoto)
-                                            <img src="{{ file_url($firstPhoto) }}" alt="" class="diary-thumb">
+                                            <img src="{{ file_url($firstPhoto) }}" alt="{{ $diary['title'] }}" class="diary-thumb" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80';">
                                         @else
-                                            <span class="text-muted small">Không ảnh</span>
+                                            <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80" alt="Placeholder" class="diary-thumb">
                                         @endif
                                     </td>
                                     <td>

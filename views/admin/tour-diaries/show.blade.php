@@ -172,43 +172,111 @@
             @endif
 
             <div class="card mb-4">
-                <div class="card-header bg-white fw-bold"><i class="bi bi-clock-history"></i> Timeline hoạt động chuyến đi</div>
+                <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                    <div><i class="bi bi-clock-history text-primary me-2"></i>Timeline lịch trình hoạt động chuyến đi</div>
+                    <span class="badge bg-light text-dark border">{{ count($tourLogs) }} hoạt động</span>
+                </div>
                 <div class="card-body">
                     @if(empty($tourLogs))
                         <div class="text-center text-muted py-4">
-                            <i class="bi bi-info-circle fs-2 mb-2 d-block"></i>
+                            <i class="bi bi-info-circle fs-2 mb-2 d-block text-secondary"></i>
                             Chưa có ghi nhận timeline hoạt động cho chuyến này.
                         </div>
                     @else
-                        <div class="timeline-list">
-                            @foreach($tourLogs as $log)
-                                <div class="timeline-item mb-3 p-3 rounded-4 border bg-light">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h6 class="fw-bold mb-1">{{ $log['title'] }}</h6>
-                                            <div class="small text-muted">
-                                                {{ !empty($log['log_date']) ? date('d/m/Y H:i', strtotime($log['log_date'])) : 'Không có thời gian' }}
-                                                @if(!empty($log['location']))
-                                                    · {{ $log['location'] }}
+                        @php
+                            $adminGroupedLogs = [];
+                            foreach ($tourLogs as $log) {
+                                $dKey = date('Y-m-d', strtotime($log['log_date']));
+                                $adminGroupedLogs[$dKey][] = $log;
+                            }
+                            ksort($adminGroupedLogs);
+                            $adminFirstDateKey = array_keys($adminGroupedLogs)[0] ?? '';
+                            $adminDaySeq = 1;
+                        @endphp
+
+                        <!-- Day Tabs -->
+                        <div class="d-flex flex-wrap gap-2 mb-3 pb-2 border-bottom">
+                            @foreach($adminGroupedLogs as $dateKey => $dayLogs)
+                                <button type="button" 
+                                    class="btn btn-sm admin-day-tab {{ $dateKey === $adminFirstDateKey ? 'btn-primary active' : 'btn-outline-secondary' }}" 
+                                    data-day="{{ $dateKey }}" 
+                                    onclick="switchAdminDay('{{ $dateKey }}')">
+                                    <i class="bi bi-calendar-event me-1"></i>Ngày {{ $adminDaySeq }} ({{ date('d/m', strtotime($dateKey)) }})
+                                    <span class="badge {{ $dateKey === $adminFirstDateKey ? 'bg-white text-primary' : 'bg-secondary text-white' }} ms-1">{{ count($dayLogs) }}</span>
+                                </button>
+                                @php $adminDaySeq++; @endphp
+                            @endforeach
+                        </div>
+
+                        <!-- Panels by Day -->
+                        @foreach($adminGroupedLogs as $dateKey => $dayLogs)
+                            <div class="admin-timeline-panel {{ $dateKey === $adminFirstDateKey ? 'd-block' : 'd-none' }}" data-admin-day-panel="{{ $dateKey }}">
+                                <div class="timeline-list">
+                                    @foreach($dayLogs as $log)
+                                        @php
+                                            $hour = (int) date('H', strtotime($log['log_date']));
+                                            if ($hour >= 5 && $hour < 11) { $periodBadge = '🌅 Sáng'; $periodClass = 'bg-warning-subtle text-warning-emphasis'; }
+                                            elseif ($hour >= 11 && $hour < 14) { $periodBadge = '☀️ Trưa'; $periodClass = 'bg-danger-subtle text-danger-emphasis'; }
+                                            elseif ($hour >= 14 && $hour < 18) { $periodBadge = '🌤️ Chiều'; $periodClass = 'bg-info-subtle text-info-emphasis'; }
+                                            else { $periodBadge = '🌙 Tối'; $periodClass = 'bg-primary-subtle text-primary-emphasis'; }
+                                        @endphp
+                                        <div class="timeline-item mb-3 p-3 rounded-4 border bg-light shadow-sm position-relative">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div>
+                                                    <span class="badge {{ $periodClass }} me-1 mb-1">{{ $periodBadge }}</span>
+                                                    <span class="fw-bold text-dark fs-6">{{ $log['title'] }}</span>
+                                                    <div class="small text-muted mt-1">
+                                                        <i class="bi bi-clock me-1"></i>{{ !empty($log['log_date']) ? date('H:i', strtotime($log['log_date'])) : 'N/A' }}
+                                                        @if(!empty($log['location']))
+                                                            <span class="ms-2"><i class="bi bi-geo-alt text-danger me-1"></i>{{ $log['location'] }}</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                @if(!empty($log['weather']))
+                                                    <span class="badge bg-info-subtle text-info-emphasis border"><i class="bi bi-cloud-sun me-1"></i>{{ $log['weather'] }}</span>
+                                                @endif
+                                            </div>
+                                            <p class="mb-2 text-dark small" style="line-height: 1.5;">{{ $log['content'] }}</p>
+                                            <div class="d-flex flex-wrap gap-2 small text-muted">
+                                                @if(!empty($log['meal_info']))
+                                                    <span class="badge bg-white border text-dark"><i class="bi bi-cup-hot text-success me-1"></i>Ăn: {{ $log['meal_info'] }}</span>
+                                                @endif
+                                                @if(!empty($log['accommodation']))
+                                                    <span class="badge bg-white border text-dark"><i class="bi bi-building text-primary me-1"></i>Ở: {{ $log['accommodation'] }}</span>
+                                                @endif
+                                                @if(!empty($log['mood']))
+                                                    <span class="badge bg-white border text-dark"><i class="bi bi-emoji-smile me-1"></i>Trạng thái: {{ $log['mood'] }}</span>
                                                 @endif
                                             </div>
                                         </div>
-                                        @if(!empty($log['weather']))
-                                            <span class="badge bg-primary text-white">{{ $log['weather'] }}</span>
-                                        @endif
-                                    </div>
-                                    <p class="mb-2 text-dark">{{ $log['content'] }}</p>
-                                    <div class="d-flex flex-wrap gap-2 small text-muted">
-                                        @if(!empty($log['mood']))
-                                            <span class="badge bg-white border">Tâm trạng: {{ $log['mood'] }}</span>
-                                        @endif
-                                        @if(!empty($log['location']))
-                                            <span class="badge bg-white border">Địa điểm: {{ $log['location'] }}</span>
-                                        @endif
-                                    </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
-                        </div>
+                            </div>
+                        @endforeach
+
+                        <script>
+                        function switchAdminDay(dateKey) {
+                            document.querySelectorAll('.admin-day-tab').forEach(function(btn) {
+                                var isCurrent = btn.dataset.day === dateKey;
+                                btn.classList.toggle('btn-primary', isCurrent);
+                                btn.classList.toggle('active', isCurrent);
+                                btn.classList.toggle('btn-outline-secondary', !isCurrent);
+                                var badge = btn.querySelector('.badge');
+                                if (badge) {
+                                    badge.className = isCurrent ? 'badge bg-white text-primary ms-1' : 'badge bg-secondary text-white ms-1';
+                                }
+                            });
+                            document.querySelectorAll('.admin-timeline-panel').forEach(function(panel) {
+                                if (panel.dataset.adminDayPanel === dateKey) {
+                                    panel.classList.remove('d-none');
+                                    panel.classList.add('d-block');
+                                } else {
+                                    panel.classList.remove('d-block');
+                                    panel.classList.add('d-none');
+                                }
+                            });
+                        }
+                        </script>
                     @endif
                 </div>
             </div>

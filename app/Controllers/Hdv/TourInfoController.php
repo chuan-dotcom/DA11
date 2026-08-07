@@ -298,26 +298,32 @@ class TourInfoController extends Controller
     private function tourLogData()
     {
         return [
-            'departure_id' => (int) ($_POST['departure_id'] ?? 0),
-            'title'        => trim($_POST['title'] ?? ''),
-            'content'      => trim($_POST['content'] ?? ''),
-            'log_date'     => trim($_POST['log_date'] ?? ''),
-            'location'     => trim($_POST['location'] ?? ''),
-            'weather'      => trim($_POST['weather'] ?? ''),
-            'mood'         => trim($_POST['mood'] ?? ''),
+            'departure_id'  => (int) ($_POST['departure_id'] ?? 0),
+            'title'         => trim($_POST['title'] ?? ''),
+            'content'       => trim($_POST['content'] ?? ''),
+            'log_date'      => trim($_POST['log_date'] ?? ''),
+            'location'      => trim($_POST['location'] ?? ''),
+            'weather'       => trim($_POST['weather'] ?? ''),
+            'mood'          => trim($_POST['mood'] ?? ''),
+            'activity_type' => trim($_POST['activity_type'] ?? ''),
+            'meal_info'     => trim($_POST['meal_info'] ?? ''),
+            'accommodation' => trim($_POST['accommodation'] ?? ''),
         ];
     }
 
     private function tourLogRules()
     {
         return [
-            'departure_id' => 'required|integer',
-            'title'        => 'required|max:255',
-            'content'      => 'required',
-            'log_date'     => 'required',
-            'location'     => 'max:255',
-            'weather'      => 'max:100',
-            'mood'         => 'max:50',
+            'departure_id'  => 'required|integer',
+            'title'         => 'required|max:255',
+            'content'       => 'required',
+            'log_date'      => 'required',
+            'location'      => 'max:255',
+            'weather'       => 'max:100',
+            'mood'          => 'max:50',
+            'activity_type' => 'max:50',
+            'meal_info'     => 'max:255',
+            'accommodation' => 'max:255',
         ];
     }
 

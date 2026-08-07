@@ -75,9 +75,11 @@ class AssignedTourController extends Controller
                     ORDER BY b.id ASC LIMIT 1
                 ) AS primary_customer_name,
                 (
-                    SELECT COUNT(g.id) FROM booking_guests g 
-                    INNER JOIN bookings b ON b.id = g.booking_id 
-                    WHERE b.departure_id = d.id
+                    SELECT COALESCE(
+                        NULLIF((SELECT COUNT(g.id) FROM booking_guests g INNER JOIN bookings b ON b.id = g.booking_id WHERE b.departure_id = d.id), 0),
+                        (SELECT SUM(b.num_people) FROM bookings b WHERE b.departure_id = d.id),
+                        0
+                    )
                 ) AS total_guests
             FROM staff_assignments sa
             INNER JOIN departures d ON d.id = sa.departure_id

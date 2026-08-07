@@ -39,27 +39,33 @@ class TourLog extends Model
     public function create(array $data)
     {
         return $this->connection->insert('tour_logs', [
-            'departure_id' => (int) $data['departure_id'],
-            'title'        => $data['title'],
-            'content'      => $data['content'],
-            'log_date'     => $data['log_date'],
-            'location'     => $data['location'] ?: null,
-            'weather'      => $data['weather'] ?: null,
-            'mood'         => $data['mood'] ?: null,
-            'author_id'    => !empty($data['author_id']) ? (int) $data['author_id'] : null,
-            'status'       => 'published',
+            'departure_id'  => (int) $data['departure_id'],
+            'title'         => $data['title'],
+            'content'       => $data['content'],
+            'log_date'      => $data['log_date'],
+            'location'      => $data['location'] ?: null,
+            'weather'       => $data['weather'] ?: null,
+            'mood'          => $data['mood'] ?: null,
+            'activity_type' => $data['activity_type'] ?: null,
+            'meal_info'     => $data['meal_info'] ?: null,
+            'accommodation' => $data['accommodation'] ?: null,
+            'author_id'     => !empty($data['author_id']) ? (int) $data['author_id'] : null,
+            'status'        => 'published',
         ]);
     }
 
     public function updateLog($id, array $data)
     {
         return $this->connection->update('tour_logs', [
-            'title'    => $data['title'],
-            'content'  => $data['content'],
-            'log_date' => $data['log_date'],
-            'location' => $data['location'] ?: null,
-            'weather'  => $data['weather'] ?: null,
-            'mood'     => $data['mood'] ?: null,
+            'title'         => $data['title'],
+            'content'       => $data['content'],
+            'log_date'      => $data['log_date'],
+            'location'      => $data['location'] ?: null,
+            'weather'       => $data['weather'] ?: null,
+            'mood'          => $data['mood'] ?: null,
+            'activity_type' => $data['activity_type'] ?: null,
+            'meal_info'     => $data['meal_info'] ?: null,
+            'accommodation' => $data['accommodation'] ?: null,
         ], ['id' => (int) $id]);
     }
 

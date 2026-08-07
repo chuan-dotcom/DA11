@@ -63,10 +63,24 @@ if (!function_exists('absolute_url')) {
 }
 
 function file_url($path) {
-    if (!empty($path)) {
-        return route(ltrim(str_replace('\\', '/', $path), '/'));
+    if (empty($path)) {
+        return 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80';
     }
-    return '';
+
+    $cleanPath = str_replace('\\', '/', trim($path));
+
+    if (preg_match('#^(https?://|data:image/)#i', $cleanPath)) {
+        return $cleanPath;
+    }
+
+    $cleanPath = ltrim($cleanPath, '/');
+    $fullPath = __DIR__ . '/' . $cleanPath;
+
+    if (!file_exists($fullPath)) {
+        return 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80';
+    }
+
+    return route($cleanPath);
 }
 
 function setFlash($key, $value) {

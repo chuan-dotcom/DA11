@@ -95,7 +95,7 @@
                                     <td>
                                         <a href="{{ route('admin/tours/show/' . $tour['id']) }}" title="Xem chi tiết">
                                             @if($tour['image'])
-                                                <img src="{{ file_url($tour['image']) }}" alt="{{ $tour['name'] }}" class="tour-thumb">
+                                                <img src="{{ file_url($tour['image']) }}" alt="{{ $tour['name'] }}" class="tour-thumb" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80';">
                                             @else
                                                 <span class="text-muted">Không có ảnh</span>
                                             @endif

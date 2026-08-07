@@ -245,27 +245,143 @@
         </div>
     @endif
 
-    <!-- Section: Lịch trình hoạt động tour - IMPROVED TIMELINE -->
+    <!-- Section: Lịch trình hoạt động tour - OPTIMIZED WITH DAY TABS -->
+
     <div class="hdv-card mb-4">
         <style>
+            /* ===== DAY TABS ===== */
+            .day-tabs-wrapper {
+                overflow-x: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            .day-tabs-wrapper::-webkit-scrollbar { display: none; }
+            .day-tabs {
+                display: flex;
+                gap: 8px;
+                padding: 4px 2px;
+                min-width: max-content;
+            }
+            .day-tab-btn {
+                flex-shrink: 0;
+                border: 1.5px solid #e2e8f0;
+                background: #fff;
+                border-radius: 12px;
+                padding: 8px 16px;
+                cursor: pointer;
+                transition: all 0.22s ease;
+                text-align: center;
+                min-width: 88px;
+            }
+            .day-tab-btn .tab-day-label {
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: #94a3b8;
+            }
+            .day-tab-btn .tab-date {
+                font-size: 13px;
+                font-weight: 700;
+                color: #334155;
+                display: block;
+                margin: 1px 0;
+            }
+            .day-tab-btn .tab-count {
+                font-size: 11px;
+                color: #94a3b8;
+            }
+            .day-tab-btn:hover {
+                border-color: #667eea;
+                background: #f8f7ff;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 10px rgba(102,126,234,0.12);
+            }
+            .day-tab-btn.active {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                border-color: transparent;
+                box-shadow: 0 4px 14px rgba(102,126,234,0.4);
+                transform: translateY(-2px);
+            }
+            .day-tab-btn.active .tab-day-label,
+            .day-tab-btn.active .tab-date,
+            .day-tab-btn.active .tab-count { color: rgba(255,255,255,0.9); }
+
+            /* ===== TIME FILTER PILLS ===== */
+            .time-filter-bar {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                align-items: center;
+                padding: 10px 0 4px;
+            }
+            .time-filter-pill {
+                border: 1.5px solid #e2e8f0;
+                background: #fff;
+                border-radius: 20px;
+                padding: 4px 14px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.18s;
+                color: #64748b;
+            }
+            .time-filter-pill:hover { border-color: #667eea; color: #667eea; background: #f8f7ff; }
+            .time-filter-pill.active {
+                background: #667eea;
+                border-color: #667eea;
+                color: #fff;
+                box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+            }
+
+            /* ===== TIMELINE ITEMS ===== */
+            .timeline-panel {
+                display: none;
+                animation: fadeSlideIn 0.28s ease;
+            }
+            .timeline-panel.active { display: block; }
+            @keyframes fadeSlideIn {
+                from { opacity: 0; transform: translateY(8px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
             .timeline-container {
                 position: relative;
                 padding: 0;
             }
             
+            .timeline-day-header {
+                background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+                border-left: 4px solid #667eea;
+                border-radius: 12px;
+                padding: 10px 16px;
+                margin-top: 24px;
+                margin-bottom: 16px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            }
+            
+            .timeline-day-header .day-badge {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                font-weight: 700;
+                padding: 4px 14px;
+                border-radius: 20px;
+                font-size: 13px;
+            }
+
             .timeline-item-improved {
                 position: relative;
-                padding-left: 60px;
-                margin-bottom: 24px;
+                padding-left: 54px;
+                margin-bottom: 14px;
             }
             
             .timeline-item-improved::before {
                 content: '';
                 position: absolute;
-                left: 18px;
-                top: 45px;
+                left: 17px;
+                top: 40px;
                 width: 2px;
-                height: calc(100% + 24px);
+                height: calc(100% + 14px);
                 background-color: #e5e7eb;
             }
             
@@ -277,23 +393,28 @@
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 40px;
-                height: 40px;
+                width: 36px;
+                height: 36px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 color: white;
-                font-size: 18px;
+                font-size: 16px;
                 z-index: 2;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                box-shadow: 0 2px 6px rgba(0,0,0,0.12);
             }
             
             .timeline-icon.pickup { background: linear-gradient(135deg, #667eea, #764ba2); }
-            .timeline-icon.departure { background: linear-gradient(135deg, #f093fb, #f5576c); }
+            .timeline-icon.departure, .timeline-icon.transfer { background: linear-gradient(135deg, #f093fb, #f5576c); }
             .timeline-icon.sightseeing { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+            .timeline-icon.breakfast { background: linear-gradient(135deg, #f6d365, #fda085); }
             .timeline-icon.lunch { background: linear-gradient(135deg, #fa709a, #fee140); }
-            .timeline-icon.checkin { background: linear-gradient(135deg, #30cfd0, #330867); }
+            .timeline-icon.dinner { background: linear-gradient(135deg, #ff0844, #ffb199); }
+            .timeline-icon.checkin, .timeline-icon.accommodation { background: linear-gradient(135deg, #30cfd0, #330867); }
+            .timeline-icon.shopping { background: linear-gradient(135deg, #f857a6, #ff5858); }
+            .timeline-icon.activity { background: linear-gradient(135deg, #00c6fb, #005bea); }
+            .timeline-icon.rest { background: linear-gradient(135deg, #5ee7df, #b490ca); }
             .timeline-icon.return { background: linear-gradient(135deg, #a8edea, #fed6e3); }
             .timeline-icon.other { background: linear-gradient(135deg, #ff9a56, #ff6a88); }
             
@@ -378,15 +499,11 @@
                 color: white;
             }
             
-            .btn-add-activity:hover {
-                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-            }
-            
+
             .empty-state-timeline {
                 padding: 40px 20px;
                 text-align: center;
             }
-            
             .empty-state-timeline i {
                 font-size: 48px;
                 color: #cbd5e1;
@@ -395,10 +512,10 @@
         </style>
 
         <!-- Header -->
-        <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
                 <div class="d-flex align-items-center gap-2">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:white;">
                         <i class="bi bi-clock-history"></i>
                     </div>
                     <div>
@@ -428,23 +545,47 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Thời gian <span class="text-danger">*</span></label>
-                        <input type="datetime-local" class="form-control" name="log_date" value="{{ date('Y-m-d\\TH:i', strtotime(($currentTourDetail['departure_date'] ?? date('Y-m-d')) . ' ' . ($currentTourDetail['meeting_time'] ?: '06:00:00'))) }}" required>
+                        <input type="datetime-local" class="form-control" name="log_date" value="{{ date('Y-m-d\TH:i', strtotime(($currentTourDetail['departure_date'] ?? date('Y-m-d')) . ' ' . ($currentTourDetail['meeting_time'] ?: '06:00:00'))) }}" required>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Địa điểm</label>
-                        <input type="text" class="form-control" name="location" value="{{ $currentTourDetail['meeting_point'] ?? '' }}" placeholder="Nhập địa điểm">
+                        <label class="form-label">Loại hoạt động</label>
+                        <select class="form-select" name="activity_type">
+                            <option value="">-- Chọn loại --</option>
+                            <option value="breakfast">🍳 Ăn sáng</option>
+                            <option value="lunch">🍲 Ăn trưa</option>
+                            <option value="dinner">🍽️ Ăn tối</option>
+                            <option value="sightseeing">📷 Tham quan</option>
+                            <option value="transfer">🚗 Di chuyển</option>
+                            <option value="accommodation">🏨 Check-in khách sạn</option>
+                            <option value="shopping">🛍️ Mua sắm</option>
+                            <option value="activity">🎯 Hoạt động</option>
+                            <option value="rest">😴 Nghỉ ngơi</option>
+                            <option value="other">⭐ Khác</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Địa điểm đi đến</label>
+                        <input type="text" class="form-control" name="location" value="{{ $currentTourDetail['meeting_point'] ?? '' }}" placeholder="Ví dụ: Hạ Long, Thăng Long Plaza, v.v...">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Ăn gì</label>
+                        <input type="text" class="form-control" name="meal_info" placeholder="Ví dụ: Buffet hải sản, Cơm chiên tôm, v.v...">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Nơi ở / Nhà hàng</label>
+                        <input type="text" class="form-control" name="accommodation" placeholder="Ví dụ: Starlight Resort, Nhà hàng Hoa Hồng, v.v...">
                     </div>
                     <div class="col-12">
-                        <label class="form-label">Nội dung <span class="text-danger">*</span></label>
-                        <textarea class="form-control" name="content" rows="3" placeholder="Mô tả chi tiết hoạt động, những gì đã xảy ra, tình hình đoàn khách, v.v..." required></textarea>
+                        <label class="form-label">Nội dung chi tiết <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="content" rows="3" placeholder="Mô tả chi tiết hoạt động, những gì đã xảy ra, tình hình đoàn khách, lưu ý, v.v..." required></textarea>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Thời tiết</label>
-                        <input type="text" class="form-control" name="weather" placeholder="Ví dụ: Nắng đẹp, Có mưa, v.v...">
+                        <input type="text" class="form-control" name="weather" placeholder="Nắng đẹp, Có mưa, v.v...">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Cảm nhận / Trạng thái</label>
-                        <input type="text" class="form-control" name="mood" placeholder="Ví dụ: Đúng kế hoạch, Trễ 30 phút, v.v...">
+                        <input type="text" class="form-control" name="mood" placeholder="Đúng kế hoạch, Trễ 30 phút, v.v...">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">&nbsp;</label>
@@ -458,7 +599,7 @@
             </form>
         </div>
 
-        <!-- Timeline hiển thị -->
+        <!-- Timeline với Day Tabs -->
         @if(empty($tourLogs))
             <div class="empty-state-timeline">
                 <i class="bi bi-inbox"></i>
@@ -466,136 +607,309 @@
                 <p class="text-muted small">Nhấn "Thêm" để bắt đầu ghi nhận lịch trình của chuyến tour</p>
             </div>
         @else
-            <div class="timeline-container">
-                @foreach($tourLogs as $index => $log)
-                    @php
-                        $activityType = 'other';
-                        $titleLower = strtolower($log['title']);
-                        
-                        if (strpos($titleLower, 'đón') !== false) {
-                            $activityType = 'pickup';
-                        } elseif (strpos($titleLower, 'khởi hành') !== false || strpos($titleLower, 'khởi') !== false) {
-                            $activityType = 'departure';
-                        } elseif (strpos($titleLower, 'tham quan') !== false || strpos($titleLower, 'thăm') !== false) {
-                            $activityType = 'sightseeing';
-                        } elseif (strpos($titleLower, 'ăn') !== false || strpos($titleLower, 'cơm') !== false || strpos($titleLower, 'trưa') !== false) {
-                            $activityType = 'lunch';
-                        } elseif (strpos($titleLower, 'check') !== false || strpos($titleLower, 'khách sạn') !== false) {
-                            $activityType = 'checkin';
-                        } elseif (strpos($titleLower, 'về') !== false || strpos($titleLower, 'kết thúc') !== false || strpos($titleLower, 'trở về') !== false) {
-                            $activityType = 'return';
-                        }
-                        
-                        $iconMap = [
-                            'pickup' => 'bi-person-plus-fill',
-                            'departure' => 'bi-car-front-fill',
-                            'sightseeing' => 'bi-camera-fill',
-                            'lunch' => 'bi-cup-hot-fill',
-                            'checkin' => 'bi-door-closed',
-                            'return' => 'bi-house-fill',
-                            'other' => 'bi-star-fill'
-                        ];
-                    @endphp
-                    
-                    <div class="timeline-item-improved">
-                        <div class="timeline-icon {{ $activityType }}">
-                            <i class="bi {{ $iconMap[$activityType] }}"></i>
+            @php
+                $groupedLogs = [];
+                foreach ($tourLogs as $log) {
+                    $dKey = date('Y-m-d', strtotime($log['log_date']));
+                    $groupedLogs[$dKey][] = $log;
+                }
+                ksort($groupedLogs);
+                $depStartDate = !empty($currentTourDetail['departure_date']) ? strtotime($currentTourDetail['departure_date']) : null;
+                $allDateKeys = array_keys($groupedLogs);
+                $firstDateKey = $allDateKeys[0] ?? '';
+                $daySeqCalc = 1;
+                $dayNumbers = [];
+                foreach ($groupedLogs as $dk => $dlogs) {
+                    if ($depStartDate) {
+                        $dd = (int) round((strtotime($dk) - strtotime(date('Y-m-d', $depStartDate))) / 86400);
+                        $dayNumbers[$dk] = max(1, $dd + 1);
+                    } else {
+                        $dayNumbers[$dk] = $daySeqCalc;
+                    }
+                    $daySeqCalc++;
+                }
+            @endphp
+
+            <!-- Day Tab Buttons -->
+            <div class="day-tabs-wrapper mb-1">
+                <div class="day-tabs" id="dayTabsBar">
+                    @foreach($groupedLogs as $dateKey => $dayLogs)
+                        <button type="button"
+                            class="day-tab-btn {{ $dateKey === $firstDateKey ? 'active' : '' }}"
+                            data-day="{{ $dateKey }}"
+                            onclick="switchDayTab('{{ $dateKey }}')">
+                            <span class="tab-day-label">Ngày {{ $dayNumbers[$dateKey] }}</span>
+                            <span class="tab-date">{{ date('d/m', strtotime($dateKey)) }}</span>
+                            <span class="tab-count">{{ count($dayLogs) }} hoạt động</span>
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Time Filter Pills -->
+            <div class="time-filter-bar" id="timeFilterBar">
+                <span class="text-muted small me-1"><i class="bi bi-funnel me-1"></i>Buổi:</span>
+                <button type="button" class="time-filter-pill active" data-period="all" onclick="filterByPeriod('all')">🌐 Tất cả</button>
+                <button type="button" class="time-filter-pill" data-period="morning" onclick="filterByPeriod('morning')">🌅 Sáng</button>
+                <button type="button" class="time-filter-pill" data-period="noon" onclick="filterByPeriod('noon')">☀️ Trưa</button>
+                <button type="button" class="time-filter-pill" data-period="afternoon" onclick="filterByPeriod('afternoon')">🌤️ Chiều</button>
+                <button type="button" class="time-filter-pill" data-period="evening" onclick="filterByPeriod('evening')">🌙 Tối</button>
+                <span class="ms-auto small text-muted" id="periodCount"></span>
+            </div>
+
+            <!-- Panels per day -->
+            @foreach($groupedLogs as $dateKey => $dayLogs)
+                <div class="timeline-panel {{ $dateKey === $firstDateKey ? 'active' : '' }}" data-day-panel="{{ $dateKey }}">
+                    <!-- Day header info -->
+                    <div class="d-flex align-items-center justify-content-between mb-3 mt-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="day-badge"><i class="bi bi-calendar-event me-1"></i> Ngày {{ $dayNumbers[$dateKey] }}</span>
+                            <h6 class="fw-bold mb-0 text-dark">{{ date('l, d/m/Y', strtotime($dateKey)) }}</h6>
                         </div>
-                        
-                        <div class="card activity-card">
-                            <div class="card-body p-3">
-                                <div class="activity-header">
-                                    <div>
-                                        <h6 class="fw-bold text-dark mb-1">{{ $log['title'] }}</h6>
-                                        <span class="activity-time">
-                                            <i class="bi bi-clock me-1"></i>{{ date('H:i', strtotime($log['log_date'])) }} · {{ date('d/m', strtotime($log['log_date'])) }}
-                                        </span>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-primary rounded-circle" type="button" data-bs-toggle="collapse" data-bs-target="#edit-tour-log-{{ $log['id'] }}" title="Chỉnh sửa">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+                        <span class="badge bg-white text-dark border px-3 py-1 fw-semibold rounded-pill" id="dayActivityCount-{{ $dateKey }}">
+                            <i class="bi bi-list-check me-1 text-primary"></i> {{ count($dayLogs) }} hoạt động
+                        </span>
+                    </div>
+
+                    <div class="timeline-container ms-2" id="dayContainer-{{ $dateKey }}">
+                        @foreach($dayLogs as $index => $log)
+                            @php
+                                $activityType = !empty($log['activity_type']) ? $log['activity_type'] : 'other';
+                                if (empty($log['activity_type'])) {
+                                    $titleLower = strtolower($log['title']);
+                                    if (strpos($titleLower, 'đón') !== false) $activityType = 'pickup';
+                                    elseif (strpos($titleLower, 'khởi') !== false) $activityType = 'departure';
+                                    elseif (strpos($titleLower, 'tham quan') !== false || strpos($titleLower, 'thăm') !== false) $activityType = 'sightseeing';
+                                    elseif (strpos($titleLower, 'ăn sáng') !== false) $activityType = 'breakfast';
+                                    elseif (strpos($titleLower, 'ăn trưa') !== false || strpos($titleLower, 'cơm') !== false) $activityType = 'lunch';
+                                    elseif (strpos($titleLower, 'ăn tối') !== false) $activityType = 'dinner';
+                                    elseif (strpos($titleLower, 'check') !== false || strpos($titleLower, 'khách sạn') !== false) $activityType = 'checkin';
+                                    elseif (strpos($titleLower, 'về') !== false || strpos($titleLower, 'kết thúc') !== false) $activityType = 'return';
+                                }
+                                $iconMap = [
+                                    'pickup'        => 'bi-person-plus-fill',
+                                    'departure'     => 'bi-car-front-fill',
+                                    'transfer'      => 'bi-car-front-fill',
+                                    'sightseeing'   => 'bi-camera-fill',
+                                    'breakfast'     => 'bi-cup-hot-fill',
+                                    'lunch'         => 'bi-cup-hot-fill',
+                                    'dinner'        => 'bi-pie-chart-fill',
+                                    'checkin'       => 'bi-door-closed',
+                                    'accommodation' => 'bi-building-fill',
+                                    'shopping'      => 'bi-bag-fill',
+                                    'activity'      => 'bi-trophy-fill',
+                                    'rest'          => 'bi-moon-stars-fill',
+                                    'return'        => 'bi-house-fill',
+                                    'other'         => 'bi-star-fill',
+                                ];
+                                // Determine time period: 5-11=morning, 11-14=noon, 14-18=afternoon, 18-24/0-5=evening
+                                $hour = (int) date('H', strtotime($log['log_date']));
+                                if ($hour >= 5 && $hour < 11) $period = 'morning';
+                                elseif ($hour >= 11 && $hour < 14) $period = 'noon';
+                                elseif ($hour >= 14 && $hour < 18) $period = 'afternoon';
+                                else $period = 'evening';
+                            @endphp
+
+                            <div class="timeline-item-improved" data-period="{{ $period }}">
+                                <div class="timeline-icon {{ $activityType }}">
+                                    <i class="bi {{ $iconMap[$activityType] ?? 'bi-star-fill' }}"></i>
                                 </div>
-                                
-                                <p class="text-dark mb-2 mt-2">{{ $log['content'] }}</p>
-                                
-                                @if(!empty($log['location']))
-                                    <div class="small text-muted mb-2">
-                                        <i class="bi bi-geo-alt text-danger me-1"></i>
-                                        <strong>{{ $log['location'] }}</strong>
-                                    </div>
-                                @endif
-                                
-                                @if(!empty($log['diary_id']))
-                                    <div class="mb-2">
-                                        <a href="{{ route('hdv/nhat-ky-tour/show/' . $log['diary_id']) }}" class="btn btn-sm btn-outline-info rounded-pill">
-                                            <i class="bi bi-journal-text me-1"></i> Xem nhật ký: {{ $log['diary_title'] }}
-                                        </a>
-                                    </div>
-                                @endif
-                                
-                                <div class="activity-badges">
-                                    @if(!empty($log['weather']))
-                                        <span class="activity-badge" style="background-color: #e0f2fe; color: #0369a1;">
-                                            <i class="bi bi-cloud-sun"></i> {{ $log['weather'] }}
-                                        </span>
-                                    @endif
-                                    @if(!empty($log['mood']))
-                                        <span class="activity-badge" style="background-color: #fef3c7; color: #92400e;">
-                                            <i class="bi bi-hand-thumbs-up"></i> {{ $log['mood'] }}
-                                        </span>
-                                    @endif
-                                </div>
-                                
-                                <!-- Form chỉnh sửa (collapse) -->
-                                <div class="collapse mt-3" id="edit-tour-log-{{ $log['id'] }}">
-                                    <form method="POST" action="{{ route('hdv/tour-logs/update/' . $log['id']) }}" class="border-top pt-3">
-                                        <input type="hidden" name="departure_id" value="{{ $selectedDepartureId }}">
-                                        <div class="row g-2">
-                                            <div class="col-md-6">
-                                                <label class="form-label small">Tên hoạt động</label>
-                                                <input class="form-control form-control-sm" name="title" value="{{ $log['title'] }}" required>
+
+                                <div class="card activity-card shadow-sm">
+                                    <div class="card-body p-2 px-3">
+                                        <div class="activity-header mb-1">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="activity-time py-1 px-2">
+                                                    <i class="bi bi-clock me-1"></i>{{ date('H:i', strtotime($log['log_date'])) }}
+                                                </span>
+                                                <h6 class="fw-bold text-dark mb-0 fs-6">{{ $log['title'] }}</h6>
                                             </div>
-                                            <div class="col-md-3">
-                                                <label class="form-label small">Thời gian</label>
-                                                <input class="form-control form-control-sm" type="datetime-local" name="log_date" value="{{ date('Y-m-d\\TH:i', strtotime($log['log_date'])) }}" required>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label class="form-label small">Địa điểm</label>
-                                                <input class="form-control form-control-sm" name="location" value="{{ $log['location'] }}" placeholder="Địa điểm">
-                                            </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">Nội dung</label>
-                                                <textarea class="form-control form-control-sm" name="content" rows="2" required>{{ $log['content'] }}</textarea>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label small">Thời tiết</label>
-                                                <input class="form-control form-control-sm" name="weather" value="{{ $log['weather'] }}" placeholder="Thời tiết">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label small">Cảm nhận</label>
-                                                <input class="form-control form-control-sm" name="mood" value="{{ $log['mood'] }}" placeholder="Cảm nhận">
-                                            </div>
-                                            <div class="col-md-4"></div>
-                                            <div class="col-12 d-flex justify-content-end gap-2">
-                                                <button type="submit" formaction="{{ route('hdv/tour-logs/delete/' . $log['id']) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa hoạt động này? Không thể hoàn tác!')">
-                                                    <i class="bi bi-trash"></i> Xóa
-                                                </button>
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    <i class="bi bi-check2"></i> Cập nhật
-                                                </button>
-                                            </div>
+                                            <button class="btn btn-sm btn-light border rounded-circle p-1 text-secondary ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#edit-tour-log-{{ $log['id'] }}" title="Chỉnh sửa">
+                                                <i class="bi bi-pencil-square fs-7"></i>
+                                            </button>
                                         </div>
-                                    </form>
+
+                                        <p class="text-secondary small mb-2">{{ $log['content'] }}</p>
+
+                                        <!-- Info badges -->
+                                        <div class="d-flex flex-wrap align-items-center gap-1 mb-1">
+                                            @if(!empty($log['location']))
+                                                <span class="badge bg-light text-dark border py-1 px-2" style="font-weight:500;">
+                                                    <i class="bi bi-geo-alt text-danger me-1"></i>{{ $log['location'] }}
+                                                </span>
+                                            @endif
+                                            @if(!empty($log['meal_info']))
+                                                <span class="badge bg-light text-dark border py-1 px-2" style="font-weight:500;">
+                                                    <i class="bi bi-cup-hot text-success me-1"></i>{{ $log['meal_info'] }}
+                                                </span>
+                                            @endif
+                                            @if(!empty($log['accommodation']))
+                                                <span class="badge bg-light text-dark border py-1 px-2" style="font-weight:500;">
+                                                    <i class="bi bi-building text-info me-1"></i>{{ $log['accommodation'] }}
+                                                </span>
+                                            @endif
+                                            @if(!empty($log['weather']))
+                                                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle py-1 px-2">
+                                                    <i class="bi bi-cloud-sun me-1"></i>{{ $log['weather'] }}
+                                                </span>
+                                            @endif
+                                            @if(!empty($log['mood']))
+                                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle py-1 px-2">
+                                                    <i class="bi bi-hand-thumbs-up me-1"></i>{{ $log['mood'] }}
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        @if(!empty($log['diary_id']))
+                                            <div class="mt-1">
+                                                <a href="{{ route('hdv/nhat-ky-tour/show/' . $log['diary_id']) }}" class="btn btn-sm btn-outline-info rounded-pill py-0 px-2 small" style="font-size:11px;">
+                                                    <i class="bi bi-journal-text me-1"></i> Xem nhật ký: {{ $log['diary_title'] }}
+                                                </a>
+                                            </div>
+                                        @endif
+
+                                        <!-- Edit Form (collapse) -->
+                                        <div class="collapse mt-3" id="edit-tour-log-{{ $log['id'] }}">
+                                            <form method="POST" action="{{ route('hdv/tour-logs/update/' . $log['id']) }}" class="border-top pt-3">
+                                                <input type="hidden" name="departure_id" value="{{ $selectedDepartureId }}">
+                                                <div class="row g-2">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label small">Tên hoạt động</label>
+                                                        <input class="form-control form-control-sm" name="title" value="{{ $log['title'] }}" required>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label small">Thời gian</label>
+                                                        <input class="form-control form-control-sm" type="datetime-local" name="log_date" value="{{ date('Y-m-d\TH:i', strtotime($log['log_date'])) }}" required>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label small">Loại hoạt động</label>
+                                                        <select class="form-select form-select-sm" name="activity_type">
+                                                            <option value="">-- Chọn loại --</option>
+                                                            <option value="breakfast" {{ isset($log['activity_type']) && $log['activity_type'] === 'breakfast' ? 'selected' : '' }}>🍳 Ăn sáng</option>
+                                                            <option value="lunch" {{ isset($log['activity_type']) && $log['activity_type'] === 'lunch' ? 'selected' : '' }}>🍲 Ăn trưa</option>
+                                                            <option value="dinner" {{ isset($log['activity_type']) && $log['activity_type'] === 'dinner' ? 'selected' : '' }}>🍽️ Ăn tối</option>
+                                                            <option value="sightseeing" {{ isset($log['activity_type']) && $log['activity_type'] === 'sightseeing' ? 'selected' : '' }}>📷 Tham quan</option>
+                                                            <option value="transfer" {{ isset($log['activity_type']) && $log['activity_type'] === 'transfer' ? 'selected' : '' }}>🚗 Di chuyển</option>
+                                                            <option value="accommodation" {{ isset($log['activity_type']) && $log['activity_type'] === 'accommodation' ? 'selected' : '' }}>🏨 Check-in</option>
+                                                            <option value="shopping" {{ isset($log['activity_type']) && $log['activity_type'] === 'shopping' ? 'selected' : '' }}>🛍️ Mua sắm</option>
+                                                            <option value="activity" {{ isset($log['activity_type']) && $log['activity_type'] === 'activity' ? 'selected' : '' }}>🎯 Hoạt động</option>
+                                                            <option value="rest" {{ isset($log['activity_type']) && $log['activity_type'] === 'rest' ? 'selected' : '' }}>😴 Nghỉ ngơi</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label small">Địa điểm</label>
+                                                        <input class="form-control form-control-sm" name="location" value="{{ $log['location'] }}" placeholder="Địa điểm">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label small">Ăn gì</label>
+                                                        <input class="form-control form-control-sm" name="meal_info" value="{{ $log['meal_info'] ?? '' }}" placeholder="Ăn gì">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label small">Nơi ở</label>
+                                                        <input class="form-control form-control-sm" name="accommodation" value="{{ $log['accommodation'] ?? '' }}" placeholder="Nơi ở">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <label class="form-label small">Nội dung chi tiết</label>
+                                                        <textarea class="form-control form-control-sm" name="content" rows="2" required>{{ $log['content'] }}</textarea>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label small">Thời tiết</label>
+                                                        <input class="form-control form-control-sm" name="weather" value="{{ $log['weather'] }}" placeholder="Thời tiết">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label small">Cảm nhận</label>
+                                                        <input class="form-control form-control-sm" name="mood" value="{{ $log['mood'] }}" placeholder="Cảm nhận">
+                                                    </div>
+                                                    <div class="col-12 d-flex justify-content-end gap-2">
+                                                        <button type="submit" formaction="{{ route('hdv/tour-logs/delete/' . $log['id']) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa hoạt động này? Không thể hoàn tác!')">
+                                                            <i class="bi bi-trash"></i> Xóa
+                                                        </button>
+                                                        <button type="submit" class="btn btn-sm btn-primary">
+                                                            <i class="bi bi-check2"></i> Cập nhật
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
+                        @endforeach
+                    </div><!-- /.timeline-container -->
+                </div><!-- /.timeline-panel -->
+            @endforeach
+
+            <!-- JS: Day Tab switching + Time filter -->
+            <script>
+            (function() {
+                function switchDayTab(dateKey) {
+                    // Switch tab buttons
+                    document.querySelectorAll('.day-tab-btn').forEach(function(btn) {
+                        btn.classList.toggle('active', btn.dataset.day === dateKey);
+                    });
+                    // Switch panels
+                    document.querySelectorAll('.timeline-panel').forEach(function(panel) {
+                        panel.classList.toggle('active', panel.dataset.dayPanel === dateKey);
+                    });
+                    // Reset period filter
+                    document.querySelectorAll('.time-filter-pill').forEach(function(p) {
+                        p.classList.toggle('active', p.dataset.period === 'all');
+                    });
+                    filterByPeriodInPanel(dateKey, 'all');
+                }
+
+                function filterByPeriod(period) {
+                    // Update pill buttons
+                    document.querySelectorAll('.time-filter-pill').forEach(function(pill) {
+                        pill.classList.toggle('active', pill.dataset.period === period);
+                    });
+                    // Find active panel
+                    var activePanel = document.querySelector('.timeline-panel.active');
+                    if (!activePanel) return;
+                    var dateKey = activePanel.dataset.dayPanel;
+                    filterByPeriodInPanel(dateKey, period);
+                }
+
+                function filterByPeriodInPanel(dateKey, period) {
+                    var container = document.getElementById('dayContainer-' + dateKey);
+                    if (!container) return;
+                    var items = container.querySelectorAll('.timeline-item-improved');
+                    var visible = 0;
+                    items.forEach(function(item) {
+                        var show = (period === 'all' || item.dataset.period === period);
+                        item.style.display = show ? '' : 'none';
+                        if (show) visible++;
+                    });
+                    // Update count badge
+                    var badge = document.getElementById('dayActivityCount-' + dateKey);
+                    if (badge) {
+                        badge.innerHTML = '<i class="bi bi-list-check me-1 text-primary"></i>' + visible + ' hoạt động';
+                    }
+                    // Update period count text
+                    var countEl = document.getElementById('periodCount');
+                    if (countEl) {
+                        countEl.textContent = (period === 'all') ? '' : 'Đang lọc: ' + visible + ' hoạt động';
+                    }
+                }
+
+                // Expose to global scope
+                window.switchDayTab = switchDayTab;
+                window.filterByPeriod = filterByPeriod;
+
+                // Auto scroll tabs to active on load
+                var activeTab = document.querySelector('.day-tab-btn.active');
+                if (activeTab) {
+                    setTimeout(function() {
+                        activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }, 100);
+                }
+            })();
+            </script>
         @endif
     </div>
 
     <!-- Section: Danh sách đoàn khách (matching Screenshot 1) -->
+
     <div class="hdv-card">
         @php
             $checkedInGuests = count(array_filter($guests, function ($guest) {

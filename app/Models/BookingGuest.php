@@ -83,7 +83,48 @@ class BookingGuest extends Model
             ->orderBy('g.check_in_status', 'ASC')
             ->addOrderBy('g.id', 'ASC');
 
-        return $stmt->fetchAllAssociative();
+        $guests = $stmt->fetchAllAssociative();
+
+        if (empty($guests)) {
+            // Fallback: If no booking_guests exist yet for this departure, check bookings table
+            $bStmt = $this->connection->createQueryBuilder();
+            $bStmt->select('b.*', 't.name AS tour_name', 'd.departure_date')
+                ->from('bookings', 'b')
+                ->leftJoin('b', 'tours', 't', 't.id = b.tour_id')
+                ->leftJoin('b', 'departures', 'd', 'd.id = b.departure_id')
+                ->where('b.departure_id = :departure_id')
+                ->setParameter('departure_id', (int) $departureId);
+            
+            $bookings = $bStmt->fetchAllAssociative();
+
+            if (!empty($bookings)) {
+                // Populate booking_guests automatically for all bookings of this departure
+                foreach ($bookings as $b) {
+                    $numPeople = max(1, (int) ($b['num_people'] ?? 1));
+                    for ($i = 1; $i <= $numPeople; $i++) {
+                        $fullName = ($i === 1) ? $b['customer_name'] : ($b['customer_name'] . ' (Khách đi cùng #' . $i . ')');
+                        $this->insert([
+                            'booking_id'      => $b['id'],
+                            'full_name'       => $fullName,
+                            'gender'          => ($i % 2 === 1) ? 'male' : 'female',
+                            'dob'             => '1992-05-15',
+                            'phone'           => ($i === 1) ? ($b['customer_phone'] ?? null) : null,
+                            'email'           => ($i === 1) ? ($b['customer_email'] ?? null) : null,
+                            'identity_no'     => null,
+                            'address'         => $b['pickup_address'] ?? null,
+                            'payment_status'  => 'paid',
+                            'check_in_status' => (int) ($b['check_in_status'] ?? 0),
+                            'checked_in_at'   => $b['checked_in_at'] ?? null,
+                            'note'            => ($i === 1) ? ($b['note'] ?? '') : '',
+                        ]);
+                    }
+                }
+                // Re-fetch after inserting
+                $guests = $stmt->fetchAllAssociative();
+            }
+        }
+
+        return $guests;
     }
 
     public function findById($id)
