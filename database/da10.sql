@@ -1,5 +1,5 @@
 -- Database Dump for `da10`
--- Generated on 2026-08-07 03:50:18
+-- Generated on 2026-08-07 14:55:15
 
 SET FOREIGN_KEY_CHECKS=0;
 SET UNIQUE_CHECKS=0;
@@ -183,7 +183,7 @@ CREATE TABLE `departures` (
   `vehicle` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `incurred_cost` bigint NOT NULL DEFAULT '0',
-  `incurred_cost_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `incurred_cost_note` text COLLATE utf8mb4_unicode_ci,
   `status` enum('scheduled','in_progress','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'scheduled',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
@@ -194,13 +194,13 @@ CREATE TABLE `departures` (
 
 -- Dumping data for table `departures`
 INSERT INTO `departures` (`id`, `tour_id`, `group_name`, `departure_date`, `return_date`, `max_participants`, `meeting_point`, `meeting_time`, `vehicle`, `notes`, `incurred_cost`, `incurred_cost_note`, `status`, `created_at`, `updated_at`) VALUES
-('8', '6', 'Chuẩn  (0349422856) - Cà mau (2026-08-07)', '2026-08-08', '2026-08-10', '5', '8B nghách 46 ngõ 1 Bùi Xương Trạch', '06:00:00', 'Xe khách', '', 0, NULL, 'scheduled', '2026-08-06 19:55:42', '2026-08-06 20:10:49'),
-('9', '5', 'Thanh Huệ  (0865144307) - Quảng Ninh (2026-08-08)', '2026-08-13', '2026-08-15', '5', '8B nghách 46 ngõ 1 Bùi Xương Trạch', '06:00:00', 'Xe khách', '', 0, NULL, 'scheduled', '2026-08-06 20:17:41', '2026-08-06 20:17:58'),
-('10', '7', 'Đoàn Sapa Fansipan (20/08 - 22/08/2026)', '2026-08-20', '2026-08-22', '15', 'Công viên Thống Nhất, Hà Nội', '06:00:00', 'Xe giường nằm cao cấp', 'Mang theo áo ấm, giày thể thao và giấy tờ tùy thân', 0, NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
-('11', '8', 'Đoàn Đà Nẵng - Hội An (25/08 - 27/08/2026)', '2026-08-25', '2026-08-27', '20', 'Sân bay Đà Nẵng / Ga Đà Nẵng', '07:30:00', 'Xe du lịch 29 chỗ đời mới', 'Nên mang theo kem chống nắng, đồ bơi', 0, NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
-('12', '9', 'Đoàn Đà Lạt Ngàn Hoa (28/08 - 30/08/2026)', '2026-08-28', '2026-08-30', '18', 'Sân bay Liên Khương / Bến xe Đà Lạt', '07:00:00', 'Xe du lịch 16 chỗ Hyundai Solati', 'Chuẩn bị trang phục chụp ảnh đẹp, áo khoác nhẹ', 0, NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
-('13', '10', 'Đoàn Ninh Bình Tràng An (01/09 - 02/09/2026)', '2026-09-01', '2026-09-02', '12', 'Nhà hát Lớn Hà Nội', '07:00:00', 'Xe Limousine 19 chỗ', 'Trang phục lịch sự khi đi chùa Bái Đính', 0, NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
-('14', '11', 'Đoàn Huế Cố Đô Di Sản (01/08 - 03/08/2026)', '2026-08-01', '2026-08-03', '20', 'Ga Huế / Sân bay Phú Bài, Thừa Thiên Huế', '07:00:00', 'Xe du lịch 29 chỗ Universe', 'Chuyến đi đã hoàn thành xuất sắc, 100% khách hài lòng.', 87500000, 'Ví dụ: Mua thêm nước uống cho đoàn', 'completed', '2026-08-07 10:05:53', '2026-08-07 10:05:53');
+('8', '6', 'Chuẩn  (0349422856) - Cà mau (2026-08-07)', '2026-08-08', '2026-08-10', '5', '8B nghách 46 ngõ 1 Bùi Xương Trạch', '06:00:00', 'Xe khách', '', '0', NULL, 'scheduled', '2026-08-06 19:55:42', '2026-08-06 20:10:49'),
+('9', '5', 'Thanh Huệ  (0865144307) - Quảng Ninh (2026-08-08)', '2026-08-13', '2026-08-15', '5', '8B nghách 46 ngõ 1 Bùi Xương Trạch', '06:00:00', 'Xe khách', '', '0', NULL, 'scheduled', '2026-08-06 20:17:41', '2026-08-06 20:17:58'),
+('10', '7', 'Đoàn Sapa Fansipan (20/08 - 22/08/2026)', '2026-08-20', '2026-08-22', '15', 'Công viên Thống Nhất, Hà Nội', '06:00:00', 'Xe giường nằm cao cấp', 'Mang theo áo ấm, giày thể thao và giấy tờ tùy thân', '0', NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
+('11', '8', 'Đoàn Đà Nẵng - Hội An (25/08 - 27/08/2026)', '2026-08-25', '2026-08-27', '20', 'Sân bay Đà Nẵng / Ga Đà Nẵng', '07:30:00', 'Xe du lịch 29 chỗ đời mới', 'Nên mang theo kem chống nắng, đồ bơi', '0', NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
+('12', '9', 'Đoàn Đà Lạt Ngàn Hoa (28/08 - 30/08/2026)', '2026-08-28', '2026-08-30', '18', 'Sân bay Liên Khương / Bến xe Đà Lạt', '07:00:00', 'Xe du lịch 16 chỗ Hyundai Solati', 'Chuẩn bị trang phục chụp ảnh đẹp, áo khoác nhẹ', '0', NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
+('13', '10', 'Đoàn Ninh Bình Tràng An (01/09 - 02/09/2026)', '2026-09-01', '2026-09-02', '12', 'Nhà hát Lớn Hà Nội', '07:00:00', 'Xe Limousine 19 chỗ', 'Trang phục lịch sự khi đi chùa Bái Đính', '0', NULL, 'scheduled', '2026-08-07 09:48:12', NULL),
+('14', '11', 'Đoàn Huế Cố Đô Di Sản (01/08 - 03/08/2026)', '2026-08-01', '2026-08-03', '20', 'Ga Huế / Sân bay Phú Bài, Thừa Thiên Huế', '07:00:00', 'Xe du lịch 29 chỗ Universe', 'Chuyến đi đã hoàn thành xuất sắc, 100% khách hài lòng.', '87500000', '', 'completed', '2026-08-07 10:05:53', '2026-08-07 14:00:08');
 
 -- --------------------------------------------------------
 -- Table structure for table `bookings`
@@ -485,6 +485,9 @@ CREATE TABLE `tour_diaries` (
   `weather` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `mood` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `photos` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `expense_amount` bigint DEFAULT '0',
+  `expense_category` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `receipt_photo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -493,14 +496,15 @@ CREATE TABLE `tour_diaries` (
   KEY `idx_created_by_hdv_id` (`created_by_hdv_id`),
   CONSTRAINT `fk_tour_diaries_tour_log` FOREIGN KEY (`tour_log_id`) REFERENCES `tour_logs` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `tour_diaries_ibfk_1` FOREIGN KEY (`departure_id`) REFERENCES `departures` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table `tour_diaries`
-INSERT INTO `tour_diaries` (`id`, `departure_id`, `tour_log_id`, `created_by_hdv_id`, `title`, `content`, `diary_date`, `weather`, `mood`, `photos`, `created_at`, `updated_at`) VALUES
-('1', '14', '145', '2', 'Ấn tượng ngày đầu tiên khám phá Hoàng Thành Cố Đô Huế', 'Hôm nay đoàn khởi hành đúng giờ. Thời tiết Huế dịu mát, nắng nhẹ rất thích hợp cho du khách đi bộ tham quan Đại Nội. Khách trong đoàn rất hào hứng khi nghe giới thiệu về lịch sử triều Nguyễn. Mọi người chụp rất nhiều ảnh kỷ niệm tại Ngọ Môn và Điện Thái Hòa. Ăn trưa ẩm thực Cung đình ai cũng khen ngon!', '2026-08-01', 'Nắng nhẹ, gió mát', 'Hào hứng & Vui vẻ', 'storage/uploads/tours/hue.jpg', '2026-08-07 10:06:00', '2026-08-07 10:16:09'),
-('2', '14', '150', '2', 'Đêm Sông Hương huyền ảo & Lắng đọng cùng Nhã nhạc Cung đình', 'Buổi tối cả đoàn lên thuyền rồng thả hoa đăng trên Sông Hương. Âm hưởng Nhã nhạc cung đình Huế vang lên giữa không gian sông nước lung linh khiến du khách vô cùng xúc động. Tất cả 20 thành viên trong đoàn đều tham gia thả hoa đăng cầu may mắn và chụp ảnh lưu niệm cùng các nghệ sĩ.', '2026-08-01', 'Đêm mát mẻ, gió sông dịu rượi', 'Thư thái & Xúc động', 'storage/uploads/tours/hue.jpg', '2026-08-07 10:06:00', '2026-08-07 10:16:09'),
-('3', '14', '155', '2', 'Sắc màu rực rỡ tại Làng hương Thủy Xuân & Đồi Vọng Cảnh', 'Mọi người vô cùng thích thú khi đến Làng hương Thủy Xuân. Các cô bác và bạn trẻ trong đoàn tha hồ mặc trang phục cổ phục nón lá chụp ảnh cùng các bó hương xòe hoa đủ màu sắc. Đến chiều lên Đồi Vọng Cảnh ngắm khúc quanh Sông Hương đẹp như bức tranh thủy mặc.', '2026-08-02', 'Nắng vàng trong trẻo', 'Phấn khởi & Hài lòng', 'storage/uploads/tours/hue.jpg', '2026-08-07 10:06:00', '2026-08-07 10:16:09'),
-('4', '14', '162', '2', 'Tổng kết chuyến đi Huế 3N2Đ - Chia tay đoàn với muôn vàn kỷ niệm đẹp', 'Chuyến đi đã kết thúc an toàn và thành công rực rỡ. 100% du khách gửi lời cảm ơn đến HDV và tài xế. Mọi người mua rất nhiều đặc sản Mè xửng và Trà Cung Đình làm quà. Hẹn gặp lại quý khách trong các hành trình tiếp theo của công ty!', '2026-08-03', 'Trời mát mẻ', 'Trọn vẹn & Lưu luyến', 'storage/uploads/tours/hue.jpg', '2026-08-07 10:06:00', '2026-08-07 10:16:09');
+INSERT INTO `tour_diaries` (`id`, `departure_id`, `tour_log_id`, `created_by_hdv_id`, `title`, `content`, `diary_date`, `weather`, `mood`, `photos`, `expense_amount`, `expense_category`, `receipt_photo`, `created_at`, `updated_at`) VALUES
+('1', '14', '145', '2', 'Ấn tượng ngày đầu tiên khám phá Hoàng Thành Cố Đô Huế', 'Hôm nay đoàn khởi hành đúng 07:00. HDV đón đoàn tại Sân bay Phú Bài & Ga Huế. Thời tiết Huế dịu mát, nắng nhẹ rất thích hợp cho du khách đi bộ tham quan Ngọ Môn, Điện Thái Hòa và Tử Cấm Thành. Bữa trưa ẩm thực Cung đình tại nhà hàng Hương Giang phục vụ chu đáo, 100% khách khen ngon!', '2026-08-01', 'Nắng nhẹ, gió mát', 'Hào hứng & Vui vẻ', 'storage/uploads/tours/hue.jpg', '4500000', 'Ăn uống', NULL, '2026-08-07 10:06:00', '2026-08-07 21:55:15'),
+('2', '14', '150', '2', 'Đêm Sông Hương huyền ảo & Lắng đọng cùng Nhã nhạc Cung đình', 'Buổi tối cả đoàn 20 thành viên lên thuyền rồng thả hoa đăng lung linh trên Sông Hương. Âm hưởng Nhã nhạc cung đình Huế vang lên giữa không gian sông nước tĩnh lặng khiến du khách vô cùng xúc động. Tất cả du khách đều tham gia thả hoa đăng cầu may mắn.', '2026-08-01', 'Đêm mát mẻ, gió sông dịu rượi', 'Thư thái & Xúc động', 'storage/uploads/tours/hue.jpg', '3200000', 'Vé tham quan', NULL, '2026-08-07 10:06:00', '2026-08-07 21:55:15'),
+('3', '14', '155', '2', 'Sắc màu rực rỡ tại Làng hương Thủy Xuân & Đồi Vọng Cảnh', 'Đoàn trải nghiệm tham quan Lăng Khải Định với kiến trúc khảm sành sứ Á - Âu tinh xảo, sau đó ghé Làng hương Thủy Xuân rực rỡ sắc màu. Các du khách nữ mặc trang phục cổ phục nón lá chụp rất nhiều ảnh đẹp. Chiều đoàn lên Đồi Vọng Cảnh ngắm khúc uốn Sông Hương.', '2026-08-02', 'Nắng vàng trong trẻo', 'Phấn khởi & Hài lòng', 'storage/uploads/tours/hue.jpg', '1800000', 'Vé tham quan', NULL, '2026-08-07 10:06:00', '2026-08-07 21:55:15'),
+('4', '14', '162', '2', 'Tổng kết chuyến đi Huế 3N2Đ - Chia tay đoàn với muôn vàn kỷ niệm đẹp', 'Chuyến đi kết thúc an toàn và thành công rực rỡ. HDV hỗ trợ đoàn mua sắm Mè xửng, Tôm chua, Trà Cung Đình tại Chợ Đông Ba làm quà. Xe đưa đoàn ra Sân bay Phú Bài đúng 13:30. Tất cả 20 khách gửi lời cảm ơn nhiệt tình tới HDV và tài xế.', '2026-08-03', 'Trời mát mẻ', 'Trọn vẹn & Lưu luyến', 'storage/uploads/tours/hue.jpg', '1200000', 'Di chuyển / Cầu đường', NULL, '2026-08-07 10:06:00', '2026-08-07 21:55:15'),
+('6', '14', '148', '2', 'Ngày 1', '123', '2026-08-01', 'Nắng nhẹ', NULL, 'Array', '0', NULL, NULL, '2026-08-07 03:55:09', '2026-08-07 10:55:09');
 
 -- --------------------------------------------------------
 -- Table structure for table `booking_guests`

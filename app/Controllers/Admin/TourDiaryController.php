@@ -49,7 +49,8 @@ class TourDiaryController extends Controller
             if (!empty($childDiaries) || $departureId === $depId) {
                 $depDetail = $this->modelDeparture->findById($depId);
                 $estimatedCost = $this->modelDeparture->getEstimatedCostForDeparture($depId);
-                $incurredCost = (float) ($depDetail['incurred_cost'] ?? 0);
+                $diariesExpenseSum = array_sum(array_map('floatval', array_column($childDiaries, 'expense_amount')));
+                $incurredCost = $diariesExpenseSum > 0 ? $diariesExpenseSum : (float) ($depDetail['incurred_cost'] ?? 0);
                 $incurredCostNote = $depDetail['incurred_cost_note'] ?? '';
 
                 $groupedJournals[] = [
