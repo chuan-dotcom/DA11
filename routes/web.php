@@ -211,5 +211,6 @@ $router->get('hdv/nhat-ky-tour/show/(\d+)', HdvDiaryController::class . '@show')
 $router->get('hdv/nhat-ky-tour/edit/(\d+)', HdvDiaryController::class . '@edit');
 $router->post('hdv/nhat-ky-tour/update/(\d+)', HdvDiaryController::class . '@update');
 $router->get('hdv/nhat-ky-tour/delete/(\d+)', HdvDiaryController::class . '@delete');
+$router->post('hdv/nhat-ky-tour/update-cost', HdvDiaryController::class . '@updateCost');
 
 $router->run();

@@ -28,15 +28,49 @@ class TourDiaryController extends Controller
         $title = 'Quản lý nhật ký tour';
         $departureId = isset($_GET['departure_id']) ? (int) $_GET['departure_id'] : null;
         $departures = $this->modelDeparture->getAll();
-        $diaries = $this->modelDiary->getAll($departureId);
-        $totalDiaries = $this->modelDiary->getTotalDiaries();
+        $allDiaries = $this->modelDiary->getAll($departureId);
+        $totalDiaries = count($allDiaries);
+
         if (isset($_SESSION['old_input'])) {
             unset($_SESSION['old_input']);
         }
 
+        // Group diaries under Main Departure Journals for Admin
+        $filteredDepartures = $departureId
+            ? array_filter($departures, fn($d) => (int)$d['id'] === $departureId)
+            : $departures;
+
+        $groupedJournals = [];
+        foreach ($filteredDepartures as $dep) {
+            $depId = (int) $dep['id'];
+            $childDiaries = array_values(array_filter($allDiaries, fn($item) => (int)($item['departure_id'] ?? 0) === $depId));
+
+            // Only show departures that have diaries OR when filtered explicitly
+            if (!empty($childDiaries) || $departureId === $depId) {
+                $depDetail = $this->modelDeparture->findById($depId);
+                $estimatedCost = $this->modelDeparture->getEstimatedCostForDeparture($depId);
+                $incurredCost = (float) ($depDetail['incurred_cost'] ?? 0);
+                $incurredCostNote = $depDetail['incurred_cost_note'] ?? '';
+
+                $groupedJournals[] = [
+                    'departure_id'       => $depId,
+                    'tour_name'          => $dep['tour_name'] ?? '—',
+                    'group_name'         => $dep['group_name'] ?: ('Đoàn #' . $depId),
+                    'departure_date'     => $dep['departure_date'] ?? null,
+                    'return_date'        => $dep['return_date'] ?? null,
+                    'estimated_cost'     => $estimatedCost,
+                    'incurred_cost'      => $incurredCost,
+                    'incurred_cost_note' => $incurredCostNote,
+                    'diaries'            => $childDiaries,
+                    'total_child_diaries'=> count($childDiaries),
+                ];
+            }
+        }
+
         return view('admin.tour-diaries.index', compact(
             'title',
-            'diaries',
+            'allDiaries',
+            'groupedJournals',
             'departures',
             'departureId',
             'totalDiaries'

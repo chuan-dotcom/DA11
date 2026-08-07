@@ -54,6 +54,8 @@ class DiaryController extends Controller
                 d.return_date, 
                 d.meeting_point,
                 d.meeting_time,
+                d.incurred_cost,
+                d.incurred_cost_note,
                 t.id AS tour_id,
                 t.name AS tour_name,
                 tc.name AS category_name
@@ -153,37 +155,62 @@ class DiaryController extends Controller
 
         $db = (new \App\Model())->getConnection();
 
-        $diaries = [];
+        $allDiaries = [];
         if (!empty($departureIds)) {
-            $qb = $db->createQueryBuilder();
-            $qb->select(
-                'td.*',
-                'd.group_name as departure_group_name',
-                'd.departure_date as tour_departure_date',
-                'd.return_date as tour_return_date',
-                't.id as tour_id',
-                't.name as tour_name',
-                'tc.name as category_name'
-            )
-                ->from('tour_diaries', 'td')
-                ->innerJoin('td', 'departures', 'd', 'd.id = td.departure_id')
-                ->innerJoin('d', 'tours', 't', 't.id = d.tour_id')
-                ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
-                ->where('td.departure_id IN (:departure_ids)')
-                ->setParameter('departure_ids', $departureIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
-
+            $sql = "
+                SELECT 
+                    td.*,
+                    d.group_name as departure_group_name,
+                    d.departure_date as tour_departure_date,
+                    d.return_date as tour_return_date,
+                    t.id as tour_id,
+                    t.name as tour_name,
+                    tc.name as category_name
+                FROM tour_diaries td
+                INNER JOIN departures d ON d.id = td.departure_id
+                INNER JOIN tours t ON t.id = d.tour_id
+                LEFT JOIN tour_categories tc ON tc.id = t.category_id
+                WHERE td.departure_id IN (" . implode(',', array_map('intval', $departureIds)) . ")
+            ";
             if ($selectedDepartureId) {
-                $qb->andWhere('td.departure_id = :selected_dep')
-                    ->setParameter('selected_dep', $selectedDepartureId);
+                $sql .= " AND td.departure_id = " . (int) $selectedDepartureId;
             }
+            $sql .= " ORDER BY td.diary_date DESC, td.id DESC";
 
-            $qb->orderBy('td.diary_date', 'DESC')
-                ->addOrderBy('td.id', 'DESC');
-
-            $diaries = $qb->fetchAllAssociative();
+            $allDiaries = $db->fetchAllAssociative($sql);
         }
 
-        $totalDiaries = count($diaries);
+        // Group diaries into Main Departure Journals
+        $groupedJournals = [];
+        $filteredDepartures = $selectedDepartureId
+            ? array_filter($departures, fn($d) => (int)$d['id'] === $selectedDepartureId)
+            : $departures;
+
+        foreach ($filteredDepartures as $dep) {
+            $depId = (int) $dep['id'];
+            $childDiaries = array_values(array_filter($allDiaries, fn($item) => (int)$item['departure_id'] === $depId));
+            $estimatedCost = $this->modelDeparture->getEstimatedCostForDeparture($depId);
+            $incurredCost = (float) ($dep['incurred_cost'] ?? 0);
+            $incurredCostNote = $dep['incurred_cost_note'] ?? '';
+
+            $groupedJournals[] = [
+                'departure'          => $dep,
+                'departure_id'       => $depId,
+                'tour_name'          => $dep['tour_name'] ?? '—',
+                'group_name'         => $dep['group_name'] ?: ('Chuyến #' . $depId),
+                'category_name'      => $dep['category_name'] ?? 'Chưa phân loại',
+                'departure_date'     => $dep['departure_date'] ?? null,
+                'return_date'        => $dep['return_date'] ?? null,
+                'estimated_cost'     => $estimatedCost,
+                'incurred_cost'      => $incurredCost,
+                'incurred_cost_note' => $incurredCostNote,
+                'diaries'            => $childDiaries,
+                'total_child_diaries'=> count($childDiaries),
+            ];
+        }
+
+        $totalDiaries = count($allDiaries);
+        $totalJournals = count($groupedJournals);
         $title = 'Nhật ký tour';
 
         return view('hdv.diaries.index', compact(
@@ -191,11 +218,33 @@ class DiaryController extends Controller
             'hdvId',
             'activeHdv',
             'allHdv',
-            'diaries',
+            'allDiaries',
+            'groupedJournals',
             'departures',
             'selectedDepartureId',
-            'totalDiaries'
+            'totalDiaries',
+            'totalJournals'
         ));
+    }
+
+    public function updateCost()
+    {
+        $hdvId = $this->getActiveHdvId();
+        $departureId = (int) ($_POST['departure_id'] ?? 0);
+        $incurredCost = (float) ($_POST['incurred_cost'] ?? 0);
+        $incurredCostNote = trim($_POST['incurred_cost_note'] ?? '');
+
+        $departures = $this->getAssignedDepartures($hdvId);
+        $selectedDeparture = $this->findAssignedDepartureById($departures, $departureId);
+
+        if (!$selectedDeparture) {
+            setFlash('error', 'Bạn chỉ có quyền cập nhật chi phí cho chuyến công tác được phân công.');
+            return redirect('hdv/nhat-ky-tour');
+        }
+
+        $this->modelDeparture->updateIncurredCost($departureId, $incurredCost, $incurredCostNote);
+        setFlash('success', 'Đã cập nhật chi phí phát sinh cho chuyến đi #' . $departureId . ' thành công!');
+        return redirect('hdv/nhat-ky-tour' . ($departureId > 0 ? '?departure_id=' . $departureId : ''));
     }
 
     public function create()

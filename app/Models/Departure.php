@@ -60,6 +60,96 @@ class Departure extends Model
             }
         } catch (\Throwable $e) {
         }
+
+        $this->ensureCostColumns();
+    }
+
+    private function ensureCostColumns()
+    {
+        try {
+            $col1 = $this->connection->fetchAssociative(
+                'SHOW COLUMNS FROM departures LIKE ?',
+                ['incurred_cost']
+            );
+            if (!$col1) {
+                $this->connection->executeStatement(
+                    "ALTER TABLE departures ADD COLUMN incurred_cost BIGINT NOT NULL DEFAULT 0 AFTER notes"
+                );
+            }
+        } catch (\Throwable $e) {
+        }
+
+        try {
+            $col2 = $this->connection->fetchAssociative(
+                'SHOW COLUMNS FROM departures LIKE ?',
+                ['incurred_cost_note']
+            );
+            if (!$col2) {
+                $this->connection->executeStatement(
+                    "ALTER TABLE departures ADD COLUMN incurred_cost_note TEXT NULL AFTER incurred_cost"
+                );
+            }
+        } catch (\Throwable $e) {
+        }
+    }
+
+    public function getEstimatedCostForDeparture($departureId)
+    {
+        $depId = (int) $departureId;
+        if ($depId <= 0) {
+            return 0;
+        }
+
+        try {
+            // 1. Prioritize total price of confirmed bookings for this departure
+            $sql = "SELECT SUM(total_price) as total_rev FROM bookings WHERE departure_id = ? AND status = 1";
+            $row = $this->connection->fetchAssociative($sql, [$depId]);
+            $confirmedRev = (float) ($row['total_rev'] ?? 0);
+            if ($confirmedRev > 0) {
+                return $confirmedRev;
+            }
+
+            // 2. Fallback to any bookings for this departure
+            $sqlAll = "SELECT SUM(total_price) as total_rev FROM bookings WHERE departure_id = ?";
+            $rowAll = $this->connection->fetchAssociative($sqlAll, [$depId]);
+            $allRev = (float) ($rowAll['total_rev'] ?? 0);
+            if ($allRev > 0) {
+                return $allRev;
+            }
+
+            // 3. Fallback to tour price * max_participants or assigned guests
+            $dep = $this->findById($depId);
+            if ($dep && !empty($dep['tour_price'])) {
+                $count = !empty($dep['max_participants']) && $dep['max_participants'] > 0
+                    ? (int) $dep['max_participants']
+                    : 10;
+                return (float) ($dep['tour_price'] * $count);
+            }
+        } catch (\Throwable $e) {
+        }
+
+        return 0;
+    }
+
+    public function updateIncurredCost($departureId, $incurredCost, $incurredCostNote = null)
+    {
+        $depId = (int) $departureId;
+        if ($depId <= 0) {
+            return false;
+        }
+
+        $cost = max(0, (float) $incurredCost);
+        $note = $incurredCostNote !== null ? trim($incurredCostNote) : null;
+
+        try {
+            return $this->connection->update('departures', [
+                'incurred_cost' => $cost,
+                'incurred_cost_note' => $note,
+                'updated_at' => date('Y-m-d H:i:s')
+            ], ['id' => $depId]);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     public function getAll($categoryId = null)
