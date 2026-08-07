@@ -211,19 +211,20 @@
                                 <table class="table table-bordered table-hover align-middle mb-0">
                                     <thead class="table-light small">
                                         <tr>
-                                            <th style="width: 50px;">ID</th>
+                                            <th style="width: 50px;">STT</th>
                                             <th style="width: 80px;">Ảnh</th>
                                             <th>Tiêu đề nhật ký con</th>
-                                            <th style="width: 160px;">Chi phí thực tế</th>
+                                            <th style="width: 140px;">Chi phí thực tế</th>
+                                            <th style="width: 140px;">Chi phí phát sinh</th>
                                             <th>Ngày nhật ký</th>
                                             <th>Thời tiết / Cảm xúc</th>
                                             <th class="text-center" style="width: 120px;">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($journal['diaries'] as $diary)
+                                        @foreach($journal['diaries'] as $index => $diary)
                                             <tr>
-                                                <td class="fw-bold">#{{ $diary['id'] }}</td>
+                                                <td class="fw-bold text-center">{{ $index + 1 }}</td>
                                                 <td>
                                                     @php
                                                         $firstPhoto = null;
@@ -260,18 +261,22 @@
                                                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold">
                                                             <i class="bi bi-cash-coin me-1"></i>{{ number_format($diary['actual_cost'], 0, ',', '.') }}đ
                                                         </span>
-                                                    @elseif(!empty($diary['expense_amount']) && (float)$diary['expense_amount'] > 0)
+                                                        @if(!empty($diary['expense_category']))
+                                                            <div class="small text-muted mt-1" style="font-size:11px;">
+                                                                <i class="bi bi-tag me-1"></i>{{ $diary['expense_category'] }}
+                                                            </div>
+                                                        @endif
+                                                    @else
+                                                        <span class="text-muted small">—</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if(!empty($diary['expense_amount']) && (float)$diary['expense_amount'] > 0)
                                                         <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-bold">
                                                             <i class="bi bi-lightning me-1"></i>+{{ number_format($diary['expense_amount'], 0, ',', '.') }}đ
                                                         </span>
                                                     @else
                                                         <span class="text-muted small">—</span>
-                                                    @endif
-
-                                                    @if(!empty($diary['expense_category']))
-                                                        <div class="small text-muted mt-1" style="font-size:11px;">
-                                                            <i class="bi bi-tag me-1"></i>{{ $diary['expense_category'] }}
-                                                        </div>
                                                     @endif
                                                 </td>
                                                 <td>

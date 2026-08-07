@@ -234,7 +234,7 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light small">
                                     <tr>
-                                        <th style="width: 50px;">ID</th>
+                                        <th style="width: 50px;">STT</th>
                                         <th style="width: 80px;">Hình ảnh</th>
                                         <th>Tiêu đề bài viết nhỏ</th>
                                         <th style="width: 140px;">Chi phí thực tế</th>
@@ -245,9 +245,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($journal['diaries'] as $diary)
+                                    @foreach($journal['diaries'] as $index => $diary)
                                         <tr>
-                                            <td class="fw-bold text-muted">#{{ $diary['id'] }}</td>
+                                            <td class="fw-bold text-muted text-center">{{ $index + 1 }}</td>
                                             <td>
                                                 @php
                                                     $firstPhoto = null;

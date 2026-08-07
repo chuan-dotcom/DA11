@@ -146,8 +146,8 @@ class TourDiary extends Model
                 ->setParameter('departure_id', (int) $departureId);
         }
 
-        $stmt->orderBy('td.diary_date', 'DESC')
-            ->addOrderBy('td.id', 'DESC');
+        $stmt->orderBy('td.diary_date', 'ASC')
+            ->addOrderBy('td.id', 'ASC');
 
         return $stmt->fetchAllAssociative();
     }
