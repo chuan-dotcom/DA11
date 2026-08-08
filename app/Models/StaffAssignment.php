@@ -6,7 +6,7 @@ use App\Model;
   
 class StaffAssignment extends Model
 {
-    public function getAll()
+    public function getAll()   
     {
         $stmt = $this->connection->createQueryBuilder();
         $stmt->select('sa.*', 'd.departure_date', 't.name as tour_name', 'h.Hoten as staff_name')
