@@ -17,7 +17,7 @@ class Model
             'dbname'    => $_ENV['DB_NAME'],
             'host'      => $_ENV['DB_HOST'],
             'driver'    => $_ENV['DB_DRIVER'],
-            'port'      => $_ENV['DB_PORT'],
+            'port'      => $_ENV['DB_PORT'],  
         ];
 
         try {

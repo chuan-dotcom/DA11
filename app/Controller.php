@@ -15,7 +15,7 @@ class Controller
         }
 
         return [];
-    }
+    } 
 
     public function logError($message)
     {
