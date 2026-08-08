@@ -2,7 +2,7 @@
 namespace App\Controllers\Admin;
   
 use App\Controller;
-use App\Models\Tour;
+use App\Models\Tour;  
 use App\Models\TourCategory;
 use App\Models\Booking;
 

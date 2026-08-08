@@ -5,7 +5,7 @@ namespace App\Controllers\Admin;
 use App\Controller;
 use App\Models\Departure;
 use App\Models\Tour;
-use App\Models\TourCategory;
+use App\Models\TourCategory;  
 use App\Models\StaffAssignment;
 use Rakit\Validation\Validator;
 use App\Models\Booking;
