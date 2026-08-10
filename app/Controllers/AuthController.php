@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Controller;
+use App\Controller; 
 use App\Models\User;
 use App\Support\Auth;
 use Rakit\Validation\Validator;
