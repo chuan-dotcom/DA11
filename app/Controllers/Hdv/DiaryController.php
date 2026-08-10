@@ -4,7 +4,7 @@ namespace App\Controllers\Hdv;
 
 use App\Controller;
 use App\Models\TourDiary;
-use App\Models\Departure;
+use App\Models\Departure;   
 use App\Models\Staff;
 use App\Models\TourLog;
 use App\Support\Auth;
