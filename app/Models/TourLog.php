@@ -11,7 +11,7 @@ class TourLog extends Model
         parent::__construct();
     }
 
-    public function getByDepartureId($departureId)
+    public function getByDepartureId($departureId)     
     {
         $stmt = $this->connection->createQueryBuilder();
         $stmt->select('tl.*', 'td.id AS diary_id', 'td.title AS diary_title')

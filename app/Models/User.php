@@ -15,7 +15,7 @@ class User extends Model
             ->orderBy('u.id', 'DESC');
 
         return $stmt->fetchAllAssociative();
-    }
+    }  
 
     public function findById($id)
     {

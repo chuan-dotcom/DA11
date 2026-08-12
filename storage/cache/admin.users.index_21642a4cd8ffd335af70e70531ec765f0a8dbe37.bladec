@@ -1,0 +1,573 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->startSection('title', $pageTitle . ' - ' . $title); ?>
+
+<?php $this->startSection('content'); ?>
+<style>
+ :root {
+ --um-primary: #2563eb;
+ --um-primary-soft: rgba(37, 99, 235, 0.1);
+ --um-success: #16a34a;
+ --um-success-soft: rgba(22, 163, 74, 0.1);
+ --um-warning: #d97706;
+ --um-warning-soft: rgba(217, 119, 6, 0.1);
+ --um-danger: #dc2626;
+ --um-danger-soft: rgba(220, 38, 38, 0.08);
+ --um-muted: #64748b;
+ --um-border: #e2e8f0;
+ --um-card: #ffffff;
+ }
+
+ .um-page {
+ max-width: 1400px;
+ margin-left: auto;
+ margin-right: auto;
+ }
+
+ .um-header-row {
+ display: flex;
+ align-items: flex-end;
+ justify-content: space-between;
+ gap: 1rem;
+ }
+
+ .um-title {
+ line-height: 1.15;
+ }
+
+ .um-subtitle {
+ color: var(--um-muted);
+ font-size: 0.95rem;
+ margin-top: 0.25rem;
+ font-weight: 500;
+ }
+
+ .um-stat-grid {
+ display: grid;
+ grid-template-columns: repeat(4, minmax(0, 1fr));
+ gap: 1rem;
+ margin-top: 1.5rem;
+ }
+
+ .um-stat-card {
+ background: var(--um-card);
+ border: 1px solid var(--um-border);
+ border-radius: 14px;
+ padding: 1rem 1.125rem;
+ box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+ display: flex;
+ align-items: center;
+ gap: 0.875rem;
+ }
+
+ .um-stat-icon {
+ width: 44px;
+ height: 44px;
+ border-radius: 12px;
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ font-size: 1.1rem;
+ flex-shrink: 0;
+ }
+
+ .um-stat-label {
+ color: var(--um-muted);
+ font-size: 0.8rem;
+ font-weight: 500;
+ margin-bottom: 0.15rem;
+ }
+
+ .um-stat-value {
+ font-weight: 800;
+ color: #0f172a;
+ font-size: 1.25rem;
+ line-height: 1.1;
+ }
+
+ .um-toolbar {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 0.75rem;
+ justify-content: flex-end;
+ }
+
+ .um-toolbar .btn {
+ border-radius: 0.75rem;
+ padding-inline: 1rem;
+ }
+
+ .um-card {
+ background: var(--um-card);
+ border: 1px solid var(--um-border);
+ border-radius: 16px;
+ box-shadow: 0 14px 40px rgba(15, 23, 42, 0.06);
+ overflow: hidden;
+ margin-top: 1.5rem;
+ }
+
+ .um-card-head {
+ padding: 1rem 1.25rem;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 1rem;
+ border-bottom: 1px solid var(--um-border);
+ background: linear-gradient(180deg, rgba(248,250,252,0.8) 0%, #ffffff 100%);
+ }
+
+ .um-card-title {
+ margin: 0;
+ font-size: 1rem;
+ font-weight: 700;
+ color: #0f172a;
+ }
+
+ .um-table-wrap {
+ padding: 0.75rem 1rem 1rem;
+ }
+
+ .um-table {
+ width: 100%;
+ border-collapse: separate;
+ border-spacing: 0;
+ font-size: 0.9rem;
+ }
+
+ .um-table thead th {
+ background: #0f172a;
+ color: #f8fafc;
+ text-align: left;
+ padding: 0.75rem 0.85rem;
+ font-weight: 600;
+ white-space: nowrap;
+ }
+
+ .um-table thead th:first-child {
+ border-top-left-radius: 10px;
+ }
+
+ .um-table thead th:last-child {
+ border-top-right-radius: 10px;
+ }
+
+ .um-table tbody td {
+ padding: 0.7rem 0.85rem;
+ border-bottom: 1px solid #f1f5f9;
+ vertical-align: middle;
+ }
+
+ .um-table tbody tr:last-child td {
+ border-bottom: none;
+ }
+
+ .um-table tbody tr:hover {
+ background: #f8fafc;
+ }
+
+ .um-checkbox {
+ width: 16px;
+ height: 16px;
+ cursor: pointer;
+ }
+
+ .um-avatar-sm {
+ width: 38px;
+ height: 38px;
+ border-radius: 50%;
+ object-fit: cover;
+ border: 1px solid var(--um-border);
+ flex-shrink: 0;
+ background: #f8fafc;
+ }
+
+ .um-avatar-placeholder {
+ width: 38px;
+ height: 38px;
+ border-radius: 50%;
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ background: #e0f2fe;
+ color: #0369a1;
+ border: 1px solid #bae6fd;
+ font-size: 1rem;
+ flex-shrink: 0;
+ }
+
+ .um-user-cell {
+ display: flex;
+ align-items: center;
+ gap: 0.75rem;
+ min-width: 0;
+ }
+
+ .um-user-meta {
+ min-width: 0;
+ }
+
+ .um-user-name {
+ font-weight: 600;
+ color: #0f172a;
+ text-decoration: none;
+ display: block;
+ line-height: 1.15;
+ }
+
+ .um-user-sub {
+ color: var(--um-muted);
+ font-size: 0.78rem;
+ margin-top: 0.1rem;
+ word-break: break-all;
+ line-height: 1.2;
+ }
+
+ .um-badge {
+ display: inline-flex;
+ align-items: center;
+ gap: 0.3rem;
+ padding: 0.3rem 0.65rem;
+ border-radius: 999px;
+ font-size: 0.76rem;
+ font-weight: 600;
+ white-space: nowrap;
+ }
+
+ .um-role-admin {
+ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ color: #fff;
+ }
+
+ .um-role-hdv {
+ background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+ color: #fff;
+ }
+
+ .um-role-user {
+ background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+ color: #fff;
+ }
+
+ .um-status-active {
+ background: var(--um-success-soft);
+ color: var(--um-success);
+ }
+
+ .um-status-locked {
+ background: #e2e8f0;
+ color: #334155;
+ }
+
+ .um-hdv-note {
+ margin-top: 0.35rem;
+ color: var(--um-muted);
+ font-size: 0.76rem;
+ }
+
+ .um-actions {
+ display: inline-flex;
+ align-items: center;
+ gap: 0.35rem;
+ }
+
+ .um-btn {
+ border-radius: 0.65rem;
+ padding: 0.32rem 0.7rem;
+ font-size: 0.8rem;
+ font-weight: 600;
+ border: 1px solid transparent;
+ text-decoration: none;
+ cursor: pointer;
+ line-height: 1.2;
+ white-space: nowrap;
+ }
+
+ .um-btn-view {
+ background: #ecfeff;
+ color: #0e7490;
+ border-color: #a5f3fc;
+ }
+ .um-btn-view:hover { color: #164e63; background: #cffafe; }
+
+ .um-btn-edit {
+ background: #fffbeb;
+ color: #b45309;
+ border-color: #fde68a;
+ }
+ .um-btn-edit:hover { color: #78350f; background: #fef3c7; }
+
+ .um-btn-delete {
+ background: #fef2f2;
+ color: #b91c1c;
+ border-color: #fecaca;
+ }
+ .um-btn-delete:hover { color: #7f1d1d; background: #fee2e2; }
+
+ .um-empty {
+ padding: 2.5rem 1rem;
+ text-align: center;
+ color: var(--um-muted);
+ }
+
+ .um-footer {
+ padding: 0.75rem 1.25rem;
+ border-top: 1px solid var(--um-border);
+ background: #f8fafc;
+ color: var(--um-muted);
+ font-size: 0.82rem;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ gap: 0.5rem;
+ }
+
+ @media (max-width: 1099.98px) {
+ .um-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ }
+
+ @media (max-width: 991.98px) {
+ .um-col-email, .um-col-phone { display: none; }
+ }
+
+ @media (max-width: 767.98px) {
+ .um-header-row { flex-direction: column; align-items: flex-start; }
+ .um-toolbar { width: 100%; justify-content: flex-start; }
+ .um-col-role { display: none; }
+ .um-actions { flex-wrap: wrap; }
+ }
+
+ @media (max-width: 575.98px) {
+ .um-stat-grid { grid-template-columns: 1fr; }
+ .um-card-head { flex-direction: column; align-items: flex-start; }
+ }
+</style>
+
+<div class="mt-4 um-page">
+ <div class="um-header-row">
+ <div>
+ <h2 class="mb-0 um-title">
+ <i class="bi bi-people-fill" style="color:#2563eb"></i> <?php echo \htmlentities($pageTitle ?? 'Quản lý tài khoản'??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </h2>
+ <div class="um-subtitle">
+ <?php echo \htmlentities($title??'', ENT_QUOTES, 'UTF-8', false); ?> &nbsp;·&nbsp; Quản trị danh sách, vai trò, trạng thái và liên kết hồ sơ HDV.
+ </div>
+ </div>
+ <div class="um-toolbar">
+ <a href="<?php echo \htmlentities(route('admin/users/create')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-primary">
+ <i class="bi bi-person-plus-fill"></i> Thêm mới tài khoản
+ </a>
+ <button type="submit" form="bulkDeleteForm" class="btn btn-danger">
+ <i class="bi bi-trash-fill"></i> Xóa tài khoản đã chọn
+ </button>
+ </div>
+ </div>
+
+ <?php 
+ $stats = $stats ?? [
+ 'total' => count($users ?? []),
+ 'active' => count(array_filter($users ?? [], static fn ($u) => ($u['status'] ?? 0) == 1)),
+ 'admin' => count(array_filter($users ?? [], static fn ($u) => ($u['role'] ?? '') === 'admin')),
+ 'hdv' => count(array_filter($users ?? [], static fn ($u) => ($u['role'] ?? '') === 'hdv')),
+ ];
+ ?>
+
+ <div class="um-stat-grid">
+ <div class="um-stat-card">
+ <span class="um-stat-icon" style="background:var(--um-primary-soft);color:var(--um-primary);">
+ <i class="bi bi-people"></i>
+ </span>
+ <div>
+ <div class="um-stat-label">Tổng tài khoản</div>
+ <div class="um-stat-value"><?php echo \htmlentities($stats['total']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ </div>
+ <div class="um-stat-card">
+ <span class="um-stat-icon" style="background:var(--um-success-soft);color:var(--um-success);">
+ <i class="bi bi-check-circle"></i>
+ </span>
+ <div>
+ <div class="um-stat-label">Đang hoạt động</div>
+ <div class="um-stat-value"><?php echo \htmlentities($stats['active']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ </div>
+ <div class="um-stat-card">
+ <span class="um-stat-icon" style="background:#ede9fe;color:#7c3aed;">
+ <i class="bi bi-shield-check"></i>
+ </span>
+ <div>
+ <div class="um-stat-label">Quản trị viên</div>
+ <div class="um-stat-value"><?php echo \htmlentities($stats['admin']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ </div>
+ <div class="um-stat-card">
+ <span class="um-stat-icon" style="background:#cffafe;color:#0891b2;">
+ <i class="bi bi-person-badge"></i>
+ </span>
+ <div>
+ <div class="um-stat-label">HDV / Liên kết</div>
+ <div class="um-stat-value"><?php echo \htmlentities($stats['hdv']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ </div>
+ </div>
+
+ <form id="bulkDeleteForm" action="<?php echo \htmlentities(route('admin/users/delete-multiple')??'', ENT_QUOTES, 'UTF-8', false); ?>" method="POST">
+ <div class="um-card">
+ <div class="um-card-head">
+ <h3 class="um-card-title">
+ <i class="bi bi-list-ul me-1"></i> Danh sách tài khoản
+ </h3>
+ <small style="color:var(--um-muted);">
+ Có thể chọn nhiều hàng và dùng “Xóa tài khoản đã chọn” để xóa hàng loạt.
+ </small>
+ </div>
+ <div class="um-table-wrap">
+ <div class="table-responsive">
+ <table class="um-table">
+ <thead>
+ <tr>
+ <th style="width:42px" class="text-center">
+ <input type="checkbox" id="selectAllUsers" class="um-checkbox" />
+ </th>
+ <th style="width:72px">ID</th>
+ <th>Tài khoản</th>
+ <th class="um-col-email" style="width:220px">Email</th>
+ <th class="um-col-phone" style="width:130px">Điện thoại</th>
+ <th class="um-col-role" style="width:180px">Vai trò</th>
+ <th style="width:130px">Trạng thái</th>
+ <th style="width:250px" class="text-center">Thao tác</th>
+ </tr>
+ </thead>
+ <tbody>
+ <?php if(empty($users)): ?>
+ <tr>
+ <td colspan="8" class="um-empty">
+ <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+ Chưa có tài khoản nào
+ </td>
+ </tr>
+ <?php else: ?>
+ <?php $__currentLoopData = $users; $this->addLoop($__currentLoopData);$this->getFirstLoop();
+ foreach($__currentLoopData as $user): $loop = $this->incrementLoopIndices();  ?>
+ <tr>
+ <td class="text-center">
+ <input type="checkbox" name="ids[]" value="<?php echo \htmlentities($user['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" class="um-checkbox" />
+ </td>
+ <td class="fw-semibold text-center"><?php echo \htmlentities($user['id']??'', ENT_QUOTES, 'UTF-8', false); ?></td>
+ <td>
+ <div class="um-user-cell">
+ <?php if(!empty($user['avatar'])): ?>
+ <img src="<?php echo \htmlentities(file_url($user['avatar'])??'', ENT_QUOTES, 'UTF-8', false); ?>" alt="<?php echo \htmlentities($user['name']??'', ENT_QUOTES, 'UTF-8', false); ?>" class="um-avatar-sm">
+ <?php else: ?>
+ <span class="um-avatar-placeholder">
+ <i class="bi bi-person"></i>
+ </span>
+ <?php endif; ?>
+ <div class="um-user-meta">
+ <a href="<?php echo \htmlentities(route('admin/users/show/' . $user['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>" class="um-user-name">
+ <?php echo \htmlentities($user['name']??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </a>
+ <span class="um-user-sub d-md-none">
+ <?php echo \htmlentities($user['email']??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ <?php if(!empty($user['phone'])): ?> · <?php echo \htmlentities($user['phone']??'', ENT_QUOTES, 'UTF-8', false); ?> <?php endif; ?>
+ </span>
+ </div>
+ </div>
+ </td>
+ <td class="um-col-email" style="color:var(--um-muted);word-break:break-all;">
+ <?php echo \htmlentities($user['email']??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </td>
+ <td class="um-col-phone">
+ <?php echo \htmlentities(!empty($user['phone']) ? $user['phone'] : '<span style="color:#94a3b8">—</span>'??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </td>
+ <td class="um-col-role">
+ <?php 
+ $roleClass = 'um-role-user';
+ $roleIcon = 'bi-person';
+ $roleLabel = 'User';
+ if ($user['role'] === 'admin') {
+ $roleClass = 'um-role-admin';
+ $roleIcon = 'bi-shield-check';
+ $roleLabel = 'Admin';
+ } elseif ($user['role'] === 'hdv') {
+ $roleClass = 'um-role-hdv';
+ $roleIcon = 'bi-person-badge';
+ $roleLabel = 'HDV';
+ }
+ ?>
+ <span class="um-badge <?php echo \htmlentities($roleClass??'', ENT_QUOTES, 'UTF-8', false); ?>">
+ <i class="bi <?php echo \htmlentities($roleIcon??'', ENT_QUOTES, 'UTF-8', false); ?>"></i><?php echo \htmlentities($roleLabel??'', ENT_QUOTES, 'UTF-8', false); ?>
+
+ </span>
+ <?php if($user['role'] === 'hdv' && !empty($user['hdv_name'])): ?>
+ <div class="um-hdv-note">Gắn với: <?php echo \htmlentities($user['hdv_name']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ <?php endif; ?>
+ </td>
+ <td>
+ <?php if($user['status'] == 1): ?>
+ <span class="um-badge um-status-active">
+ <i class="bi bi-check-circle"></i> Hoạt động
+ </span>
+ <?php else: ?>
+ <span class="um-badge um-status-locked">
+ <i class="bi bi-lock"></i> Khóa
+ </span>
+ <?php endif; ?>
+ </td>
+ <td class="text-center">
+ <div class="um-actions justify-content-center">
+ <a href="<?php echo \htmlentities(route('admin/users/show/' . $user['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ class="um-btn um-btn-view"
+ title="Xem chi tiết">
+ <i class="bi bi-eye"></i> Xem
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/users/edit/' . $user['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ class="um-btn um-btn-edit"
+ title="Sửa">
+ <i class="bi bi-pencil"></i> Sửa
+ </a>
+ <a href="<?php echo \htmlentities(route('admin/users/delete/' . $user['id'])??'', ENT_QUOTES, 'UTF-8', false); ?>"
+ class="um-btn um-btn-delete"
+ title="Xóa"
+ onclick="return confirm('Bạn có chắc muốn xóa tài khoản này? Hành động này không thể hoàn tác!')">
+ <i class="bi bi-trash"></i> Xóa
+ </a>
+ </div>
+ </td>
+ </tr>
+ <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
+ <?php endif; ?>
+ </tbody>
+ </table>
+ </div>
+ </div>
+ <div class="um-footer">
+ <span>
+ <i class="bi bi-info-circle me-1"></i>
+ Tổng số tài khoản: <strong><?php echo \htmlentities(count($users)??'', ENT_QUOTES, 'UTF-8', false); ?></strong>
+ </span>
+ <small>Cập nhật lúc: <?php echo \htmlentities(date('d/m/Y H:i')??'', ENT_QUOTES, 'UTF-8', false); ?></small>
+ </div>
+ </div>
+ </form>
+</div>
+<?php $this->stopSection(); ?>
+
+<?php $this->startSection('scripts'); ?>
+<script>
+ (function () {
+ const selectAll = document.getElementById('selectAllUsers');
+ const boxes = document.querySelectorAll('input[name="ids[]"]');
+ selectAll?.addEventListener('change', function () {
+ const checked = this.checked;
+ boxes?.forEach(function (checkbox) { checkbox.checked = checked; });
+ });
+ })();
+</script>
+<?php $this->stopSection(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->runChild('layouts.admin'); } ?>

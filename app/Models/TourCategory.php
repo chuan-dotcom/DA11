@@ -7,7 +7,7 @@ class TourCategory extends Model{
     public function getAll() {
         $stmt=$this->connection->createQueryBuilder();
         $stmt->select('*')
-            ->from('tour_categories');
+            ->from('tour_categories');    
         
         return $stmt->fetchAllAssociative();
     }

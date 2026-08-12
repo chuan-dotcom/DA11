@@ -5,8 +5,8 @@ namespace App\Models;
 use App\Model;
 
 class Staff extends Model
-{  
-    public function getAll()
+{     
+    public function getAll()    
     {
         $stmt = $this->connection->createQueryBuilder();
         $stmt->select('h.*')
