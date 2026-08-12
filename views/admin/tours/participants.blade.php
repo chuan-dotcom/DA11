@@ -116,6 +116,11 @@
                         <i class="bi bi-upc-scan"></i>
                         Mã tour #{{ $tour['id'] }}
                     </span>
+                    <span>
+                        <i class="bi bi-people-fill"></i>
+                        Tối đa:
+                        <b>{{ !empty($tour['max_participants']) ? number_format($tour['max_participants']) . ' người' : 'Không giới hạn' }}</b>
+                    </span>
                     @if($tour['status'] == 1)
                         <span class="badge badge-pill bg-light text-dark">
                             <i class="bi bi-eye"></i> Hiển thị
@@ -200,6 +205,52 @@
                 </div>
             </div>
         </div>
+        @php
+            $maxP = (int)($tour['max_participants'] ?? 0);
+            $confirmedP = (int)($stats['confirmed_people'] ?? 0);
+            if ($maxP > 0) {
+                $remainingP = max($maxP - $confirmedP, 0);
+                $percentP = min(round(($confirmedP / $maxP) * 100), 100);
+            }
+        @endphp
+        @if($maxP > 0)
+        <div class="col-6 col-md-3">
+            <div class="stat-card d-flex align-items-center gap-3">
+                <div class="stat-icon" style="background:{{ $remainingP <= 0 ? '#ef4444' : ($remainingP <= 5 ? '#f59e0b' : '#14b8a6') }};">
+                    <i class="bi bi-person-dash"></i>
+                </div>
+                <div>
+                    <div class="stat-value" style="color:{{ $remainingP <= 0 ? '#ef4444' : ($remainingP <= 5 ? '#f59e0b' : '#14b8a6') }};">
+                        {{ $remainingP }} / {{ $maxP }}
+                    </div>
+                    <div class="stat-label">Chỗ trống / Tối đa</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card d-flex align-items-center gap-3">
+                <div class="stat-icon" style="background:#6366f1;">
+                    <i class="bi bi-pie-chart-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ $percentP }}%</div>
+                    <div class="stat-label">Độ đầy (đã xác nhận)</div>
+                </div>
+            </div>
+        </div>
+        @else
+        <div class="col-12 col-md-6">
+            <div class="stat-card d-flex align-items-center gap-3">
+                <div class="stat-icon" style="background:#6366f1;">
+                    <i class="bi bi-infinity"></i>
+                </div>
+                <div>
+                    <div class="stat-value text-primary">Không giới hạn</div>
+                    <div class="stat-label">Số lượng người tham gia</div>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 
     <div class="card">

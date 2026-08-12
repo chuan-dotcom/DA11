@@ -40,6 +40,7 @@ class TourController extends Controller{
             'price' =>$_POST['price'],
             'duration' =>$_POST['duration'],
             'location' =>$_POST['location'] ?? null,
+            'max_participants' =>$_POST['max_participants'] ?? 0,
             'description' =>$_POST['description'],
             'status' =>$_POST['status'],
         ];
@@ -49,6 +50,7 @@ class TourController extends Controller{
             'category_id' =>'required|integer',
             'price' =>'required|numeric',
             'duration' =>'required',
+            'max_participants' =>'integer|min:0',
             'status' =>'required',
         ];
 
@@ -87,6 +89,7 @@ class TourController extends Controller{
             'price' =>$_POST['price'],
             'duration' =>$_POST['duration'],
             'location' =>$_POST['location'] ?? null,
+            'max_participants' =>$_POST['max_participants'] ?? 0,
             'description' =>$_POST['description'],
             'status' =>$_POST['status'],
         ];
@@ -96,6 +99,7 @@ class TourController extends Controller{
             'category_id' =>'required|integer',
             'price' =>'required|numeric',
             'duration' =>'required',
+            'max_participants' =>'integer|min:0',
             'status' =>'required',
         ];
 
@@ -143,7 +147,9 @@ class TourController extends Controller{
             return redirect('admin/tours');
         }
 
-        return view('admin.tours.show', compact('title', 'tour'));
+        $stats = $this->modelBooking->getTourParticipantsStats($id);
+
+        return view('admin.tours.show', compact('title', 'tour', 'stats'));
     }
 
     /**

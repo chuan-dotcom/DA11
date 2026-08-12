@@ -91,6 +91,24 @@
                         </div>
                     </div>
                     <div class="col-6">
+                        <div class="info-label">Địa điểm</div>
+                        <div class="info-value">
+                            <i class="bi bi-geo-alt"></i>
+                            {{ !empty($tour['location']) ? $tour['location'] : 'Chưa cập nhật' }}
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="info-label">Số khách tối đa</div>
+                        <div class="info-value">
+                            <i class="bi bi-people-fill"></i>
+                            @if(!empty($tour['max_participants']))
+                                {{ number_format($tour['max_participants']) }} người
+                            @else
+                                <span class="text-muted">Không giới hạn</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-6">
                         <div class="info-label">Trạng thái</div>
                         <div class="info-value">
                             @if($tour['status'] == 1)
@@ -105,6 +123,72 @@
                         <div class="info-value">#{{ $tour['id'] }}</div>
                     </div>
                 </div>
+
+                @php
+                    $confirmed = (int)($stats['confirmed_people'] ?? 0);
+                    $pending = (int)($stats['pending_people'] ?? 0);
+                    $total = $confirmed + $pending;
+                    $max = (int)($tour['max_participants'] ?? 0);
+                    if ($max > 0) {
+                        $percent = min(round(($confirmed / $max) * 100), 100);
+                        $remaining = max($max - $confirmed, 0);
+                        if ($percent >= 90) {
+                            $barClass = 'bg-danger';
+                            $badgeClass = 'bg-danger';
+                        } elseif ($percent >= 70) {
+                            $barClass = 'bg-warning';
+                            $badgeClass = 'bg-warning text-dark';
+                        } else {
+                            $barClass = 'bg-success';
+                            $badgeClass = 'bg-success';
+                        }
+                    }
+                @endphp
+                @if($max > 0 || $total > 0)
+                <div class="mt-3 p-3 rounded" style="background:#f8fafc;border:1px solid #e5e7eb;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-semibold text-dark">
+                            <i class="bi bi-person-check"></i> Tình hình đặt chỗ
+                        </div>
+                        <div>
+                            @if($max > 0)
+                                <span class="badge {{ $badgeClass }}">
+                                    Còn {{ $remaining }} / {{ $max }} chỗ
+                                </span>
+                            @else
+                                <span class="badge bg-info">Không giới hạn</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-auto">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                <i class="bi bi-check-circle-fill"></i> Đã xác nhận: <b>{{ $confirmed }}</b>
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                <i class="bi bi-hourglass-split"></i> Chờ xác nhận: <b>{{ $pending }}</b>
+                            </span>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <span class="text-muted small">Tổng đăng ký: <b class="text-dark">{{ $total }}</b></span>
+                        </div>
+                    </div>
+                    @if($max > 0)
+                    <div class="progress" style="height:10px;border-radius:999px;">
+                        <div class="progress-bar {{ $barClass }} progress-bar-striped" 
+                             role="progressbar" 
+                             style="width:{{ $percent }}%;border-radius:999px;"
+                             aria-valuenow="{{ $percent }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <div class="mt-1 small text-muted text-end">{{ $percent }}% chỗ đã được xác nhận</div>
+                    @endif
+                </div>
+                @endif
 
                 <hr>
 

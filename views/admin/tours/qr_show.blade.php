@@ -120,6 +120,24 @@
                     </div>
                 </div>
                 <div class="meta-item">
+                    <div class="label">Địa điểm</div>
+                    <div class="value">
+                        <i class="bi bi-geo-alt"></i>
+                        {{ !empty($tour['location']) ? $tour['location'] : 'Chưa cập nhật' }}
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="label">Số khách tối đa</div>
+                    <div class="value">
+                        <i class="bi bi-people-fill"></i>
+                        @if(!empty($tour['max_participants']))
+                            {{ number_format($tour['max_participants']) }} người
+                        @else
+                            Không giới hạn
+                        @endif
+                    </div>
+                </div>
+                <div class="meta-item">
                     <div class="label">Trạng thái</div>
                     <div class="value">
                         @if($tour['status'] == 1)

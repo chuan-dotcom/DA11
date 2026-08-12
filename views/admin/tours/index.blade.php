@@ -78,6 +78,7 @@
                             <th>Danh mục</th>
                             <th>Giá</th>
                             <th>Thời gian</th>
+                            <th>Số người (tối đa)</th>
                             <th>Trạng thái</th>
                             <th>Thao tác</th>
                         </tr>
@@ -85,7 +86,7 @@
                     <tbody>
                         @if(empty($tours))
                             <tr>
-                                <td colspan="9" class="text-center">Chưa có tour nào</td>
+                                <td colspan="10" class="text-center">Chưa có tour nào</td>
                             </tr>
                         @else
                             @foreach($tours as $tour)
@@ -118,6 +119,17 @@
                                     <td>{{ $tour['category_name'] }}</td>
                                     <td class="text-danger">{{ number_format($tour['price']) }} VNĐ</td>
                                     <td>{{ $tour['duration'] }}</td>
+                                    <td>
+                                        @if(!empty($tour['max_participants']))
+                                            <span class="badge bg-primary">
+                                                <i class="bi bi-people me-1"></i>{{ number_format($tour['max_participants']) }}
+                                            </span>
+                                        @else
+                                            <span class="badge bg-info text-dark">
+                                                <i class="bi bi-infinity me-1"></i>Không giới hạn
+                                            </span>
+                                        @endif
+                                    </td>
                                     <td>
                                         @if($tour['status'] == 1)
                                             <span class="badge bg-success">Hiển thị</span>

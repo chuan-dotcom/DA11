@@ -8,6 +8,7 @@ class Tour extends Model{
     {
         parent::__construct();
         $this->ensureLocationColumn();
+        $this->ensureMaxParticipantsColumn();
     }
 
     private function ensureLocationColumn()
@@ -21,6 +22,23 @@ class Tour extends Model{
             if (!$column) {
                 $this->connection->executeStatement(
                     "ALTER TABLE tours ADD COLUMN location VARCHAR(255) NULL AFTER duration"
+                );
+            }
+        } catch (\Throwable $e) {
+        }
+    }
+
+    private function ensureMaxParticipantsColumn()
+    {
+        try {
+            $column = $this->connection->fetchAssociative(
+                'SHOW COLUMNS FROM tours LIKE ?',
+                ['max_participants']
+            );
+
+            if (!$column) {
+                $this->connection->executeStatement(
+                    "ALTER TABLE tours ADD COLUMN max_participants INT NOT NULL DEFAULT 0 AFTER location"
                 );
             }
         } catch (\Throwable $e) {
@@ -66,6 +84,7 @@ class Tour extends Model{
             'price' =>$data['price'],
             'duration' =>$data['duration'],
             'location' =>$data['location'] ?? null,
+            'max_participants' => !empty($data['max_participants']) ? (int)$data['max_participants'] : 0,
             'description' =>$data['description'],
             'image' =>$data['image'],
             'status' =>$data['status'],
@@ -79,6 +98,7 @@ class Tour extends Model{
             'price' =>$data['price'],
             'duration' =>$data['duration'],
             'location' =>$data['location'] ?? null,
+            'max_participants' => !empty($data['max_participants']) ? (int)$data['max_participants'] : 0,
             'description' =>$data['description'],
             'image' =>$data['image'],
             'status' =>$data['status'],

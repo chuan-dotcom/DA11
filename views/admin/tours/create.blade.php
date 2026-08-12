@@ -41,6 +41,10 @@
                             <label for="location" class="form-label">Địa điểm tour</label>
                             <input type="text" class="form-control" id="location" name="location" placeholder="Ví dụ: Sapa, Ninh Bình, Đà Lạt">
                         </div>
+                        <div class="mb-3">
+                            <label for="max_participants" class="form-label">Số lượng người tối đa</label>
+                            <input type="number" class="form-control" id="max_participants" name="max_participants" min="0" placeholder="Ví dụ: 20 (để 0 nếu không giới hạn)">
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">
