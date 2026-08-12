@@ -1,0 +1,226 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->startSection('title', $title); ?>
+
+<?php $this->startSection('content'); ?>
+
+<div class="hdv-card mb-4">
+ <div class="d-flex justify-content-between align-items-center">
+ <h4 class="fw-bold text-dark mb-0"><i class="bi bi-pencil-square text-primary me-2"></i> <?php echo \htmlentities($title??'', ENT_QUOTES, 'UTF-8', false); ?></h4>
+ <a href="<?php echo \htmlentities(route('hdv/nhat-ky-tour')??'', ENT_QUOTES, 'UTF-8', false); ?>" class="btn btn-outline-secondary rounded-pill px-3">
+ <i class="bi bi-arrow-left me-1"></i> Quay lại
+ </a>
+ </div>
+</div>
+
+<div class="hdv-card">
+ <?php 
+ $initialDiaryDate = old('diary_date', !empty($selectedDeparture['departure_date']) ? $selectedDeparture['departure_date'] : '');
+ $initialStartDate = $selectedDeparture['departure_date'] ?? '';
+ $initialEndDate = $selectedDeparture['return_date'] ?? $initialStartDate;
+ ?>
+ <form method="POST" action="<?php echo \htmlentities(route('hdv/nhat-ky-tour/store')??'', ENT_QUOTES, 'UTF-8', false); ?>" enctype="multipart/form-data">
+ <div class="row g-3">
+ <!-- Chọn chuyến khởi hành -->
+ <div class="col-md-6">
+ <label class="form-label fw-bold">Chuyến khởi hành phân công <span class="text-danger">*</span></label>
+ <select name="departure_id" id="diary-departure" class="form-select" required>
+ <option value="">-- Chọn tour bạn được phân công --</option>
+ <?php $__currentLoopData = $departures; $this->addLoop($__currentLoopData);$this->getFirstLoop();
+ foreach($__currentLoopData as $d): $loop = $this->incrementLoopIndices();  ?>
+ <?php $selId = old('departure_id', $selectedDepartureId ?? null);  ?>
+ <option value="<?php echo \htmlentities($d['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" data-start-date="<?php echo \htmlentities($d['departure_date']??'', ENT_QUOTES, 'UTF-8', false); ?>" data-end-date="<?php echo \htmlentities($d['return_date'] ?: $d['departure_date']??'', ENT_QUOTES, 'UTF-8', false); ?>" <?php echo \htmlentities((int) $selId === (int) $d['id'] ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>
+ #<?php echo \htmlentities($d['id']??'', ENT_QUOTES, 'UTF-8', false); ?> - <?php echo \htmlentities($d['tour_name']??'', ENT_QUOTES, 'UTF-8', false); ?> - <?php echo \htmlentities($d['category_name'] ?? 'Chưa phân loại'??'', ENT_QUOTES, 'UTF-8', false); ?> (<?php echo \htmlentities(date('d/m/Y', strtotime($d['departure_date']))??'', ENT_QUOTES, 'UTF-8', false); ?>)
+ </option>
+ <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
+ </select>
+ </div>
+
+ <!-- Ngày nhật ký -->
+ <div class="col-md-6">
+ <label class="form-label fw-bold">Ngày ghi nhật ký <span class="text-danger">*</span></label>
+ <input type="date" name="diary_date" id="diary-date" class="form-control" value="<?php echo \htmlentities($initialDiaryDate??'', ENT_QUOTES, 'UTF-8', false); ?>" min="<?php echo \htmlentities($initialStartDate??'', ENT_QUOTES, 'UTF-8', false); ?>" max="<?php echo \htmlentities($initialEndDate??'', ENT_QUOTES, 'UTF-8', false); ?>" required>
+ <div id="diary-date-help" class="form-text">Chọn chuyến để xác định ngày hợp lệ.</div>
+ </div>
+
+ <div class="col-12">
+ <label class="form-label fw-bold">Liên kết mốc hoạt động <span class="text-muted fw-normal">(không bắt buộc)</span></label>
+ <select name="tour_log_id" id="diary-tour-log" class="form-select">
+ <option value="">-- Chọn hoạt động trong timeline --</option>
+ <?php $__currentLoopData = $timelineLogs; $this->addLoop($__currentLoopData);$this->getFirstLoop();
+ foreach($__currentLoopData as $log): $loop = $this->incrementLoopIndices();  ?>
+ <option value="<?php echo \htmlentities($log['id']??'', ENT_QUOTES, 'UTF-8', false); ?>" data-departure-id="<?php echo \htmlentities($log['departure_id']??'', ENT_QUOTES, 'UTF-8', false); ?>" data-log-date="<?php echo \htmlentities(date('Y-m-d', strtotime($log['log_date']))??'', ENT_QUOTES, 'UTF-8', false); ?>" <?php echo \htmlentities((int) old('tour_log_id', 0) === (int) $log['id'] ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>
+ <?php echo \htmlentities(date('d/m/Y H:i', strtotime($log['log_date']))??'', ENT_QUOTES, 'UTF-8', false); ?> — <?php echo \htmlentities($log['title']??'', ENT_QUOTES, 'UTF-8', false); ?><?php if(!empty($log['location'])): ?> (<?php echo \htmlentities($log['location']??'', ENT_QUOTES, 'UTF-8', false); ?>) <?php endif; ?>
+ </option>
+ <?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>
+ </select>
+ <div class="form-text">Chọn mốc để liên kết nhật ký này với hoạt động thực tế của chuyến đi.</div>
+ </div>
+
+ <?php if(!empty($selectedDeparture)): ?>
+ <div class="col-12">
+ <div class="alert alert-info mb-0">
+ <div class="fw-bold mb-1">Chuyến đang chọn</div>
+ <div>Tour: <strong><?php echo \htmlentities($selectedDeparture['tour_name']??'', ENT_QUOTES, 'UTF-8', false); ?></strong></div>
+ <div>Danh mục: <strong><?php echo \htmlentities($selectedDeparture['category_name'] ?? 'Chưa phân loại'??'', ENT_QUOTES, 'UTF-8', false); ?></strong></div>
+ <div>Đoàn: <strong><?php echo \htmlentities($selectedDeparture['group_name'] ?: ('Chuyến #' . $selectedDeparture['id'])??'', ENT_QUOTES, 'UTF-8', false); ?></strong></div>
+ <div>Thời gian: <strong><?php echo \htmlentities(!empty($selectedDeparture['departure_date']) ? date('d/m/Y', strtotime($selectedDeparture['departure_date'])) : 'Chưa có'??'', ENT_QUOTES, 'UTF-8', false); ?></strong><?php if(!empty($selectedDeparture['return_date'])): ?> - <strong><?php echo \htmlentities(date('d/m/Y', strtotime($selectedDeparture['return_date']))??'', ENT_QUOTES, 'UTF-8', false); ?></strong><?php endif; ?></div>
+ </div>
+ </div>
+ <?php endif; ?>
+
+ <!-- Tiêu đề -->
+ <div class="col-12">
+ <label class="form-label fw-bold">Tiêu đề bài viết <span class="text-danger">*</span></label>
+ <input type="text" name="title" class="form-control" value="<?php echo \htmlentities(old('title')??'', ENT_QUOTES, 'UTF-8', false); ?>" placeholder="Ví dụ: Ngày 1 - Đón đoàn và ổn định lịch trình" required>
+ </div>
+
+ <!-- Thời tiết & Tâm trạng -->
+ <div class="col-md-6">
+ <label class="form-label fw-bold">Thời tiết trong ngày</label>
+ <input type="text" name="weather" class="form-control" value="<?php echo \htmlentities(old('weather')??'', ENT_QUOTES, 'UTF-8', false); ?>" placeholder="Nắng nhẹ, Nắng mát, Mưa rào...">
+ </div>
+
+ <div class="col-md-6">
+ <label class="form-label fw-bold">Tâm trạng / Không khí đoàn</label>
+ <input type="text" name="mood" class="form-control" value="<?php echo \htmlentities(old('mood')??'', ENT_QUOTES, 'UTF-8', false); ?>" placeholder="Hào hứng, Vui vẻ, Mệt mỏi nhẹ...">
+ </div>
+
+
+ <?php if(!empty($selectedDeparture)): ?>
+ <div class="col-12">
+ <div class="alert alert-info mb-0">
+ <div class="fw-bold mb-1">Chuyến đang chọn</div>
+ <div>Tour: <strong><?php echo \htmlentities($selectedDeparture['tour_name']??'', ENT_QUOTES, 'UTF-8', false); ?></strong></div>
+ <div>Danh mục: <strong><?php echo \htmlentities($selectedDeparture['category_name'] ?? 'Chưa phân loại'??'', ENT_QUOTES, 'UTF-8', false); ?></strong></div>
+ <div>Đoàn: <strong><?php echo \htmlentities($selectedDeparture['group_name'] ?: ('Chuyến #' . $selectedDeparture['id'])??'', ENT_QUOTES, 'UTF-8', false); ?></strong></div>
+ <div>Thời gian: <strong><?php echo \htmlentities(!empty($selectedDeparture['departure_date']) ? date('d/m/Y', strtotime($selectedDeparture['departure_date'])) : 'Chưa có'??'', ENT_QUOTES, 'UTF-8', false); ?></strong><?php if(!empty($selectedDeparture['return_date'])): ?> - <strong><?php echo \htmlentities(date('d/m/Y', strtotime($selectedDeparture['return_date']))??'', ENT_QUOTES, 'UTF-8', false); ?></strong><?php endif; ?></div>
+ </div>
+ </div>
+ <?php endif; ?>
+
+ <!-- Tiêu đề -->
+ <div class="col-12">
+ <label class="form-label fw-bold">Tiêu đề bài viết <span class="text-danger">*</span></label>
+ <input type="text" name="title" class="form-control" value="<?php echo \htmlentities(old('title')??'', ENT_QUOTES, 'UTF-8', false); ?>" placeholder="Ví dụ: Ngày 1 - Đón đoàn và ổn định lịch trình" required>
+ </div>
+
+ <!-- Thời tiết & Tâm trạng -->
+ <div class="col-md-6">
+ <label class="form-label fw-bold">Thời tiết trong ngày</label>
+ <input type="text" name="weather" class="form-control" value="<?php echo \htmlentities(old('weather')??'', ENT_QUOTES, 'UTF-8', false); ?>" placeholder="Nắng nhẹ, Nắng mát, Mưa rào...">
+ </div>
+
+ <div class="col-md-6">
+ <label class="form-label fw-bold">Tâm trạng / Không khí đoàn</label>
+ <input type="text" name="mood" class="form-control" value="<?php echo \htmlentities(old('mood')??'', ENT_QUOTES, 'UTF-8', false); ?>" placeholder="Hào hứng, Vui vẻ, Mệt mỏi nhẹ...">
+ </div>
+
+ <!-- Nội dung chi tiết -->
+ <div class="col-12">
+ <label class="form-label fw-bold">Nội dung nhật ký chi tiết <span class="text-danger">*</span></label>
+ <textarea name="content" class="form-control" rows="6" placeholder="Ghi chép tình hình đoàn, tiến độ lịch trình, sự cố nếu có..." required><?php echo \htmlentities(old('content')??'', ENT_QUOTES, 'UTF-8', false); ?></textarea>
+ </div>
+
+ <!-- Ảnh minh họa & Bằng chứng thực địa -->
+ <div class="col-12">
+ <label class="form-label fw-bold">Hình ảnh thực địa / Bằng chứng chuyến đi (Có thể chọn nhiều ảnh)</label>
+ <input type="file" name="photos[]" class="form-control" multiple accept="image/*">
+ </div>
+
+ <!-- Chi phí thực tế & Chi phí phát sinh -->
+ <div class="col-md-4">
+ <label class="form-label fw-bold">Chi phí thực tế tại mốc (VNĐ)</label>
+ <div class="input-group">
+ <input type="number" name="actual_cost" class="form-control" value="<?php echo \htmlentities(old('actual_cost')??'', ENT_QUOTES, 'UTF-8', false); ?>" placeholder="Ví dụ: 4500000" min="0" step="1000">
+ <span class="input-group-text">VNĐ</span>
+ </div>
+ </div>
+ <div class="col-md-4">
+ <label class="form-label fw-bold">Chi phí phát sinh (nếu có)</label>
+ <div class="input-group">
+ <input type="number" name="expense_amount" class="form-control" value="<?php echo \htmlentities(old('expense_amount')??'', ENT_QUOTES, 'UTF-8', false); ?>" placeholder="Ví dụ: 500000" min="0" step="1000">
+ <span class="input-group-text">VNĐ</span>
+ </div>
+ </div>
+ <div class="col-md-4">
+ <label class="form-label fw-bold">Loại chi phí</label>
+ <select name="expense_category" class="form-select">
+ <option value="">-- Không có chi phí --</option>
+ <option value="Vé máy bay / Phương tiện" <?php echo \htmlentities(old('expense_category') === 'Vé máy bay / Phương tiện' ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>✈️ Vé máy bay / Đò / Tàu hỏa</option>
+ <option value="Lưu trú / Khách sạn" <?php echo \htmlentities(old('expense_category') === 'Lưu trú / Khách sạn' ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>🏨 Lưu trú / Khách sạn</option>
+ <option value="Di chuyển / Cầu đường" <?php echo \htmlentities(old('expense_category') === 'Di chuyển / Cầu đường' ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>🚗 Di chuyển / Cầu đường / Xăng xe</option>
+ <option value="Ăn uống" <?php echo \htmlentities(old('expense_category') === 'Ăn uống' ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>🍲 Ăn uống</option>
+ <option value="Vé tham quan" <?php echo \htmlentities(old('expense_category') === 'Vé tham quan' ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>🎟️ Vé tham quan</option>
+ <option value="Khác" <?php echo \htmlentities(old('expense_category') === 'Khác' ? 'selected' : ''??'', ENT_QUOTES, 'UTF-8', false); ?>>⭐ Khác</option>
+ </select>
+ </div>
+
+ <div class="col-12 text-end mt-4">
+ <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold">
+ <i class="bi bi-save me-1"></i> Lưu
+ </button>
+ </div>
+ </div>
+ </form>
+</div>
+
+<script>
+ (function () {
+ const departureSelect = document.getElementById('diary-departure');
+ const diaryDate = document.getElementById('diary-date');
+ const dateHelp = document.getElementById('diary-date-help');
+ const timelineSelect = document.getElementById('diary-tour-log');
+
+ function updateTimelineOptions() {
+ const departureId = departureSelect.value;
+ Array.from(timelineSelect.options).forEach(function (option, index) {
+ if (index === 0) return;
+ const belongsToDeparture = option.dataset.departureId === departureId;
+ option.hidden = !belongsToDeparture;
+ option.disabled = !belongsToDeparture;
+ });
+ if (timelineSelect.selectedIndex > 0 && timelineSelect.options[timelineSelect.selectedIndex].disabled) {
+ timelineSelect.value = '';
+ }
+ }
+
+ function updateDiaryDateRange(resetDate) {
+ const option = departureSelect.options[departureSelect.selectedIndex];
+ const startDate = option && option.dataset.startDate ? option.dataset.startDate : '';
+ const endDate = option && option.dataset.endDate ? option.dataset.endDate : '';
+
+ diaryDate.min = startDate;
+ diaryDate.max = endDate;
+
+ if (!startDate) {
+ diaryDate.value = '';
+ diaryDate.disabled = true;
+ dateHelp.textContent = 'Vui lòng chọn chuyến khởi hành trước.';
+ return;
+ }
+
+ diaryDate.disabled = false;
+ dateHelp.textContent = 'Chỉ được ghi nhật ký từ ' + startDate.split('-').reverse().join('/') + ' đến ' + endDate.split('-').reverse().join('/') + '.';
+
+ if (resetDate || !diaryDate.value || diaryDate.value < startDate || diaryDate.value > endDate) {
+ diaryDate.value = startDate;
+ }
+ }
+
+ departureSelect.addEventListener('change', function () {
+ updateDiaryDateRange(true);
+ updateTimelineOptions();
+ });
+ timelineSelect.addEventListener('change', function () {
+ const option = timelineSelect.options[timelineSelect.selectedIndex];
+ if (option && option.dataset.logDate) diaryDate.value = option.dataset.logDate;
+ });
+ updateDiaryDateRange(false);
+ updateTimelineOptions();
+ })();
+</script>
+
+<?php $this->stopSection(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->runChild('layouts.hdv'); } ?>
