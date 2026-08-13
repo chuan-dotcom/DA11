@@ -4,7 +4,7 @@
 
 @section('content')
 <style>
-    .uf-page {
+    .uf-page {                                                              
         max-width: 1400px;
         margin-left: auto;
         margin-right: auto;

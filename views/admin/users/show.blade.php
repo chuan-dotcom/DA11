@@ -3,7 +3,7 @@
 @section('title', ($pageTitle ?? 'Quản lý tài khoản') . ' - ' . $title)
 
 @section('content')
-<style>
+<style>                                              
     .us-page {
         max-width: 1400px;
         margin-left: auto;

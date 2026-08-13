@@ -6,7 +6,7 @@
     <div class="mb-4">
         <h1 class="h3 fw-bold mb-2">Đăng ký tài khoản</h1>
         <p class="auth-muted mb-0">Tạo tài khoản người dùng mới để sử dụng hệ thống.</p>
-    </div>
+    </div>                                                
 
     <form action="{{ route('auth/register') }}" method="POST">
         <div class="mb-3">

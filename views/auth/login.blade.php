@@ -5,7 +5,7 @@
 @section('content')
     <div class="mb-4">
         <h1 class="h3 fw-bold mb-2">Đăng nhập</h1>
-    </div>
+    </div>                                                           
 
     <form action="{{ route('auth/login') }}" method="POST">
         <div class="mb-3">

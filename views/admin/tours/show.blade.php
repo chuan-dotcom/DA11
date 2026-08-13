@@ -3,7 +3,7 @@
 @section('title', $title)
 
 @section('content')
-<style>                     
+<style>                                              
     .tour-detail-card {
         border: 1px solid #e8e8e8;
         border-radius: 12px;

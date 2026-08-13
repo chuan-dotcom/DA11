@@ -6,7 +6,7 @@
 
 <div class="mb-3">
     <h4 class="fw-bold text-dark mb-1">Thông tin tour đã được phân bổ</h4>
-</div>
+</div>                                                                    
 
 <!-- Tour được phân công Table Card (Matching Screenshot 2) -->
 <div class="hdv-card mb-4">

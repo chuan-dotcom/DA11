@@ -3,7 +3,7 @@
 @section('title', $pageTitle . ' - ' . $title)
 
 @section('content')
-<style>
+<style>                                                               
     :root {
         --um-primary: #2563eb;
         --um-primary-soft: rgba(37, 99, 235, 0.1);
