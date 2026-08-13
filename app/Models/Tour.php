@@ -1,0 +1,183 @@
+<?php
+namespace App\Models;
+
+use App\Model;
+                
+class Tour extends Model{ 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->ensureLocationColumn();
+        $this->ensureMaxParticipantsColumn();
+    }
+
+    private function ensureLocationColumn()
+    {
+        try {
+            $column = $this->connection->fetchAssociative(
+                'SHOW COLUMNS FROM tours LIKE ?',
+                ['location']
+            );
+
+            if (!$column) {
+                $this->connection->executeStatement(
+                    "ALTER TABLE tours ADD COLUMN location VARCHAR(255) NULL AFTER duration"
+                );
+            }
+        } catch (\Throwable $e) {
+        }
+    }
+
+    private function ensureMaxParticipantsColumn()
+    {
+        try {
+            $column = $this->connection->fetchAssociative(
+                'SHOW COLUMNS FROM tours LIKE ?',
+                ['max_participants']
+            );
+
+            if (!$column) {
+                $this->connection->executeStatement(
+                    "ALTER TABLE tours ADD COLUMN max_participants INT NOT NULL DEFAULT 0 AFTER location"
+                );
+            }
+        } catch (\Throwable $e) {
+        }
+    }
+
+    public function getAll() {
+        $stmt=$this->connection->createQueryBuilder();
+        $stmt->select('t.*', 'tc.name as category_name')
+            ->from('tours', 't')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->orderBy('t.id', 'DESC');
+        
+        return $stmt->fetchAllAssociative();
+    }
+
+    public function findByid($id) {
+        $stmt=$this->connection->createQueryBuilder();
+        $stmt->select('t.*', 'tc.name as category_name')
+            ->from('tours', 't')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->where('t.id = :id')
+            ->setParameter('id', $id);
+        
+        return $stmt->fetchAssociative();
+    }
+
+    public function delete($id) {
+        $tour = $this->findByid($id);
+        $deleted = $this->connection->delete('tours', ['id'=>$id]);
+
+        if ($deleted && $tour && $tour['image'] && file_exists($tour['image'])) {
+            unlink($tour['image']);
+        }
+
+        return $deleted;
+    }
+
+    public function insert($data) {
+        return $this->connection->insert('tours',[
+            'name' =>$data['name'],
+            'category_id' =>$data['category_id'],
+            'price' =>$data['price'],
+            'duration' =>$data['duration'],
+            'location' =>$data['location'] ?? null,
+            'max_participants' => !empty($data['max_participants']) ? (int)$data['max_participants'] : 0,
+            'description' =>$data['description'],
+            'image' =>$data['image'],
+            'status' =>$data['status'],
+        ]);
+    }
+
+    public function update($id, $data){
+        return $this->connection->update('tours',[
+            'name' =>$data['name'],
+            'category_id' =>$data['category_id'],
+            'price' =>$data['price'],
+            'duration' =>$data['duration'],
+            'location' =>$data['location'] ?? null,
+            'max_participants' => !empty($data['max_participants']) ? (int)$data['max_participants'] : 0,
+            'description' =>$data['description'],
+            'image' =>$data['image'],
+            'status' =>$data['status'],
+        ], ['id'=>$id]);
+    }
+
+    // Các hàm thống kê
+    public function getTotalTours() {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('COUNT(id) as total_tours')->from('tours');
+
+        return (int) ($stmt->fetchAssociative()['total_tours'] ?? 0);
+    }
+
+    public function getTotalActiveTours() {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('COUNT(id) as total_active_tours')
+            ->from('tours')
+            ->where('status = :status')
+            ->setParameter('status', 1);
+
+        return (int) ($stmt->fetchAssociative()['total_active_tours'] ?? 0);
+    }
+
+    public function getTotalHiddenTours() {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('COUNT(id) as total_hidden_tours')
+            ->from('tours')
+            ->where('status = :status')
+            ->setParameter('status', 0);
+
+        return (int) ($stmt->fetchAssociative()['total_hidden_tours'] ?? 0);
+    }
+
+    public function getMostExpensiveTour() {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('t.*', 'tc.name as category_name')
+            ->from('tours', 't')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->orderBy('t.price', 'DESC')
+            ->setMaxResults(1);
+
+        return $stmt->fetchAssociative();
+    }
+
+    public function getCheapestTour() {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('t.*', 'tc.name as category_name')
+            ->from('tours', 't')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->orderBy('t.price', 'ASC')
+            ->setMaxResults(1);
+
+        return $stmt->fetchAssociative();
+    }
+
+    public function getTotalPrice() {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('SUM(price) as total_price')->from('tours');
+        return $stmt->fetchAssociative()['total_price'] ?? 0;
+    }
+
+    public function getToursByCategory() {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('c.name as category_name', 'COUNT(t.id) as tour_count')
+             ->from('tour_categories', 'c')
+             ->leftJoin('c', 'tours', 't', 'c.id = t.category_id')
+             ->groupBy('c.id');
+        return $stmt->fetchAllAssociative();
+    }
+
+    public function getLatestTours($limit = 5) {
+        $stmt = $this->connection->createQueryBuilder();
+        $stmt->select('t.*', 'tc.name as category_name')
+            ->from('tours', 't')
+            ->leftJoin('t', 'tour_categories', 'tc', 'tc.id = t.category_id')
+            ->orderBy('t.id', 'DESC')
+            ->setMaxResults((int) $limit);
+
+        return $stmt->fetchAllAssociative();
+    }
+}
