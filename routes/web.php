@@ -48,7 +48,7 @@ $router->before('GET|POST', '/admin.*', function () {
         redirect('auth/account');
     }
 });
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
 $router->before('GET|POST', '/hdv.*', function () {
     if (!Auth::check()) {
         setFlash('error', 'Vui lòng đăng nhập để tiếp tục.');

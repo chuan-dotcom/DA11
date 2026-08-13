@@ -152,3 +152,8 @@ class User extends Model
         return (int) ($stmt->fetchAssociative()['count'] ?? 0) > 0;
     }
 }
+                                                                                                                                  
+                                                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                      
+                                                                                                                                                         
