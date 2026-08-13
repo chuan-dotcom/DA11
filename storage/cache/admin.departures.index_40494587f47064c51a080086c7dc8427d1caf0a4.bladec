@@ -8,7 +8,7 @@
  .status-in_progress { background-color: #ffc107; color: #000; }
  .status-completed { background-color: #198754; }
  .status-cancelled { background-color: #6c757d; }
- .stat-card {
+ .stat-card {                       
  border-radius: 10px;
  border: none;
  box-shadow: 0 2px 8px rgba(0,0,0,0.06);

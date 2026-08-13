@@ -1,6 +1,6 @@
 <?php 
 namespace App;
-
+                           
 class Controller
 {
     public function validate($validator, $data, $rules)        

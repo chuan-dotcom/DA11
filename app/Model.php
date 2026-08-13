@@ -6,7 +6,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception;
 
 class Model
-{
+{                   
     protected $connection;
 
     public function __construct()

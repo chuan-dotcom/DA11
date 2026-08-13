@@ -2,7 +2,7 @@
 namespace App\Models;
 
 use App\Model;
-  
+                
 class Tour extends Model{ 
     public function __construct()
     {

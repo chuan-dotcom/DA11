@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Model;
-  
+         
 class StaffAssignment extends Model
 {
     public function getAll()       

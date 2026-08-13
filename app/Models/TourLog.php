@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Model;
-
+                    
 class TourLog extends Model
 {
     public function __construct()
